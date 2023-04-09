@@ -1,0 +1,24 @@
+{
+  "compilerOptions": {
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "dom.asynciterable",
+      // https://deno.land/manual@v1.32.2/advanced/typescript/configuration#using-the-lib-property
+      "deno.ns" // For build scripts
+    ]
+  },
+  "lint": {
+    "files": {
+      "exclude": [
+        "www/dist"
+      ]
+    }
+  },
+  "importMap": "./import_map.json",
+  "tasks": {
+    "esm:add": "deno run -A https://esm.sh/v113 add",
+    "esm:update": "deno run -A https://esm.sh/v113 update",
+    "esm:remove": "deno run -A https://esm.sh/v113 remove"
+  }
+}
