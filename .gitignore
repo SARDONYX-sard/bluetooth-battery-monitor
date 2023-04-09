@@ -2,3 +2,5 @@ target
 WixTools
 dist
 **/node_modules/
+
+devices.json
