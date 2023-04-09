@@ -1,0 +1,56 @@
+{
+  "[jsonc]": {
+    "editor.defaultFormatter": "vscode.json-language-features"
+  },
+  "[markdown]": {
+    "editor.codeActionsOnSave": {
+      "source.fixAll.markdownlint": true
+    },
+    "editor.defaultFormatter": "DavidAnson.vscode-markdownlint",
+    "editor.padding.bottom": 250,
+    "editor.quickSuggestions": {
+      "comments": false,
+      "other": true,
+      "strings": false
+    },
+    "editor.scrollBeyondLastLine": false
+  },
+  "[rust]": {
+    "editor.formatOnSave": true
+  },
+  "deno.enable": true,
+  "deno.importMap": "./import_map.json",
+  "deno.inlayHints.parameterNames.enabled": "all",
+  "deno.inlayHints.variableTypes.enabled": true,
+  "deno.inlayHints.enumMemberValues.enabled": true,
+  "deno.inlayHints.functionLikeReturnTypes.enabled": true,
+  "deno.inlayHints.parameterTypes.enabled": true,
+  "editor.formatOnSave": true,
+  "files.exclude": {
+    "**/.dccache": true,
+    "**/.DS_Store": true,
+    "**/.gdb_history": true,
+    "**/.git": true,
+    "**/target": true
+  },
+  "files.watcherExclude": {
+    "**/.DS_Store": true,
+    "**/.dccache": true,
+    "**/.gdb_history": true,
+    "**/.git": true,
+    "**/dist": true,
+    "**/node_modules": true,
+    "**/target": true,
+  },
+  "git.autoRepositoryDetection": false,
+  "git.ignoreLimitWarning": true,
+  "markdownlint.config": {
+    "default": true,
+    "MD024": false,
+    "MD025": false,
+    "MD033": false,
+    "no-hard-tabs": false
+  },
+  "rust-analyzer.check.command": "clippy",
+  "rust-analyzer.rustfmt.rangeFormatting.enable": true,
+}
