@@ -1,12 +1,12 @@
 {
   "build": {
-    "beforeBuildCommand": "deno run -A build.ts",
-    "beforeDevCommand": "deno run -A bundle.ts",
+    "beforeBuildCommand": "deno run -A ./bundle.ts --release",
+    "beforeDevCommand": "deno run -A ./bundle.ts --dev",
     "devPath": "http://localhost:3000",
     "distDir": "../www"
   },
   "package": {
-    "productName": "tauri-deno-starter",
+    "productName": "bluetooth battery monitor",
     "version": "0.1.0"
   },
   "tauri": {
@@ -46,6 +46,10 @@
         "timestampUrl": ""
       }
     },
+    "systemTray": {
+      "iconPath": "icons/icon.png",
+      "iconAsTemplate": true
+    },
     "security": {
       "csp": null
     },
@@ -57,7 +61,7 @@
         "fullscreen": false,
         "height": 600,
         "resizable": true,
-        "title": "Tauri Deno Starter",
+        "title": "bluetooth battery monitor",
         "width": 800
       }
     ]
