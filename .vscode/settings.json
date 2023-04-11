@@ -53,4 +53,9 @@
   },
   "rust-analyzer.check.command": "clippy",
   "rust-analyzer.rustfmt.rangeFormatting.enable": true,
+  "rust-analyzer.inlayHints.lifetimeElisionHints.enable": "skip_trivial",
+  "rust-analyzer.inlayHints.lifetimeElisionHints.useParameterNames": true,
+  "rust-analyzer.diagnostics.disabled": [
+    "unresolved-proc-macro"
+  ] // For rust-js-interval test error
 }
