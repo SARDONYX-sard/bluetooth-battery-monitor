@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react/";
 import { tw } from "twind";
+import { clsx } from "clsx";
 
 import {
   DeviceJson,
@@ -43,7 +44,10 @@ export default function App() {
   return (
     <section>
       <div
-        className={tw`grid grid-cols-2 place-items-stretch fixed w-full py-4 glass`}
+        className={clsx(
+          tw`grid grid-cols-2 place-items-stretch fixed w-full py-4`,
+          "glass"
+        )}
       >
         <Button callback={getBatteryInfo} idleText="Update info" />
         <Button callback={pollingInterval} idleText="Interval battery" />
@@ -58,7 +62,10 @@ export default function App() {
 
           return (
             <button
-              className={tw`grid grid-flow-row-dense grid-cols-1 gap-1 w-11/12 rounded-3xl py-3 glass`}
+              className={clsx(
+                tw`grid grid-flow-row-dense grid-cols-1 gap-1 w-11/12 rounded-3xl py-3`,
+                "glass"
+              )}
               style={bgColor}
               key={device.instance_id}
               value={device.instance_id}
