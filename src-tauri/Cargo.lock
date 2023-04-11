@@ -146,6 +146,7 @@ name = "bluetooth-battery-monitor"
 version = "0.1.0"
 dependencies = [
  "bincode",
+ "once_cell",
  "serde",
  "serde_json",
  "tauri",
