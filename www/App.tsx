@@ -22,15 +22,23 @@ export default function App() {
   }, []);
 
   async function getBatteryInfo() {
-    await get_bluetooth_info_all((json_array) => {
-      setResult(json_array);
-      localStorage.setItem("bluetooth-info-all", JSON.stringify(json_array));
-    });
+    try {
+      await get_bluetooth_info_all((json_array) => {
+        setResult(json_array);
+        localStorage.setItem("bluetooth-info-all", JSON.stringify(json_array));
+      });
+    } catch (error) {
+      console.error(error);
+    }
   }
 
   async function pollingInterval() {
-    const duration_time = 10; // * 60;
-    await update_info_interval(selectedDeviceId, duration_time);
+    try {
+      const duration_time = 10; // * 60;
+      await update_info_interval(selectedDeviceId, duration_time);
+    } catch (error) {
+      console.error(error);
+    }
   }
 
   const selectDevice: React.MouseEventHandler<HTMLButtonElement> = (e) => {
