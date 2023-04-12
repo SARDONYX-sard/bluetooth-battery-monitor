@@ -15,21 +15,21 @@ pub fn tray_event(app: &AppHandle, event: SystemTrayEvent) {
             size: _,
             ..
         } => {
-            println!("system tray received a left click");
+            info!("Left click");
         }
         SystemTrayEvent::RightClick {
             position: _,
             size: _,
             ..
         } => {
-            println!("system tray received a right click");
+            info!("Right click");
         }
         SystemTrayEvent::DoubleClick {
             position: _,
             size: _,
             ..
         } => {
-            println!("system tray received a double click");
+            info!("Double click");
         }
         SystemTrayEvent::MenuItemClick { id, .. } => match id.as_str() {
             "toggle_window" => {
@@ -54,33 +54,22 @@ pub fn tray_event(app: &AppHandle, event: SystemTrayEvent) {
 }
 
 pub async fn update_tray_icon(app: &AppHandle, battery_level: u8) {
-    println!("Enter change icon");
-    match battery_level {
-        1..=25 => {
-            app.tray_handle()
-                .set_icon(tauri::Icon::Raw(
-                    include_bytes!("../icons/battery/Graphicloads-100-Flat-2-Battery-low.256.png")
-                        .to_vec(),
-                ))
-                .unwrap();
-        }
-        26..=50 => {
-            app.tray_handle()
-                .set_icon(tauri::Icon::Raw(
-                    include_bytes!("../icons/battery/Graphicloads-100-Flat-2-Battery-half.256.png")
-                        .to_vec(),
-                ))
-                .unwrap();
-        }
-        51..=100 => {
-            println!("change to full icon");
-            app.tray_handle()
-                .set_icon(tauri::Icon::Raw(
-                    include_bytes!("../icons/battery/Graphicloads-100-Flat-2-Battery-full.256.png")
-                        .to_vec(),
-                ))
-                .unwrap();
-        }
+    debug!("Change to {} battery icon", battery_level);
+    let battery_icon = match battery_level {
+        0 => include_bytes!("../icons/battery/battery-0.png").to_vec(),
+        1..=10 => include_bytes!("../icons/battery/battery-10.png").to_vec(),
+        11..=20 => include_bytes!("../icons/battery/battery-20.png").to_vec(),
+        21..=30 => include_bytes!("../icons/battery/battery-30.png").to_vec(),
+        31..=40 => include_bytes!("../icons/battery/battery-40.png").to_vec(),
+        41..=50 => include_bytes!("../icons/battery/battery-50.png").to_vec(),
+        51..=60 => include_bytes!("../icons/battery/battery-60.png").to_vec(),
+        61..=70 => include_bytes!("../icons/battery/battery-70.png").to_vec(),
+        71..=80 => include_bytes!("../icons/battery/battery-80.png").to_vec(),
+        81..=90 => include_bytes!("../icons/battery/battery-90.png").to_vec(),
+        91..=100 => include_bytes!("../icons/battery/battery-100.png").to_vec(),
         _ => unreachable!(),
-    }
+    };
+    app.tray_handle()
+        .set_icon(tauri::Icon::Raw(battery_icon))
+        .unwrap();
 }
