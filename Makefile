@@ -1,7 +1,11 @@
 default: dev
 
+# info|debug|error(default: debug)
+LOG_LEVEL?=debug
+
 dev:
-	cargo tauri dev
+	@echo "develop mode: log level(${LOG_LEVEL})"
+	@export RUST_LOG=${LOG_LEVEL} && cargo tauri dev
 
 build:
 	deno run -A ./bundle.ts --build

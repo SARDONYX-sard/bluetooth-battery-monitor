@@ -1,5 +1,6 @@
 use std::{fmt::Display, os::windows::process::CommandExt, process::Command};
 
+use anyhow::Result;
 use serde::{ser::SerializeStruct, Deserialize, Serialize};
 use serde_json::Value;
 use windows::{
@@ -326,7 +327,7 @@ struct SystemTime {
     milliseconds: u16,
 }
 
-pub fn get_bluetooth_device_info() -> windows::core::Result<Vec<BluetoothDeviceInfo>> {
+pub fn get_bluetooth_device_info() -> Result<Vec<BluetoothDeviceInfo>> {
     // See: https://learn.microsoft.com/windows/win32/api/bluetoothapis/ns-bluetoothapis-bluetooth_device_search_params
     let search_params: BLUETOOTH_DEVICE_SEARCH_PARAMS = BLUETOOTH_DEVICE_SEARCH_PARAMS {
         // size of the structure (in bytes).
@@ -358,7 +359,7 @@ pub fn get_bluetooth_device_info() -> windows::core::Result<Vec<BluetoothDeviceI
     let search_handle = match unsafe { BluetoothFindFirstDevice(&search_params, &mut device_info) }
     {
         Ok(search_handle) => match search_handle.is_invalid() {
-            true => return Err(windows::core::Error::from_win32()),
+            true => return Err(windows::core::Error::from_win32().into()),
             false => search_handle,
         },
         Err(_) => panic!("Couldn't get first device."),
@@ -368,7 +369,7 @@ pub fn get_bluetooth_device_info() -> windows::core::Result<Vec<BluetoothDeviceI
     loop {
         match unsafe { BluetoothGetDeviceInfo(HANDLE(search_handle.0), &mut device_info) } {
             result if result != 0 => {
-                eprintln!("Error code: {}", result);
+                error!("Error code: {}", result);
                 break;
             }
             result => result,

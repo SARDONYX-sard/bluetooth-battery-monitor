@@ -6,7 +6,7 @@
     "distDir": "../www"
   },
   "package": {
-    "productName": "bluetooth battery monitor",
+    "productName": "Bluetooth Battery Monitor",
     "version": "0.1.0"
   },
   "tauri": {
@@ -62,7 +62,9 @@
         "height": 600,
         "resizable": true,
         "title": "bluetooth battery monitor",
-        "width": 800
+        "width": 800,
+        "theme": "Dark",
+        "visible": false
       }
     ]
   }

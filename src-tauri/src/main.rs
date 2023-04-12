@@ -8,10 +8,16 @@ mod system_tray;
 mod utils;
 mod window_menu;
 
+#[macro_use]
+extern crate log;
+
 use system_tray::{create_system_tray, tray_event};
 use window_menu::{create_menu, menu_event};
 
 fn main() {
+    env_logger::init();
+
+    info!("Entering tauri builder");
     tauri::Builder::default()
         .system_tray(create_system_tray())
         .on_system_tray_event(tray_event)

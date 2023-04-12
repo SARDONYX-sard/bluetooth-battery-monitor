@@ -4,6 +4,7 @@ use std::sync::Arc;
 use std::time::Duration;
 use std::{future::Future, sync::atomic::AtomicBool};
 
+use anyhow::Result;
 use once_cell::sync::Lazy;
 use serde_json::{json, Value};
 use tauri::async_runtime::JoinHandle;
@@ -12,9 +13,6 @@ use tokio::{
     sync::{mpsc, Mutex, OnceCell},
     time::interval,
 };
-
-use crate::commands::bluetooth;
-use crate::system_tray::update_tray_icon;
 
 #[tauri::command]
 pub async fn update_info_interval(
@@ -34,42 +32,18 @@ pub async fn update_info_interval(
             let app = app.clone();
             let tx = tx.clone();
             Box::pin(async move {
-                match bluetooth::get_bluetooth_info(instance_id.as_str()) {
-                    Ok(v) => {
-                        println!("{}", &v);
-                        let default_value = json!(0);
-                        let battery_level = v.get("battery_level").unwrap_or(&default_value);
-                        update_tray_icon(
-                            &app.clone(),
-                            battery_level.as_u64().expect("Failed to convert u64") as u8,
-                        )
-                        .await;
-                        tx.send(v).await.unwrap();
-                        // v
-                    }
-                    Err(err) => {
-                        tx.send(json!({ "error": err })).await.unwrap();
-                        // json!({ "error": err })
-                    }
-                };
+                super::bluetooth::sys::get_bluetooth_info(instance_id.as_str());
             })
         },
         duration,
     )
     .await;
 
-    async {
-        loop {
-            if is_running_interval().await {
-                let json_val = rx.recv().await.unwrap();
-                return Ok(json_val);
-            } else {
-                break;
-            };
-        }
-        Ok(json!(0))
-    }
-    .await
+    if is_running_interval().await {
+        let json_val = rx.recv().await.unwrap();
+        return Ok(json_val);
+    };
+    Ok(json!(0))
 }
 
 // Define a struct to hold the state of the interval process
@@ -100,9 +74,8 @@ impl IntervalProcess {
                 if !running.load(Ordering::Relaxed) {
                     break;
                 }
-                callback().await;
-                // let t = callback().await;
-                // println!("{:?}", t);
+                let res = callback().await;
+                debug!("Interval callback  res: {:?}", res);
             }
         }));
         self.running.store(true, Ordering::Relaxed);
