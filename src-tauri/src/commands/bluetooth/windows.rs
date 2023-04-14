@@ -20,15 +20,16 @@ type SysBluetoothDeviceInfo = windows::Win32::Devices::Bluetooth::BLUETOOTH_DEVI
 const CREATE_NO_WINDOW: u32 = 0x08000000;
 
 pub fn get_bluetooth_info(instance_id: &str) -> Result<Value, serde_json::Error> {
+    let script_str = &format!(
+        "\n$InstanceId = \"{}\";{}",
+        instance_id,
+        include_str!("../../../scripts/get-bluetooth-battery.ps1")
+    );
+
+    debug!("{}", script_str);
+
     let output = Command::new("powershell.exe")
-        .args([
-            "-ExecutionPolicy",
-            "ByPass",
-            "-File",
-            "./scripts/get-bluetooth-battery.ps1",
-            "-InstanceId",
-            instance_id,
-        ])
+        .args(["-ExecutionPolicy", "ByPass", "-Command", script_str])
         .creation_flags(CREATE_NO_WINDOW)
         .output()
         .expect("Failed to spawn powershell command");
@@ -51,8 +52,8 @@ pub fn get_bluetooth_info_all() -> Result<Value, serde_json::Error> {
         .args([
             "-ExecutionPolicy",
             "ByPass",
-            "-File",
-            "./scripts/get-bluetooth-battery-all.ps1",
+            "-Command",
+            include_str!("../../../scripts/get-bluetooth-battery-all.ps1"),
         ])
         .creation_flags(CREATE_NO_WINDOW)
         .output()
