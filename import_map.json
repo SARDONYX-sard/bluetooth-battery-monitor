@@ -1,6 +1,6 @@
 {
   "imports": {
-    "twind": "https://cdn.skypack.dev/twind",
+    "twind": "https://cdn.skypack.dev/twind@0.16.19",
     "@tauri-apps/api": "https://esm.sh/v113/@tauri-apps/api@1.2.0",
     "@tauri-apps/api/": "https://esm.sh/v113/@tauri-apps/api@1.2.0/",
     "clsx": "https://esm.sh/v113/clsx@1.2.1",

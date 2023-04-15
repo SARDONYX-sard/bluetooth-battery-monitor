@@ -6,6 +6,7 @@ type StorageData<T> = {
 };
 
 /**
+ *
  * @export
  * @param {string} key
  * @param {*} value
@@ -15,7 +16,10 @@ export async function write_data<T>(key: string, value: T) {
 }
 
 /**
- * @param key
+ * @param {string} key - key to store
+ *
+ * - NOTE:
+ *  JSON.parse() is not necessary and can be used as an object immediately by casting with as.
  */
 export async function read_data<T>(key: string) {
   let res;

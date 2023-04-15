@@ -45,3 +45,93 @@ body {
   box-shadow: rgb(0 0 0 / 65%) 20px 20px 60px, rgb(0 0 0 / 50%) -20px -20px 60px;
   background-color: #121212a6;
 }
+
+.animate {
+  transition: all 0.5s ease;
+}
+
+.animate.left-move {
+  left: 100%;
+  transform: translate(-100%, 0);
+}
+
+.animate.right-move {
+  right: 100%;
+  transform: translate(100%, 0);
+}
+
+.animate.top-move {
+  top: 100%;
+  transform: translate(0, -100%);
+}
+
+.animate.bottom-move {
+  bottom: 100%;
+  transform: translate(0, 100%);
+}
+
+.translate-x-9999 {
+  transform: translate(9999px, 0);
+}
+
+.hidden {
+  display: none;
+}
+
+.form-input {
+  background-color: #a1adb738;
+}
+
+.switch-label {
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 30px;
+}
+
+.switch-input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.switch-span {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: #515561;
+  transition: 0.3s;
+  border-radius: 30px;
+}
+
+.switch-span:before {
+  position: absolute;
+  content: "";
+  height: 25px;
+  width: 25px;
+  left: 3px;
+  bottom: 2.6px;
+  background-color: #f0f0eef1;
+  border-radius: 50%;
+  transition: 0.3s;
+}
+
+.switch-input:checked + span {
+  background-color: #64afd1;
+}
+
+.switch-input:checked + span:before {
+  transform: translateX(29px);
+}
+
+.switch-strong {
+  position: absolute;
+  left: 100%;
+  width: max-content;
+  line-height: 30px;
+  margin-left: 10px;
+  cursor: pointer;
+}
