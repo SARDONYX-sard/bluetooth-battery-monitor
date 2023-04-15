@@ -47,7 +47,7 @@ export async function get_bluetooth_info<T, U extends DeviceJson>(
   fn: (json_array: U) => T
 ) {
   const json_array = await invoke<U>("get_bluetooth_info", {
-    instance_id: instanceId,
+    instanceId,
   });
   return fn(json_array);
 }

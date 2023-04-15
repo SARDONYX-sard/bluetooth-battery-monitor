@@ -3,12 +3,11 @@ use serde_json::Value;
 use tauri::AppHandle;
 
 #[cfg(target_os = "windows")]
-pub mod windows;
+mod windows;
 #[cfg(target_os = "windows")]
-pub use self::windows as sys;
+use self::windows as sys;
 
-use super::storage::write_data;
-use crate::system_tray::update_tray_icon;
+use crate::{commands::storage::write_data, system_tray::update_tray_icon};
 
 #[tauri::command]
 pub async fn get_bluetooth_info(app: AppHandle, instance_id: &str) -> Result<Value, tauri::Error> {
@@ -30,15 +29,23 @@ pub async fn get_bluetooth_info(app: AppHandle, instance_id: &str) -> Result<Val
     }
 }
 
-#[tauri::command(async)]
-pub fn get_bluetooth_info_all() -> Result<Value, String> {
-    let v = sys::get_bluetooth_info_all();
-    match v {
-        Ok(v) => {
-            write_data("device_info", v.clone());
-            debug!("Device_info all Json: {}", v);
-            Ok(v)
+#[tauri::command]
+pub async fn get_bluetooth_info_all() -> Result<Value, tauri::Error> {
+    match sys::get_bluetooth_info_all() {
+        Ok(devices_json) => {
+            debug!("Devices_info Json: {}", devices_json);
+            Ok(devices_json)
         }
-        Err(err) => Err(err.to_string()),
+        Err(err) => Err(err.into()),
+    }
+}
+
+pub fn get_bluetooth_info_all_() -> Result<Value> {
+    match sys::get_bluetooth_info_all() {
+        Ok(devices_json) => {
+            debug!("Devices_info Json: {}", devices_json);
+            Ok(devices_json)
+        }
+        Err(err) => Err(err.into()),
     }
 }
