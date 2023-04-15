@@ -90,6 +90,15 @@ fn main() {
 fn window_event(event: tauri::GlobalWindowEvent) {
     if let tauri::WindowEvent::CloseRequested { api, .. } = event.event() {
         event.window().hide().expect("Failed to hide window.");
+        let tray_toggle_window = event
+            .window()
+            .app_handle()
+            .tray_handle()
+            .get_item("toggle_window");
+        tray_toggle_window
+            .set_title("show")
+            .expect("Couldn't set hide title in system tray");
+
         api.prevent_close();
     }
 }
