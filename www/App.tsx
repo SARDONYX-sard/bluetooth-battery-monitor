@@ -9,19 +9,23 @@ import {
 } from "./commands/bluetooth.ts";
 import { update_info_interval } from "./commands/timer.ts";
 import { Button } from "./components/button.tsx";
+import { read_data, write_data } from "./commands/storage.ts";
 
 export default function App() {
   const [result, setResult] = useState<DeviceJson[] | []>([]);
   const [selectedDeviceId, setSelectedDeviceId] = useState("");
 
   useEffect(() => {
-    const cache = localStorage.getItem("bluetooth-info-all");
-    const cacheId = localStorage.getItem("selected-device-id");
-    cache && setResult(JSON.parse(cache) as DeviceJson[]);
-    cacheId && setSelectedDeviceId(JSON.parse(cacheId));
+    (async () => {
+      const cache = await read_data<DeviceJson[]>("device_info");
+      console.log(cache);
+      const cacheId = await read_data<string>("selected_device_id");
+      cache && setResult(cache);
+      cacheId && setSelectedDeviceId(cacheId);
+    })();
   }, []);
 
-  async function getBatteryInfo() {
+  async function getBatteryInfo_all() {
     try {
       await get_bluetooth_info_all((json_array) => {
         setResult(json_array);
@@ -32,21 +36,20 @@ export default function App() {
     }
   }
 
-  async function pollingInterval() {
-    try {
-      const duration_time = 10; // * 60;
-      await update_info_interval(selectedDeviceId, duration_time);
-    } catch (error) {
-      console.error(error);
-    }
+  async function updateSystemTrayInterval() {
+    const duration_time = 10;
+    await update_info_interval(duration_time); // write battery info by backend
+    setInterval(async () => {
+      const cacheId = await read_data<string>("selected_device_id");
+      if (cacheId) {
+        setSelectedDeviceId(cacheId);
+      }
+    });
   }
 
   const selectDevice: React.MouseEventHandler<HTMLButtonElement> = (e) => {
     setSelectedDeviceId(e.currentTarget.value);
-    localStorage.setItem(
-      "selected-device-id",
-      JSON.stringify(e.currentTarget.value)
-    );
+    write_data("selected_device_id", e.currentTarget.value);
   };
 
   return (
@@ -57,14 +60,17 @@ export default function App() {
           "glass"
         )}
       >
-        <Button callback={getBatteryInfo} idleText="Update info" />
-        <Button callback={pollingInterval} idleText="Interval battery" />
+        <Button callback={getBatteryInfo_all} idleText="Update info" />
+        <Button
+          callback={updateSystemTrayInterval}
+          idleText="Interval battery"
+        />
       </div>
 
       <div className={tw`grid gap-8 place-items-center pt-24 pb-5`}>
         {result.map((device) => {
           const bgColor =
-            device.instance_id === selectedDeviceId
+            device.bluetooth_address === selectedDeviceId
               ? ({ backgroundColor: "#000000bf" } as const)
               : undefined;
 
@@ -76,7 +82,7 @@ export default function App() {
               )}
               style={bgColor}
               key={device.instance_id}
-              value={device.instance_id}
+              value={device.bluetooth_address}
               onClick={selectDevice}
             >
               {Object.keys(device).map((key) => {

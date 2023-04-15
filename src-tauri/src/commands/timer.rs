@@ -1,49 +1,62 @@
 use std::pin::Pin;
-use std::sync::atomic::Ordering;
-use std::sync::Arc;
+use std::sync::{atomic::Ordering, Arc};
 use std::time::Duration;
 use std::{future::Future, sync::atomic::AtomicBool};
 
-use anyhow::Result;
 use once_cell::sync::Lazy;
-use serde_json::{json, Value};
 use tauri::async_runtime::JoinHandle;
 use tauri::AppHandle;
-use tokio::{
-    sync::{mpsc, Mutex, OnceCell},
-    time::interval,
-};
+use tokio::sync::{Mutex, OnceCell};
+use tokio::time::interval;
+
+use crate::system_tray::update_tray_icon;
+
+use super::bluetooth::get_bluetooth_info_all_;
+use super::storage::read_data;
 
 #[tauri::command]
-pub async fn update_info_interval(
-    app: AppHandle,
-    instance_id: &str,
-    duration: u64,
-) -> Result<Value, tauri::Error> {
-    let (tx, mut rx) = mpsc::channel(10);
-    let duration = Duration::from_secs(duration); // milliseconds to seconds
-    let instance_id = instance_id.to_owned();
+pub async fn update_info_interval(app: AppHandle, duration_sec: u64) {
+    let duration = Duration::from_secs(duration_sec); // milliseconds to seconds
 
     clear_interval().await;
 
     set_interval(
         move || {
-            let instance_id = instance_id.clone();
             let app = app.clone();
-            let tx = tx.clone();
+            let devices_info = get_bluetooth_info_all_()
+                .unwrap()
+                .as_array()
+                .expect("Not found devices")
+                .to_owned();
+            let first_device = devices_info[0].get("bluetooth_address").unwrap().clone();
             Box::pin(async move {
-                super::bluetooth::sys::get_bluetooth_info(instance_id.as_str());
+                let selected_device_id = match read_data("selected_device_id") {
+                    Ok(device) => match device.status {
+                        true => device.data,
+                        false => {
+                            warn!("Not selected_device file. So fallback to first device.");
+                            first_device
+                        }
+                    },
+                    Err(err) => {
+                        warn!("Not selected_device file.So fallback to first device: {err}");
+                        first_device
+                    }
+                };
+                debug!("Selected device: {}", selected_device_id);
+                let selected_device_info = devices_info
+                    .iter()
+                    .find(|device| device.get("bluetooth_address") == Some(&selected_device_id));
+                let battery_level = selected_device_info
+                    .expect("Not found selected device")
+                    .get("battery_level")
+                    .expect("Couldn't found battery level");
+                update_tray_icon(&app, battery_level.as_u64().unwrap() as u8).await;
             })
         },
         duration,
     )
     .await;
-
-    if is_running_interval().await {
-        let json_val = rx.recv().await.unwrap();
-        return Ok(json_val);
-    };
-    Ok(json!(0))
 }
 
 // Define a struct to hold the state of the interval process
@@ -61,9 +74,9 @@ impl IntervalProcess {
     }
 
     // Start the interval process with the given callback and interval duration
-    fn start<F, T>(&mut self, callback: F, duration: Duration)
+    fn start<F, T>(&mut self, mut callback: F, duration: Duration)
     where
-        F: Fn() -> Pin<Box<dyn Future<Output = T> + Send + 'static>> + Send + 'static + Sync,
+        F: FnMut() -> Pin<Box<dyn Future<Output = T> + Send + 'static>> + Send + 'static + Sync,
         T: std::fmt::Debug,
     {
         let running = self.running.clone();
@@ -98,19 +111,10 @@ fn get_or_init_interval<'a>() -> impl Future<Output = &'a Arc<Mutex<IntervalProc
     INTERVAL_PROCESS.get_or_init(|| async { Arc::new(Mutex::new(IntervalProcess::new())) })
 }
 
-async fn is_running_interval() -> bool {
-    get_or_init_interval()
-        .await
-        .lock()
-        .await
-        .running
-        .load(Ordering::Relaxed)
-}
-
 // Define the setInterval and clearInterval functions
 async fn set_interval<F, T>(callback: F, duration: Duration)
 where
-    F: Fn() -> Pin<Box<dyn Future<Output = T> + Send + 'static>> + Send + 'static + Sync,
+    F: FnMut() -> Pin<Box<dyn Future<Output = T> + Send + 'static>> + Send + 'static + Sync,
     T: std::fmt::Debug,
 {
     get_or_init_interval()
@@ -122,4 +126,54 @@ where
 
 async fn clear_interval() {
     get_or_init_interval().await.lock().await.stop();
+}
+
+#[cfg(test)]
+mod tests {
+    use tokio::sync::mpsc;
+
+    use super::*;
+
+    async fn is_running_interval() -> bool {
+        get_or_init_interval()
+            .await
+            .lock()
+            .await
+            .running
+            .load(Ordering::Relaxed)
+    }
+
+    #[allow(clippy::bool_assert_comparison)]
+    #[tokio::test]
+    async fn test_interval_process() {
+        let (tx, mut rx) = mpsc::channel(4);
+        let send_array = [1, 2, 3, 4, 5];
+        let mut i = 0;
+        set_interval(
+            move || {
+                let tx = tx.clone();
+                let val = send_array[i];
+                i = (i + 1) % send_array.len();
+                Box::pin(async move {
+                    tx.send(val).await.unwrap();
+                    info!("send: {}", val);
+                })
+            },
+            Duration::from_secs(1),
+        )
+        .await;
+
+        for expected_val in &send_array {
+            let res_val = rx.recv().await.unwrap();
+            info!("res: {}", res_val);
+            assert_eq!(res_val, *expected_val);
+        }
+
+        assert!(is_running_interval().await);
+
+        clear_interval().await;
+
+        info!("Should have stopped the interval");
+        assert_eq!(is_running_interval().await, false);
+    }
 }
