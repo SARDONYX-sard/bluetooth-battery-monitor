@@ -34,6 +34,7 @@ pub async fn get_bluetooth_info_all() -> Result<Value, tauri::Error> {
     match sys::get_bluetooth_info_all() {
         Ok(devices_json) => {
             debug!("Devices_info Json: {}", devices_json);
+            write_data("device_info", devices_json.clone());
             Ok(devices_json)
         }
         Err(err) => Err(err.into()),
@@ -44,6 +45,7 @@ pub fn get_bluetooth_info_all_() -> Result<Value> {
     match sys::get_bluetooth_info_all() {
         Ok(devices_json) => {
             debug!("Devices_info Json: {}", devices_json);
+            write_data("device_info", devices_json.clone());
             Ok(devices_json)
         }
         Err(err) => Err(err.into()),

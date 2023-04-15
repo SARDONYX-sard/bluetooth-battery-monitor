@@ -27,9 +27,9 @@ export default function App() {
 
   async function getBatteryInfo_all() {
     try {
-      await get_bluetooth_info_all((json_array) => {
+      await get_bluetooth_info_all(async (json_array) => {
         setResult(json_array);
-        localStorage.setItem("bluetooth-info-all", JSON.stringify(json_array));
+        await write_data("device_info", JSON.stringify(json_array));
       });
     } catch (error) {
       console.error(error);
