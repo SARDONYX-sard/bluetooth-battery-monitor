@@ -1,34 +1,41 @@
-import React, { useEffect, useState } from "react/";
-import { tw } from "twind";
+import React, { TransitionEvent, useEffect, useState } from "react/";
 import { clsx } from "clsx";
+import { tw } from "twind";
 
-import {
-  DeviceJson,
-  SystemTime,
-  get_bluetooth_info_all,
-} from "./commands/bluetooth.ts";
-import { update_info_interval } from "./commands/timer.ts";
+import { Home } from "./components/pages/Home.tsx";
+import { Settings } from "./components/pages/Settings.tsx";
 import { Button } from "./components/button.tsx";
 import { read_data, write_data } from "./commands/storage.ts";
+import { get_bluetooth_info_all } from "./commands/bluetooth.ts";
+import { update_info_interval } from "./commands/timer.ts";
+
+import type { DeviceJson } from "./commands/bluetooth.ts";
+
+export type Settings = {
+  "battery-query-duration-sec": number;
+};
 
 export default function App() {
-  const [result, setResult] = useState<DeviceJson[] | []>([]);
+  const [devices, setDevices] = useState<DeviceJson[] | []>([]);
   const [selectedDeviceId, setSelectedDeviceId] = useState("");
+  const [toggleSettings, setToggleSettings] = useState(false);
+  const [settings, setSettings] = useState<Settings>();
 
   useEffect(() => {
     (async () => {
       const cache = await read_data<DeviceJson[]>("device_info");
-      console.log(cache);
       const cacheId = await read_data<string>("selected_device_id");
-      cache && setResult(cache);
+      const settings = await read_data<Settings>("settings.json");
+      cache && setDevices(cache);
       cacheId && setSelectedDeviceId(cacheId);
+      settings && setSettings(settings);
     })();
   }, []);
 
   async function getBatteryInfo_all() {
     try {
       await get_bluetooth_info_all(async (json_array) => {
-        setResult(json_array);
+        setDevices(json_array);
         await write_data("device_info", JSON.stringify(json_array));
       });
     } catch (error) {
@@ -37,97 +44,61 @@ export default function App() {
   }
 
   async function updateSystemTrayInterval() {
-    const duration_time = 10;
+    const num = Number(settings?.["battery-query-duration-sec"]);
+    if (Number.isNaN(num)) {
+      console.error("Invalid value. expected number");
+      return;
+    }
+    const duration_time = num;
     await update_info_interval(duration_time); // write battery info by backend
     setInterval(async () => {
       const cacheId = await read_data<string>("selected_device_id");
-      if (cacheId) {
-        setSelectedDeviceId(cacheId);
-      }
+      cacheId && setSelectedDeviceId(cacheId);
     });
   }
 
-  const selectDevice: React.MouseEventHandler<HTMLButtonElement> = (e) => {
-    setSelectedDeviceId(e.currentTarget.value);
-    write_data("selected_device_id", e.currentTarget.value);
-  };
-
   return (
-    <section>
+    <div className={clsx("App")}>
       <div
         className={clsx(
-          tw`grid grid-cols-2 place-items-stretch fixed w-full py-4`,
+          tw`grid grid-cols-3 place-items-stretch fixed w-full py-4 z-50`,
           "glass"
         )}
       >
-        <Button callback={getBatteryInfo_all} idleText="Update info" />
+        <Button callback={getBatteryInfo_all} idleText="Update devices info" />
         <Button
           callback={updateSystemTrayInterval}
-          idleText="Interval battery"
+          idleText="Restart interval battery query"
         />
+        {toggleSettings ? (
+          <Button idleText="To Home" onClick={() => setToggleSettings(false)} />
+        ) : (
+          <Button
+            idleText="To Settings"
+            onClick={() => setToggleSettings(true)}
+          />
+        )}
       </div>
 
-      <div className={tw`grid gap-8 place-items-center pt-24 pb-5`}>
-        {result.map((device) => {
-          const bgColor =
-            device.bluetooth_address === selectedDeviceId
-              ? ({ backgroundColor: "#000000bf" } as const)
-              : undefined;
-
-          return (
-            <button
-              className={clsx(
-                tw`grid grid-flow-row-dense grid-cols-1 gap-1 w-11/12 rounded-3xl py-3`,
-                "glass"
-              )}
-              style={bgColor}
-              key={device.instance_id}
-              value={device.bluetooth_address}
-              onClick={selectDevice}
-            >
-              {Object.keys(device).map((key) => {
-                return (
-                  <DeviceInfo
-                    device={device}
-                    device_key={key as keyof DeviceJson}
-                  />
-                );
-              })}
-            </button>
-          );
-        })}
-      </div>
-    </section>
-  );
-}
-
-function DeviceInfo({
-  device,
-  device_key,
-}: {
-  device: DeviceJson;
-  device_key: keyof DeviceJson;
-}) {
-  let value = device[device_key];
-  if (device_key === "is_connected") {
-    value = value ? "is paired" : "not paired";
-  }
-  if (
-    ["instance_id", "friendly_name", "bluetooth_address"].includes(device_key)
-  ) {
-    return null;
-  }
-  if (["last_seen", "last_used"].includes(device_key)) {
-    const val = value as SystemTime;
-    value = `${val.year}/${val.month}/${val.day} - ${val.hour}:${val.minute}:${val.second}`;
-  }
-
-  return (
-    <div
-      key={device_key}
-      className={tw`grid place-items-start my-1 mx-16 text-gray-100`}
-    >
-      {device_key}: {`${value}`}
+      <Home
+        className={clsx(
+          "animate",
+          tw`z-0 pt-24 pb-5 ${
+            toggleSettings ? "opacity-0 invisible" : "opacity-100"
+          }`
+        )}
+        devices={devices}
+        selectedDeviceId={selectedDeviceId}
+        setSelectedDeviceId={setSelectedDeviceId}
+      />
+      <Settings
+        settings={settings}
+        setSettings={setSettings}
+        className={clsx(
+          `float-right animate translate-x-${toggleSettings ? "" : "9999"}`,
+          tw`fixed z-10 top-0 pt-24 pb-5 grid grid-cols-1 place-items-center w-screen`
+        )}
+      />
     </div>
   );
 }
