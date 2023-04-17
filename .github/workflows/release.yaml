@@ -5,6 +5,8 @@ on:
       - release
     tags:
       - "*"
+  pull_request:
+    types: [opened]
 
 jobs:
   publish-tauri:
@@ -37,10 +39,9 @@ jobs:
       #   run: |
       #     sudo apt-get update
       #     sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.0-dev libappindicator3-dev librsvg2-dev patchelf
-
-      - name: "Build Changelog"
-        id: build_changelog
-        uses: mikepenz/release-changelog-builder-action@v3.7.1
+      - name: Run Changelog CI
+        uses: saadmk11/changelog-ci@v1.1.1
+        id: changelog-ci
 
       - uses: tauri-apps/tauri-action@v0
         name: Create release files
@@ -49,6 +50,6 @@ jobs:
         with:
           tagName: bluetooth-battery-monitor-v__VERSION__ # the action automatically replaces \_\_VERSION\_\_ with the app version
           releaseName: "Bluetooth battery monitor v__VERSION__"
-          releaseBody: ${{steps.build_changelog.outputs.changelog}}
+          releaseBody: ${{ steps.changelog-ci.outputs.changelog }}
           releaseDraft: true
           prerelease: false
