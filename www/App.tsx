@@ -28,6 +28,13 @@ export default function App() {
     })();
   }, []);
 
+  // To scroll lock For settings page.
+  if (toggleSettings) {
+    document.body.classList.add(tw`overflow-y-hidden`);
+  } else {
+    document.body.classList.remove(tw`overflow-y-hidden`);
+  }
+
   async function getBatteryInfo_all() {
     try {
       await get_bluetooth_info_all(async (json_array) => {
