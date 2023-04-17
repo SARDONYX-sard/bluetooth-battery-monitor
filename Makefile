@@ -7,13 +7,11 @@ dev:
 	@echo "develop mode: log level(${LOG_LEVEL})"
 	@export RUST_LOG=${LOG_LEVEL} && cargo tauri dev
 
-build:
-	deno run -A ./bundle.ts --build
+build: deps
 	cargo tauri build
 
-build-release:
-	deno run -A ./bundle.ts --release
-	cargo tauri build
+deps:
+	cargo install tauri-cli
 
 update:
 	deno task esm:update
@@ -26,4 +24,4 @@ lint:
 	deno lint www
 	cargo clippy
 
-.PHONY: dev build build-release update fmt lint
+.PHONY: dev build deps update fmt lint
