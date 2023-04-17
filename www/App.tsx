@@ -1,4 +1,4 @@
-import React, { TransitionEvent, useEffect, useState } from "react/";
+import React, { useEffect, useState } from "react/";
 import { clsx } from "clsx";
 import { tw } from "twind";
 
