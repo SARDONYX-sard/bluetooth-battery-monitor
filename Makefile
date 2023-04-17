@@ -7,12 +7,7 @@ dev:
 	@echo "develop mode: log level(${LOG_LEVEL})"
 	@export RUST_LOG=${LOG_LEVEL} && cargo tauri dev
 
-build:
-	deno run -A ./bundle.ts --build
-	cargo tauri build
-
-build-release:
-	deno run -A ./bundle.ts --release
+build: deps
 	cargo tauri build
 
 update:
