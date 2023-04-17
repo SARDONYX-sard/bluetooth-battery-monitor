@@ -24,7 +24,7 @@ jobs:
       - uses: denoland/setup-deno@v1
         name: Install deno
         with:
-          deno-version: "1.8.2"
+          deno-version: "1.32.4"
 
       - name: Install Rust stable
         uses: dtolnay/rust-toolchain@stable
