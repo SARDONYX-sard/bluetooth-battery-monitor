@@ -22,12 +22,27 @@ export async function write_data<T>(key: string, value: T) {
  *  JSON.parse() is not necessary and can be used as an object immediately by casting with as.
  */
 export async function read_data<T>(key: string) {
-  let res;
+  let res: StorageData<T>;
   try {
-    res = (await invoke("read_data", { key })) as StorageData<T>;
+    res = await invoke("read_data", { key });
     return res.data;
   } catch (err) {
     console.error(err);
-    console.error(res);
+  }
+}
+
+/**
+ * @param {string} key - key to store
+ *
+ * - NOTE:
+ *  JSON.parse() is not necessary and can be used as an object immediately by casting with as.
+ */
+export async function delete_storage_data<T>(key: string) {
+  let res: StorageData<T>;
+  try {
+    res = await invoke("delete_storage_data", { key });
+    return res.data;
+  } catch (err) {
+    console.error(err);
   }
 }
