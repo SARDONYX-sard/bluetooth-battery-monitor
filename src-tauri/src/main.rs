@@ -4,6 +4,7 @@
 )]
 
 mod commands;
+mod setup;
 mod system_tray;
 mod utils;
 mod window_menu;
@@ -11,17 +12,12 @@ mod window_menu;
 #[macro_use]
 extern crate log;
 
-use serde_json::json;
 use tauri::Manager;
 use tauri_plugin_autostart::MacosLauncher;
 
+use setup::tauri_setup;
 use system_tray::{create_system_tray, tray_event};
 use window_menu::{create_menu, menu_event};
-
-use commands::{
-    storage::{read_data, write_data},
-    timer::update_info_interval,
-};
 
 fn main() {
     env_logger::init();
@@ -32,45 +28,7 @@ fn main() {
             MacosLauncher::LaunchAgent,
             None,
         ))
-        .setup(|app| {
-            let app = app.app_handle();
-            let duration_item_name = "battery-query-duration-minutes";
-            let default_duration_secs = 60 * 60; // 1 hour
-            tauri::async_runtime::spawn(async move {
-                let settings = match read_data("settings.json") {
-                    Ok(storage) => match storage.status {
-                        true => storage.data,
-                        false => {
-                            write_data(
-                                "settings.json",
-                                json!({ duration_item_name: default_duration_secs }),
-                            );
-                            read_data("settings.json").unwrap().data
-                        }
-                    },
-                    Err(err) => {
-                        eprintln!("{}", err);
-                        write_data(
-                            "settings.json",
-                            json!({ duration_item_name: default_duration_secs }),
-                        );
-                        read_data("settings.json").unwrap().data
-                    }
-                };
-                let duration_secs = settings
-                    .get(duration_item_name)
-                    .unwrap_or_else(|| {
-                        panic!("Not found {duration_item_name} item in settings.json")
-                    })
-                    .as_u64()
-                    .unwrap_or_else(|| {
-                        panic!("wrong {duration_item_name} type. expected number(e.g. 10)")
-                    });
-                info!("duration time: {duration_secs}");
-                update_info_interval(app, duration_secs).await;
-            });
-            Ok(())
-        })
+        .setup(tauri_setup)
         .system_tray(create_system_tray())
         .on_system_tray_event(tray_event)
         .menu(create_menu())
