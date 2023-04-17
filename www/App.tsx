@@ -2,30 +2,26 @@ import React, { useEffect, useState } from "react/";
 import { clsx } from "clsx";
 import { tw } from "twind";
 
-import { Home } from "./components/pages/Home.tsx";
-import { Settings } from "./components/pages/Settings.tsx";
-import { Button } from "./components/button.tsx";
-import { read_data, write_data } from "./commands/storage.ts";
+import { Button } from "./components/ui/button.tsx";
+import { Home, Settings } from "./components/pages/index.ts";
 import { get_bluetooth_info_all } from "./commands/bluetooth.ts";
+import { read_data, write_data } from "./commands/storage.ts";
 import { update_info_interval } from "./commands/timer.ts";
 
+import type { SettingsJson } from "./components/pages/Settings.tsx";
 import type { DeviceJson } from "./commands/bluetooth.ts";
-
-export type Settings = {
-  "battery-query-duration-sec": number;
-};
 
 export default function App() {
   const [devices, setDevices] = useState<DeviceJson[] | []>([]);
   const [selectedDeviceId, setSelectedDeviceId] = useState("");
   const [toggleSettings, setToggleSettings] = useState(false);
-  const [settings, setSettings] = useState<Settings>();
+  const [settings, setSettings] = useState<SettingsJson>();
 
   useEffect(() => {
     (async () => {
       const cache = await read_data<DeviceJson[]>("device_info");
       const cacheId = await read_data<string>("selected_device_id");
-      const settings = await read_data<Settings>("settings.json");
+      const settings = await read_data<SettingsJson>("settings.json");
       cache && setDevices(cache);
       cacheId && setSelectedDeviceId(cacheId);
       settings && setSettings(settings);

@@ -2,15 +2,18 @@ import React, { TransitionEventHandler } from "react";
 import { clsx } from "clsx";
 import { tw } from "twind";
 
-import { Form } from "../form.tsx";
-import { Toggle } from "../switch.tsx";
-import { Settings } from "../../App.tsx";
+import { Form } from "../ui/form.tsx";
+import { Toggle } from "../ui/switch.tsx";
+
+export type SettingsJson = {
+  "battery-query-duration-sec": number;
+};
 
 type Props = {
   className?: string;
   onTransitionEnd?: TransitionEventHandler<HTMLElement>;
-  settings?: Settings;
-  setSettings: React.Dispatch<React.SetStateAction<Settings | undefined>>;
+  settings?: SettingsJson;
+  setSettings: React.Dispatch<React.SetStateAction<SettingsJson | undefined>>;
 };
 
 export function Settings({

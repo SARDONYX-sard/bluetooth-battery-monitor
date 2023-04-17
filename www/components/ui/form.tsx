@@ -1,15 +1,29 @@
-import React from "react";
-import { Settings } from "../App.tsx";
+import React, { useCallback } from "react";
 import { clsx } from "clsx";
 import { tw } from "twind";
-import { write_data } from "../commands/storage.ts";
+
+import { write_data } from "../../commands/storage.ts";
+
+import type { ChangeEvent } from "react";
+import type { SettingsJson } from "../pages/index.ts";
 
 type Props = {
-  settings?: Settings;
-  setSettings: React.Dispatch<React.SetStateAction<Settings | undefined>>;
+  settings?: SettingsJson;
+  setSettings: React.Dispatch<React.SetStateAction<SettingsJson | undefined>>;
 };
 
 export function Form({ settings, setSettings }: Props) {
+  const handleOnchange = useCallback((event: ChangeEvent<HTMLInputElement>) => {
+    setSettings((prev) => {
+      const res = {
+        ...prev,
+        "battery-query-duration-sec": Number(event.target.value),
+      } as const satisfies SettingsJson;
+      write_data("settings.json", res);
+      return res;
+    });
+  }, [setSettings]);
+
   return (
     <form className={tw`shadow-md rounded px-8 pt-6 pb-3`}>
       <div className={tw`mb-4`}>
@@ -28,16 +42,7 @@ export function Form({ settings, setSettings }: Props) {
           type="text"
           placeholder="seconds"
           value={settings?.["battery-query-duration-sec"]}
-          onChange={(event) =>
-            setSettings((prev) => {
-              const res = {
-                ...prev,
-                "battery-query-duration-sec": Number(event.target.value),
-              };
-              write_data("settings.json", res);
-              return res;
-            })
-          }
+          onChange={handleOnchange}
         />
       </div>
     </form>
