@@ -26,4 +26,7 @@ lint:
 	deno lint www
 	cargo clippy
 
+deps:
+	cargo install create-tauri-app
+
 .PHONY: dev build build-release update fmt lint
