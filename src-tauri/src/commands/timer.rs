@@ -15,8 +15,8 @@ use super::bluetooth::get_bluetooth_info_all_;
 use super::storage::read_data;
 
 #[tauri::command]
-pub async fn update_info_interval(app: AppHandle, duration_sec: u64) {
-    let duration = Duration::from_secs(duration_sec); // milliseconds to seconds
+pub async fn update_info_interval(app: AppHandle, duration_secs: u64) {
+    let duration = Duration::from_secs(duration_secs);
 
     clear_interval().await;
 
@@ -24,11 +24,14 @@ pub async fn update_info_interval(app: AppHandle, duration_sec: u64) {
         move || {
             let app = app.clone();
             let devices_info = get_bluetooth_info_all_()
-                .unwrap()
+                .expect("Parse error json")
                 .as_array()
                 .expect("Not found devices")
                 .to_owned();
-            let first_device = devices_info[0].get("bluetooth_address").unwrap().clone();
+            let first_device = devices_info[0]
+                .get("bluetooth_address")
+                .expect("Not found 'bluetooth_address' key")
+                .clone();
             Box::pin(async move {
                 let selected_device_id = match read_data("selected_device_id") {
                     Ok(device) => match device.status {

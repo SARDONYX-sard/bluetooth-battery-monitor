@@ -18,7 +18,7 @@ use tauri_plugin_autostart::MacosLauncher;
 use system_tray::{create_system_tray, tray_event};
 use window_menu::{create_menu, menu_event};
 
-use crate::commands::{
+use commands::{
     storage::{read_data, write_data},
     timer::update_info_interval,
 };
@@ -34,8 +34,8 @@ fn main() {
         ))
         .setup(|app| {
             let app = app.app_handle();
-            let duration_item_name = "battery-query-duration-sec";
-            let duration_minutes = 10 * 60;
+            let duration_item_name = "battery-query-duration-minutes";
+            let default_duration_secs = 60 * 60; // 1 hour
             tauri::async_runtime::spawn(async move {
                 let settings = match read_data("settings.json") {
                     Ok(storage) => match storage.status {
@@ -43,7 +43,7 @@ fn main() {
                         false => {
                             write_data(
                                 "settings.json",
-                                json!({ duration_item_name: duration_minutes }),
+                                json!({ duration_item_name: default_duration_secs }),
                             );
                             read_data("settings.json").unwrap().data
                         }
@@ -52,12 +52,12 @@ fn main() {
                         eprintln!("{}", err);
                         write_data(
                             "settings.json",
-                            json!({ duration_item_name: duration_minutes }),
+                            json!({ duration_item_name: default_duration_secs }),
                         );
                         read_data("settings.json").unwrap().data
                     }
                 };
-                let duration_sec = settings
+                let duration_secs = settings
                     .get(duration_item_name)
                     .unwrap_or_else(|| {
                         panic!("Not found {duration_item_name} item in settings.json")
@@ -66,8 +66,8 @@ fn main() {
                     .unwrap_or_else(|| {
                         panic!("wrong {duration_item_name} type. expected number(e.g. 10)")
                     });
-                info!("duration time: {duration_sec}");
-                update_info_interval(app, duration_sec).await;
+                info!("duration time: {duration_secs}");
+                update_info_interval(app, duration_secs).await;
             });
             Ok(())
         })
@@ -79,9 +79,10 @@ fn main() {
         .invoke_handler(tauri::generate_handler![
             commands::bluetooth::get_bluetooth_info,
             commands::bluetooth::get_bluetooth_info_all,
-            commands::timer::update_info_interval,
+            commands::storage::delete_storage_data,
             commands::storage::read_data,
             commands::storage::write_data,
+            commands::timer::update_info_interval,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
