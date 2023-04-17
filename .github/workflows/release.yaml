@@ -40,8 +40,6 @@ jobs:
       #   id: build_changelog
       #   uses: mikepenz/release-changelog-builder-action@v3.7.1
 
-      - run: make build
-
       - uses: tauri-apps/tauri-action@v0
         name: Create release files
         env:
