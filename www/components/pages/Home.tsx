@@ -1,10 +1,31 @@
 import React, { TransitionEventHandler } from "react/";
 import { clsx } from "clsx";
 import { tw } from "twind";
+import {
+  IconHeadphones,
+  IconHeadset,
+  IconVideo,
+  IconMicrophone,
+  IconDeviceSpeaker,
+  IconHeadsetOff,
+  IconHeadphonesOff,
+  IconDeviceSpeakerOff,
+  IconDeviceGamepad,
+  IconVideoOff,
+  IconMicrophoneOff,
+  IconHelpOctagon,
+  IconDeviceLaptop,
+  IconDeviceLaptopOff,
+  IconDeviceDesktop,
+  IconDeviceDesktopOff,
+  IconDeviceAirpods,
+  IconDeviceAudioTape,
+} from "@tabler/icons-react";
 
 import { write_data } from "../../commands/storage.ts";
 
-import type { SystemTime, DeviceJson } from "../../commands/bluetooth.ts";
+import type { TablerIconsProps } from "@tabler/icons-react";
+import type { DeviceJson } from "../../commands/bluetooth.ts";
 
 type Props = {
   devices: DeviceJson[] | [];
@@ -28,66 +49,139 @@ export function Home({
   return (
     <section className={className} onTransitionEnd={onTransitionEnd}>
       <div className={tw`grid gap-8 place-items-center`}>
-        {devices.map((device) => {
-          const bgColor =
-            device.bluetooth_address === selectedDeviceId
-              ? ({ backgroundColor: "#000000bf" } as const)
-              : undefined;
+        {Array.isArray(devices) ? (
+          devices.map((device) => {
+            const bgColor =
+              device.bluetooth_address === selectedDeviceId
+                ? ({ backgroundColor: "#000000bf" } as const)
+                : undefined;
 
-          return (
-            <button
-              className={clsx(
-                tw`grid grid-flow-row-dense grid-cols-1 gap-1 w-11/12 rounded-3xl py-3`,
-                "glass"
-              )}
-              style={bgColor}
-              key={device.instance_id}
-              value={device.bluetooth_address}
-              onClick={selectDevice}
-            >
-              {Object.keys(device).map((key) => {
-                return (
-                  <DeviceInfo
-                    device={device}
-                    device_key={key as keyof DeviceJson}
-                  />
-                );
-              })}
-            </button>
-          );
-        })}
+            return (
+              <button
+                className={clsx(
+                  tw`grid grid-flow-row-dense grid-cols-1 gap-1 w-11/12 rounded-3xl py-3`,
+                  "glass"
+                )}
+                style={bgColor}
+                key={device.instance_id}
+                value={device.bluetooth_address}
+                onClick={selectDevice}
+              >
+                <DeviceInfo device={device} />
+              </button>
+            );
+          })
+        ) : (
+          <div>
+            <span>Devices not Found.</span>
+            <span>Please press `Update devices info` button.</span>
+          </div>
+        )}
       </div>
     </section>
   );
 }
 
-function DeviceInfo({
-  device,
-  device_key,
-}: {
-  device: DeviceJson;
-  device_key: keyof DeviceJson;
-}) {
-  let value = device[device_key];
-  if (device_key === "is_connected") {
-    value = value ? "is paired" : "not paired";
-  }
-  if (
-    ["instance_id", "friendly_name", "bluetooth_address"].includes(device_key)
-  ) {
-    return null;
-  }
-  if (["last_seen", "last_used"].includes(device_key)) {
-    const val = value as SystemTime;
-    value = `${val.year}/${val.month}/${val.day} - ${val.hour}:${val.minute}:${val.second}`;
-  }
+function DeviceInfo({ device }: { device: DeviceJson }) {
+  const lastUsed = device["last_used"];
+  if (!lastUsed) return null;
+  const lastUsedDate = `${lastUsed.year}/${lastUsed.month}/${lastUsed.day} ${lastUsed.hour}:${lastUsed.minute}:${lastUsed.second}`;
+
+  const meterOffCss = {
+    "--background": "#dadada18",
+    "--optimum": "#868686",
+    "--sub-optimum": "#868686",
+    "--sub-sub-optimum": "#868686",
+  } as React.CSSProperties;
 
   return (
-    <div
-      key={device_key}
-      className={tw`grid place-items-start my-1 mx-16 text-gray-100`}
-    >
-      {device_key}: {`${value}`}
-    </div>
+    <React.Fragment>
+      <div className={tw`grid grid-cols-2 text-gray-100 h-full`}>
+        <div className={tw`grid place-items-center row-span-2`}>
+          <DeviceCategoryIcon device={device} /> {device["device_name"]}
+        </div>
+        <div className={tw`grid place-items-center  text-gray-100`}>
+          Battery level: {device["battery_level"]}%
+          <meter
+            style={device["is_connected"] ? undefined : meterOffCss}
+            max={100}
+            min={0}
+            value={device["battery_level"] ?? 0}
+            high={80}
+            low={40}
+            optimum={80}
+          ></meter>
+        </div>
+        <div className={tw`grid place-items-center  text-gray-100`}>
+          Last Used: {lastUsedDate}
+        </div>
+      </div>
+    </React.Fragment>
   );
+}
+
+function DeviceCategoryIcon({ device }: { device: DeviceJson }) {
+  const device_class = device["class_of_device"] ?? ":";
+  const [_cc, sub] = device_class.split(":");
+
+  const connectedBgColor = device["is_connected"] ? "#ffffff" : "#b1b1b1a2";
+  const iconProps: TablerIconsProps = { size: "3rem", color: connectedBgColor };
+
+  switch (sub.trim()) {
+    case "Wearable Headset Device" || "Hands-free Device":
+      if (device["is_connected"]) {
+        return <IconHeadset {...iconProps} />;
+      } else {
+        return <IconHeadsetOff {...iconProps} />;
+      }
+    case "Microphone":
+      return device["is_connected"] ? (
+        <IconMicrophone {...iconProps} />
+      ) : (
+        <IconMicrophoneOff {...iconProps} />
+      );
+    case "Loudspeaker" ||
+      "Video Display and Loudspeaker" ||
+      "Set-top box" ||
+      "HiFi Audio Device":
+      return device["is_connected"] ? (
+        <IconDeviceSpeaker {...iconProps} />
+      ) : (
+        <IconDeviceSpeakerOff {...iconProps} />
+      );
+    case "Headphones":
+      return device["is_connected"] ? (
+        <IconHeadphones {...iconProps} />
+      ) : (
+        <IconHeadphonesOff {...iconProps} />
+      );
+    case "Portable Audio":
+      return <IconDeviceAirpods {...iconProps} />;
+    case "Car audio":
+      return <IconDeviceAudioTape />;
+    case "VCR":
+      return null;
+    case "Video Camera" || "Camcorder":
+      return device["is_connected"] ? (
+        <IconVideo {...iconProps} />
+      ) : (
+        <IconVideoOff {...iconProps} />
+      );
+    case "Video Monitor":
+      return device["is_connected"] ? (
+        <IconDeviceDesktop {...iconProps} />
+      ) : (
+        <IconDeviceDesktopOff {...iconProps} />
+      );
+    case "Video Conferencing":
+      return device["is_connected"] ? (
+        <IconDeviceLaptop {...iconProps} />
+      ) : (
+        <IconDeviceLaptopOff {...iconProps} />
+      );
+    case "Gaming/Toy":
+      return <IconDeviceGamepad {...iconProps} />;
+    default: // "Uncategorized" and "(Reserved)" too
+      return <IconHelpOctagon {...iconProps} />;
+  }
 }

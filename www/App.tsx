@@ -1,8 +1,13 @@
-import React, { useEffect, useState } from "react/";
+import React, { useCallback, useEffect, useState } from "react/";
 import { clsx } from "clsx";
 import { tw } from "twind";
+import {
+  IconHome,
+  IconRotateClockwise2,
+  IconSettings,
+} from "@tabler/icons-react";
 
-import { Button } from "./components/ui/button.tsx";
+import { Button } from "./components/ui/reactive-button.tsx";
 import { Home, Settings } from "./components/pages/index.ts";
 import { get_bluetooth_info_all } from "./commands/bluetooth.ts";
 import { read_data, write_data } from "./commands/storage.ts";
@@ -16,6 +21,7 @@ export default function App() {
   const [selectedDeviceId, setSelectedDeviceId] = useState("");
   const [toggleSettings, setToggleSettings] = useState(false);
   const [settings, setSettings] = useState<SettingsJson>();
+  const [intervalId, setIntervalId] = useState<number | null>(null);
 
   useEffect(() => {
     (async () => {
@@ -46,41 +52,47 @@ export default function App() {
     }
   }
 
+  const intervalFn = useCallback(async () => {
+    const cacheId = await read_data<string>("selected_device_id");
+    cacheId && setSelectedDeviceId(cacheId);
+  }, [setSelectedDeviceId]);
+
   async function updateSystemTrayInterval() {
-    const num = Number(settings?.["battery-query-duration-sec"]);
-    if (Number.isNaN(num)) {
+    const secs = Number(settings?.["battery-query-duration-sec"]);
+    if (Number.isNaN(secs)) {
       console.error("Invalid value. expected number");
       return;
     }
-    const duration_time = num;
+    const duration_time = secs;
     await update_info_interval(duration_time); // write battery info by backend
-    setInterval(async () => {
-      const cacheId = await read_data<string>("selected_device_id");
-      cacheId && setSelectedDeviceId(cacheId);
-    });
+
+    intervalId && clearInterval(intervalId);
+    const id = setInterval(intervalFn, secs * 1000); // milliseconds argument to seconds argument
+    setIntervalId(id);
   }
 
   return (
     <div className={clsx("App")}>
       <div
         className={clsx(
-          tw`grid grid-cols-3 place-items-stretch fixed w-full py-4 z-50`,
+          tw`flex justify-around fixed w-full py-4 z-50`,
           "glass"
         )}
       >
-        <Button callback={getBatteryInfo_all} idleText="Update devices info" />
+        <Button
+          className={tw`grid place-items-center`}
+          callback={getBatteryInfo_all}
+          idleText={<IconRotateClockwise2 />}
+        />
         <Button
           callback={updateSystemTrayInterval}
           idleText="Restart interval battery query"
         />
-        {toggleSettings ? (
-          <Button idleText="To Home" onClick={() => setToggleSettings(false)} />
-        ) : (
-          <Button
-            idleText="To Settings"
-            onClick={() => setToggleSettings(true)}
-          />
-        )}
+        <Button
+          className={tw`grid place-items-center`}
+          idleText={toggleSettings ? <IconHome /> : <IconSettings />}
+          onClick={() => setToggleSettings(!toggleSettings)}
+        />
       </div>
 
       <Home
@@ -98,8 +110,8 @@ export default function App() {
         settings={settings}
         setSettings={setSettings}
         className={clsx(
-          `float-right animate translate-x-${toggleSettings ? "" : "9999"}`,
-          tw`fixed z-10 top-0 pt-24 pb-5 grid grid-cols-1 place-items-center w-screen`
+          `animate translate-x-${toggleSettings ? "0" : "9999"}`,
+          tw`fixed float-right z-10 top-0 pt-24 pb-5 grid grid-cols-1 place-items-center w-screen`
         )}
       />
     </div>

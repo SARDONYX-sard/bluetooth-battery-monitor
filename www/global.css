@@ -26,19 +26,12 @@
 }
 
 body {
-  background-color: #4158d0;
   background-image: linear-gradient(
     43deg,
     #4158d0 0%,
     #c850c0 46%,
     #ffcc70 100%
   );
-  /* background-image: linear-gradient(
-    43deg,
-    #7db2e7 0%,
-    #a3b1a8 46%,
-    #385322ab 100%
-  ); */
 }
 
 .glass {
@@ -105,6 +98,8 @@ body {
   background: #51556159;
   transition: 0.3s;
   border-radius: 30px;
+  border: 0.5px;
+  border-style: solid;
 }
 
 .switch-span:before {
@@ -114,13 +109,13 @@ body {
   width: 25px;
   left: 3px;
   bottom: 2.6px;
-  background-color: #314497cb;
+  background-color: #f7be55;
   border-radius: 50%;
   transition: 0.3s;
 }
 
 .switch-input:checked + span {
-  background-color: #eaeaebe8;
+  background-color: rgba(255, 255, 255, 0.91);
 }
 
 .switch-input:checked + span:before {
@@ -134,4 +129,53 @@ body {
   line-height: 30px;
   margin-left: 10px;
   cursor: pointer;
+}
+
+/* See: https://stackoverflow.com/questions/8094835/how-to-style-html5-meter-tag */
+meter {
+  --background: #dadada18;
+  --optimum: forestgreen;
+  --sub-optimum: gold;
+  --sub-sub-optimum: crimson;
+
+  /* The gray background in Firefox */
+  background: var(--background);
+  display: block;
+  /* margin-bottom: 1em; */
+  width: 90%;
+}
+
+/* The gray background in Chrome, etc. */
+meter::-webkit-meter-bar {
+  background: var(--background);
+}
+
+/* The green (optimum) bar in Firefox */
+meter:-moz-meter-optimum::-moz-meter-bar {
+  background: var(--optimum);
+}
+
+/* The green (optimum) bar in Chrome etc. */
+meter::-webkit-meter-optimum-value {
+  background: var(--optimum);
+}
+
+/* The yellow (sub-optimum) bar in Firefox */
+meter:-moz-meter-sub-optimum::-moz-meter-bar {
+  background: var(--sub-optimum);
+}
+
+/* The yellow (sub-optimum) bar in Chrome etc. */
+meter::-webkit-meter-suboptimum-value {
+  background: var(--sub-optimum);
+}
+
+/* The red (even less good) bar in Firefox */
+meter:-moz-meter-sub-sub-optimum::-moz-meter-bar {
+  background: var(--sub-sub-optimum);
+}
+
+/* The red (even less good) bar in Chrome etc. */
+meter::-webkit-meter-even-less-good-value {
+  background: var(--sub-sub-optimum);
 }
