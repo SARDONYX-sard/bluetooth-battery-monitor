@@ -2,8 +2,10 @@ import React, { useState } from "react";
 import ReactiveButton, { ReactiveButtonProps } from "reactive-button";
 
 type Props = {
-  /** onClick function wrapper */
-  callback?: () => Promise<void>;
+  /** onClick function wrapper with async.
+   * This will cause loading and completion state transitions.
+   */
+  callback?: (event: React.MouseEvent<Element, MouseEvent>) => Promise<void>;
 };
 
 export const Button = (props: ReactiveButtonProps & Props) => {
@@ -11,10 +13,12 @@ export const Button = (props: ReactiveButtonProps & Props) => {
     "idle"
   );
 
-  const onClickHandler = async () => {
+  const onClickHandler = async (
+    event: React.MouseEvent<Element, MouseEvent>
+  ) => {
     setState("loading");
     try {
-      props.callback && (await props.callback());
+      props.callback && (await props.callback(event));
       setState("success");
     } catch (error) {
       setState("error");
