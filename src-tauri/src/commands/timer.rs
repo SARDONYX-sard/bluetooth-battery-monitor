@@ -12,6 +12,7 @@ use tokio::time::interval;
 use crate::system_tray::update_tray_icon;
 
 use super::bluetooth::get_bluetooth_info_all_;
+use super::notify::notify;
 use super::storage::read_data;
 
 #[tauri::command]
@@ -46,14 +47,22 @@ pub async fn update_info_interval(app: AppHandle, duration_secs: u64) {
                         first_device
                     }
                 };
-                debug!("Selected device: {}", selected_device_id);
+                info!("Selected device: {}", selected_device_id);
                 let selected_device_info = devices_info
                     .iter()
-                    .find(|device| device.get("bluetooth_address") == Some(&selected_device_id));
+                    .find(|device| device.get("bluetooth_address") == Some(&selected_device_id))
+                    .expect("Not found selected device");
                 let battery_level = selected_device_info
-                    .expect("Not found selected device")
                     .get("battery_level")
                     .expect("Couldn't found battery level");
+                let battery = battery_level.as_u64().unwrap();
+                if battery <= 20 {
+                    notify(
+                        &app,
+                        "[bluetooth battery monitor]",
+                        format!("Configured battery warning.{}%", battery_level).as_str(),
+                    );
+                };
                 update_tray_icon(&app, battery_level.as_u64().unwrap() as u8).await;
             })
         },
