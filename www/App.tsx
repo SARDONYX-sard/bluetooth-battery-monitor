@@ -39,7 +39,7 @@ export default function App() {
     try {
       await get_bluetooth_info_all(async (json_array) => {
         setDevices(json_array);
-        await write_data("device_info", JSON.stringify(json_array));
+        await write_data("device_info", json_array);
       });
     } catch (error) {
       console.error(error);
