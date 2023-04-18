@@ -12,7 +12,11 @@ type StorageData<T> = {
  * @param {*} value
  */
 export async function write_data<T>(key: string, value: T) {
-  await invoke("write_data", { key, value });
+  try {
+    await invoke("write_data", { key, value });
+  } catch (err) {
+    console.error(err);
+  }
 }
 
 /**
