@@ -4,6 +4,7 @@ import { tw } from "twind";
 
 import { Form } from "../ui/form.tsx";
 import { Toggle } from "../ui/switch.tsx";
+import { CSSText } from "./../ui/css-text.tsx";
 
 export type SettingsJson = {
   "battery-query-duration-sec": number;
@@ -25,9 +26,10 @@ export function Settings({
   return (
     <section className={className} onTransitionEnd={onTransitionEnd}>
       <h1 className={clsx(tw`my-2 text-3xl text-white`)}>Settings</h1>
-      <div className={clsx(tw` h-96 w-11/12 rounded-3xl`, "glass")}>
+      <div className={clsx(tw`w-11/12 rounded-3xl`, "glass")}>
         <Form settings={settings} setSettings={setSettings} />
         <Toggle label={"auto start"} />
+        <CSSText />
       </div>
     </section>
   );
