@@ -34,12 +34,12 @@ fn get_storage_dir() -> PathBuf {
 pub fn write_data(key: &str, value: serde_json::Value) {
     let storage_dir = get_storage_dir();
     if let Err(e) = fs::create_dir_all(&storage_dir) {
-        eprintln!("Failed to create dirs: {:?}", e);
+        error!("Failed to create dirs: {:?}", e);
     }
     let value = bincode::serialize(&serde_json::to_vec(&value).unwrap()).unwrap();
 
     if let Err(e) = fs::write(storage_dir.join(key), value) {
-        eprintln!("Failed to write data: {:?}", e);
+        error!("Failed to write data: {:?}", e);
     }
 }
 

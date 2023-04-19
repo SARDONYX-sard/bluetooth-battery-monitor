@@ -8,26 +8,27 @@ import {
 } from "@tabler/icons-react";
 
 import { Button } from "./components/ui/reactive-button.tsx";
+import { DEFAULT_SETTINGS, read_settings } from "./commands/fs/settings.ts";
 import { Home, Settings } from "./components/pages/index.ts";
 import { get_bluetooth_info_all } from "./commands/bluetooth.ts";
-import { read_data, write_data } from "./commands/storage.ts";
+import { read_data, write_data } from "./commands/fs/bincode.ts";
 import { update_info_interval } from "./commands/timer.ts";
 
-import type { SettingsJson } from "./components/pages/Settings.tsx";
 import type { DeviceJson } from "./commands/bluetooth.ts";
+import type { SettingsJson } from "./commands/fs/settings.ts";
 
 export default function App() {
   const [devices, setDevices] = useState<DeviceJson[] | []>([]);
   const [selectedDeviceId, setSelectedDeviceId] = useState("");
   const [toggleSettings, setToggleSettings] = useState(false);
-  const [settings, setSettings] = useState<SettingsJson>();
+  const [settings, setSettings] = useState<SettingsJson>(DEFAULT_SETTINGS);
   const [intervalId, setIntervalId] = useState<number | null>(null);
 
   useEffect(() => {
     (async () => {
       const cache = await read_data<DeviceJson[]>("device_info");
       const cacheId = await read_data<string>("selected_device_id");
-      const settings = await read_data<SettingsJson>("settings.json");
+      const settings = await read_settings();
       cache && setDevices(cache);
       cacheId && setSelectedDeviceId(cacheId);
       settings && setSettings(settings);
@@ -58,16 +59,15 @@ export default function App() {
   }, [setSelectedDeviceId]);
 
   async function updateSystemTrayInterval() {
-    const mins = Number(settings?.["battery-query-duration-minutes"]);
-    if (Number.isNaN(mins)) {
+    if (!settings.base.battery_query_duration_minutes) {
       console.error("Invalid value. expected number");
       return;
     }
-    const duration_time = mins;
-    await update_info_interval(duration_time); // write battery info by backend
+    const duration_minutes = settings.base.battery_query_duration_minutes;
 
+    await update_info_interval(duration_minutes); // write battery info by backend
     intervalId && clearInterval(intervalId);
-    const id = setInterval(intervalFn, mins * 60 * 1000); // minutes to milliseconds
+    const id = setInterval(intervalFn, duration_minutes * 60 * 1000); // minutes to milliseconds
     setIntervalId(id);
   }
 

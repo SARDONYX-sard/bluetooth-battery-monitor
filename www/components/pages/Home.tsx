@@ -22,7 +22,7 @@ import {
   IconDeviceAudioTape,
 } from "@tabler/icons-react";
 
-import { write_data } from "../../commands/storage.ts";
+import { write_data } from "../../commands/fs/bincode.ts";
 
 import type { TablerIconsProps } from "@tabler/icons-react";
 import type { DeviceJson } from "../../commands/bluetooth.ts";

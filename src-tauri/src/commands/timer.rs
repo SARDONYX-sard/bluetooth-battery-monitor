@@ -9,14 +9,20 @@ use tauri::AppHandle;
 use tokio::sync::{Mutex, OnceCell};
 use tokio::time::interval;
 
+use crate::commands::fs::settings::{read_settings, Settings};
 use crate::system_tray::update_tray_icon;
 
 use super::bluetooth::get_bluetooth_info_all_;
+use super::fs::bincode::read_data;
 use super::notify::notify;
-use super::storage::read_data;
 
 #[tauri::command]
 pub async fn update_info_interval(app: AppHandle, duration_mins: u64) {
+    let mut duration_mins = duration_mins;
+    if duration_mins == 0 {
+        duration_mins = 1;
+        error!("Got invalid duration_mins: {duration_mins}. Fallback to 1");
+    }
     let duration = Duration::from_secs(duration_mins * 60); // `* 60`: minutes to seconds
 
     clear_interval().await;
@@ -47,7 +53,8 @@ pub async fn update_info_interval(app: AppHandle, duration_mins: u64) {
                         first_device
                     }
                 };
-                info!("Selected device: {}", selected_device_id);
+                // We use `debug!` because we don't want to show it in `info!` for privacy reasons.
+                debug!("Selected device: {}", selected_device_id);
                 let selected_device_info = devices_info
                     .iter()
                     .find(|device| device.get("bluetooth_address") == Some(&selected_device_id))
@@ -56,7 +63,9 @@ pub async fn update_info_interval(app: AppHandle, duration_mins: u64) {
                     .get("battery_level")
                     .expect("Couldn't found battery level");
                 let battery = battery_level.as_u64().unwrap();
-                if battery <= 20 {
+
+                let settings = read_settings().unwrap_or(Settings::default());
+                if battery <= settings.base.notify_battery_level.into() {
                     notify(
                         &app,
                         "[bluetooth battery monitor]",

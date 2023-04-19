@@ -31,11 +31,15 @@ export function CSSText() {
 
   return (
     <div className={tw`grid grid-cols-2 my-7 grid-rows-1`}>
+      <label
+        className={tw`block text-white text-sm font-bold mb-2`}
+        htmlFor="custom-css"
+      >
+        custom css
+      </label>
       <textarea
-        className={clsx(
-          tw`my-5 mx-5 py-5 px-5 col-span-2 text-white rounded-3xl`,
-          "glass"
-        )}
+        id="custom-css"
+        className={clsx(tw`px-5 col-span-2 text-white rounded-3xl`, "glass")}
         cols={40}
         rows={5}
         value={customCSS}
