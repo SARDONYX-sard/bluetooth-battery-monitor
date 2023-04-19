@@ -1,15 +1,39 @@
-# Deno 🦕 + Tauri
+# Bluetooth battery monitor
 
-Starter template for Tauri, bundling the frontend made with React using Deno
-with esbuild.
+<div style="display:grid;place-items:center">
+   <img src="./src-tauri/icons/128x128.png" alt="bluetooth battery monitor icon"/>
+</div>
 
-You can use TypeScript or JavaScript. With React or any other library, or just
-vanilla, with no extra steps.
+## Supported Features
+
+- [x] Bluetooth classic device search
+- [x] Battery information acquisition for Bluetooth classic
+- [x] Autostart at PC startup
+- [x] Battery information acquisition interval setting
+- [x] CSS customization
+
+## Features to be implemented
+
+- [ ] Support pages including links to source code pages, license information, version information, etc.
+- [ ] Abundant CSS options
+- [ ] Localization
+
+## Unsupported Features
+
+- Reason: the author does not have a supported device.
+
+- [ ] Bluetooth LE device search
+- [ ] Battery information acquisition for Bluetooth LE
+
+![Bluetooth battery monitor GUI](https://user-images.githubusercontent.com/68905624/233191197-0c2906b7-c823-41dc-a417-11abac34474e.png)
+
+![settings page](https://user-images.githubusercontent.com/68905624/233191832-4e314825-0b5b-484d-baeb-7c0d3dbdaee9.png)
+
+## Development & Build
 
 - `src-tauri`: Rust backend
 - `www`: Web frontend
-- `build.ts`: Script to build your frontend
-- `bundle.ts`: Script to bundle your frontend while developing
+- `bundle.ts`: Script to bundle your frontend
 
 Prerequisites:
 
@@ -20,29 +44,17 @@ Prerequisites:
 
 Development:
 
-```shell
-cargo tauri dev
-```
+|  Command   |    Explain   |
+| :--------- | :----------: |
+| make dev   |  Development |
+| make build |   Building   |
+| make fmt   |  Formatting  |
+| make lint  |    Linting   |
 
-Building:
+And Consider to read the following documentations.
 
-```shell
-cargo tauri build
-```
-
-Formatting:
-
-```shell
-deno fmt www
-cargo fmt
-```
-
-Linting:
-
-```shell
-deno lint www
-cargo clippy
-```
+- [Code of Conduct](./CODE_OF_CONDUCT.md)
+- [Guidelines for contribution](./CONTRIBUTING.md)
 
 ## License
 
@@ -54,9 +66,3 @@ Licensed under either of
    ([LICENSE-MIT](LICENSE-MIT) or <http://opensource.org/licenses/MIT>)
 
 at your option.
-
-## Contribution
-
-Unless you explicitly state otherwise, any contribution intentionally submitted
-for inclusion in the work by you, as defined in the Apache-2.0 license, shall be
-dual licensed as above, without any additional terms or conditions.
