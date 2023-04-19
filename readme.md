@@ -1,8 +1,8 @@
 # Bluetooth battery monitor
 
-<div style="display:grid;place-items:center">
+<p align="center">
    <img src="./src-tauri/icons/128x128.png" alt="bluetooth battery monitor icon"/>
-</div>
+</p>
 
 ## Supported Features
 
