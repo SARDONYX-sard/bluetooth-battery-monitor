@@ -7,7 +7,7 @@ mod windows;
 #[cfg(target_os = "windows")]
 use self::windows as sys;
 
-use crate::{commands::storage::write_data, system_tray::update_tray_icon};
+use crate::{commands::fs::bincode::write_data, system_tray::update_tray_icon};
 
 #[tauri::command]
 pub async fn get_bluetooth_info(app: AppHandle, instance_id: &str) -> Result<Value, tauri::Error> {
@@ -22,6 +22,7 @@ pub async fn get_bluetooth_info(app: AppHandle, instance_id: &str) -> Result<Val
                 .unwrap() as u8;
             update_tray_icon(&app.clone(), battery_level).await;
             write_data("device_info", device_json.clone());
+            // We use `debug!` because we don't want to show it in `info!` for privacy reasons.
             debug!("Device_info Json: {}", device_json);
             Ok(device_json)
         }

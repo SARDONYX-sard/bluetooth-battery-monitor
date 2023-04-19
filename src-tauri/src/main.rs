@@ -37,9 +37,12 @@ fn main() {
         .invoke_handler(tauri::generate_handler![
             commands::bluetooth::get_bluetooth_info,
             commands::bluetooth::get_bluetooth_info_all,
-            commands::storage::delete_storage_data,
-            commands::storage::read_data,
-            commands::storage::write_data,
+            commands::fs::bincode::delete_storage_data,
+            commands::fs::bincode::read_data,
+            commands::fs::bincode::write_data,
+            commands::fs::settings::delete_settings,
+            commands::fs::settings::read_settings,
+            commands::fs::settings::write_settings,
             commands::timer::update_info_interval,
         ])
         .run(tauri::generate_context!())

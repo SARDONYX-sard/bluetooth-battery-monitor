@@ -20,11 +20,11 @@
   },
   "deno.enable": true,
   "deno.importMap": "./import_map.json",
-  "deno.inlayHints.parameterNames.enabled": "all",
-  "deno.inlayHints.variableTypes.enabled": true,
   "deno.inlayHints.enumMemberValues.enabled": true,
   "deno.inlayHints.functionLikeReturnTypes.enabled": true,
+  "deno.inlayHints.parameterNames.enabled": "all",
   "deno.inlayHints.parameterTypes.enabled": true,
+  "deno.inlayHints.variableTypes.enabled": true,
   "editor.formatOnSave": true,
   "files.exclude": {
     "**/.dccache": true,
@@ -34,13 +34,13 @@
     "**/target": true
   },
   "files.watcherExclude": {
-    "**/.DS_Store": true,
     "**/.dccache": true,
+    "**/.DS_Store": true,
     "**/.gdb_history": true,
     "**/.git": true,
     "**/dist": true,
     "**/node_modules": true,
-    "**/target": true,
+    "**/target": true
   },
   "git.autoRepositoryDetection": false,
   "git.ignoreLimitWarning": true,
@@ -52,10 +52,13 @@
     "no-hard-tabs": false
   },
   "rust-analyzer.check.command": "clippy",
-  "rust-analyzer.rustfmt.rangeFormatting.enable": true,
-  "rust-analyzer.inlayHints.lifetimeElisionHints.enable": "skip_trivial",
-  "rust-analyzer.inlayHints.lifetimeElisionHints.useParameterNames": true,
   "rust-analyzer.diagnostics.disabled": [
     "unresolved-proc-macro"
-  ] // For rust-js-interval test error
+  ],
+  "rust-analyzer.inlayHints.lifetimeElisionHints.enable": "skip_trivial",
+  "rust-analyzer.inlayHints.lifetimeElisionHints.useParameterNames": true,
+  "rust-analyzer.linkedProjects": [
+    "./src-tauri/Cargo.toml"
+  ], // For rust-js-interval test error
+  "rust-analyzer.rustfmt.rangeFormatting.enable": true
 }

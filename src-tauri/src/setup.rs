@@ -1,47 +1,25 @@
 use anyhow::Result;
-use serde_json::json;
 use std::error::Error;
 use tauri::{App, Manager};
 
 use crate::commands::{
-    storage::{read_data, write_data},
+    fs::settings::{read_settings, write_settings, Settings},
     timer::update_info_interval,
 };
 
 pub fn tauri_setup(app: &mut App) -> Result<(), Box<(dyn Error + 'static)>> {
+    //! NOTE: If not declared here, ownership errors will occur within the async block!
     let app = app.app_handle();
-    let duration_item_name = "battery-query-duration-minutes";
-    let default_duration_mins = 60 * 60; // 1 hour
 
     tauri::async_runtime::spawn(async move {
-        let settings = match read_data("settings.json") {
-            Ok(storage) => match storage.status {
-                true => storage.data,
-                false => {
-                    write_data(
-                        "settings.json",
-                        json!({ duration_item_name: default_duration_mins }),
-                    );
-                    read_data("settings.json").unwrap().data
-                }
-            },
-            Err(err) => {
-                eprintln!("{}", err);
-                write_data(
-                    "settings.json",
-                    json!({ duration_item_name: default_duration_mins }),
-                );
-                read_data("settings.json").unwrap().data
-            }
-        };
-        let duration_secs = settings
-            .get(duration_item_name)
-            .unwrap_or_else(|| panic!("Not found {duration_item_name} item in settings.json"))
-            .as_u64()
-            .unwrap_or_else(|| panic!("wrong {duration_item_name} type. expected number(e.g. 10)"));
-
-        info!("duration time: {duration_secs}");
-        update_info_interval(app, duration_secs).await;
+        let settings = read_settings().unwrap_or_else(|err| {
+            error!("Fallback to default settings. Reason: {err}");
+            write_settings(Settings::default()).expect("Failed to write default settings");
+            Settings::default()
+        });
+        let duration_mins = settings.base.battery_query_duration_minutes;
+        info!("duration minutes: {duration_mins}");
+        update_info_interval(app, duration_mins).await;
     });
     Ok(())
 }
