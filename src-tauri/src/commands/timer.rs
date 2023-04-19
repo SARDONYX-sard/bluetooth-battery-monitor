@@ -155,7 +155,6 @@ mod tests {
             .load(Ordering::Relaxed)
     }
 
-    #[allow(clippy::bool_assert_comparison)]
     #[tokio::test]
     async fn test_interval_process() {
         let (tx, mut rx) = mpsc::channel(4);
@@ -186,6 +185,6 @@ mod tests {
         clear_interval().await;
 
         info!("Should have stopped the interval");
-        assert_eq!(is_running_interval().await, false);
+        assert!(!is_running_interval().await);
     }
 }
