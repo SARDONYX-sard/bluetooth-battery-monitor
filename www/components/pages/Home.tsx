@@ -96,7 +96,7 @@ function DeviceInfo({ device }: { device: DeviceJson }) {
 
   return (
     <React.Fragment>
-      <div className={tw`grid grid-cols-2 text-gray-100 h-full`}>
+      <div className={tw`grid grid-cols-2 gap-2 text-gray-100 h-full`}>
         <div className={tw`grid place-items-center row-span-2`}>
           <DeviceCategoryIcon device={device} /> {device["device_name"]}
         </div>
@@ -108,8 +108,8 @@ function DeviceInfo({ device }: { device: DeviceJson }) {
             min={0}
             value={device["battery_level"] ?? 0}
             high={80}
-            low={40}
-            optimum={80}
+            low={21}
+            optimum={100}
           ></meter>
         </div>
         <div className={tw`grid place-items-center  text-gray-100`}>
