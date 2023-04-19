@@ -10,6 +10,9 @@ dev:
 build: deps
 	cargo tauri build
 
+gen-icon:
+	cargo tauri icon ./src-tauri/icons/icon.png
+
 deps:
 	cargo install tauri-cli
 
