@@ -1,0 +1,46 @@
+---
+name: Pull request new feature
+description: File a pull request new feature
+title: "[Feature]: "
+labels: ["enhanced"]
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to fill out this pull request!
+
+  - type: textarea
+    id: Feature
+    attributes:
+      label: Added feature items is here.
+      description: New features
+      placeholder: "- [x] Add japanese localization."
+    validations:
+      required: true
+
+  - type: textarea
+    id: any
+    attributes:
+      label: any
+      # yamllint disable-line rule:line-length
+      description: If you have anything else you would like to write about, please do so.
+      placeholder: "Image url, others..."
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Code of Conduct
+      # yamllint disable-line rule:line-length
+      description: By submitting this pull request, you read to follow our [Code of Conduct](https://github.com/SARDONYX-sard/bluetooth-battery-monitor/CODE_OF_CONDUCT.md)
+      options:
+        - label: I agree to follow this project's Code of Conduct
+          required: true
+  - type: checkboxes
+    id: contributions
+    attributes:
+      label: Guidelines for contribution
+      # yamllint disable-line rule:line-length
+      description: By submitting this pull request, you read to follow our [Guidelines for contribution](https://github.com/SARDONYX-sard/bluetooth-battery-monitor/CONTRIBUTING.md)
+      options:
+        - label: I read to follow this project's Guidelines for contribution
+          required: true
