@@ -13,16 +13,19 @@ type Props = {
 };
 
 export function Form({ settings, setSettings }: Props) {
-  const handleOnchange = useCallback((event: ChangeEvent<HTMLInputElement>) => {
-    setSettings((prev) => {
-      const res = {
-        ...prev,
-        "battery-query-duration-sec": Number(event.target.value),
-      } as const satisfies SettingsJson;
-      write_data("settings.json", res);
-      return res;
-    });
-  }, [setSettings]);
+  const handleOnchange = useCallback(
+    (event: ChangeEvent<HTMLInputElement>) => {
+      setSettings((prev) => {
+        const res = {
+          ...prev,
+          "battery-query-duration-minutes": Number(event.target.value),
+        } as const satisfies SettingsJson;
+        write_data("settings.json", res);
+        return res;
+      });
+    },
+    [setSettings]
+  );
 
   return (
     <form className={tw`shadow-md rounded px-8 pt-6 pb-3`}>
@@ -41,7 +44,7 @@ export function Form({ settings, setSettings }: Props) {
           id="duration"
           type="text"
           placeholder="seconds"
-          value={settings?.["battery-query-duration-sec"]}
+          value={settings?.["battery-query-duration-minutes"]}
           onChange={handleOnchange}
         />
       </div>

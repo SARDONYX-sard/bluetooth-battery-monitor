@@ -11,7 +11,7 @@ use crate::commands::{
 pub fn tauri_setup(app: &mut App) -> Result<(), Box<(dyn Error + 'static)>> {
     let app = app.app_handle();
     let duration_item_name = "battery-query-duration-minutes";
-    let default_duration_secs = 60 * 60; // 1 hour
+    let default_duration_mins = 60 * 60; // 1 hour
 
     tauri::async_runtime::spawn(async move {
         let settings = match read_data("settings.json") {
@@ -20,7 +20,7 @@ pub fn tauri_setup(app: &mut App) -> Result<(), Box<(dyn Error + 'static)>> {
                 false => {
                     write_data(
                         "settings.json",
-                        json!({ duration_item_name: default_duration_secs }),
+                        json!({ duration_item_name: default_duration_mins }),
                     );
                     read_data("settings.json").unwrap().data
                 }
@@ -29,7 +29,7 @@ pub fn tauri_setup(app: &mut App) -> Result<(), Box<(dyn Error + 'static)>> {
                 eprintln!("{}", err);
                 write_data(
                     "settings.json",
-                    json!({ duration_item_name: default_duration_secs }),
+                    json!({ duration_item_name: default_duration_mins }),
                 );
                 read_data("settings.json").unwrap().data
             }

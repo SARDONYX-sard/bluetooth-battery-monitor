@@ -16,8 +16,8 @@ use super::notify::notify;
 use super::storage::read_data;
 
 #[tauri::command]
-pub async fn update_info_interval(app: AppHandle, duration_secs: u64) {
-    let duration = Duration::from_secs(duration_secs);
+pub async fn update_info_interval(app: AppHandle, duration_mins: u64) {
+    let duration = Duration::from_secs(duration_mins * 60); // `* 60`: minutes to seconds
 
     clear_interval().await;
 

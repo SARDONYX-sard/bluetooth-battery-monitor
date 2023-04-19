@@ -58,16 +58,16 @@ export default function App() {
   }, [setSelectedDeviceId]);
 
   async function updateSystemTrayInterval() {
-    const secs = Number(settings?.["battery-query-duration-sec"]);
-    if (Number.isNaN(secs)) {
+    const mins = Number(settings?.["battery-query-duration-minutes"]);
+    if (Number.isNaN(mins)) {
       console.error("Invalid value. expected number");
       return;
     }
-    const duration_time = secs;
+    const duration_time = mins;
     await update_info_interval(duration_time); // write battery info by backend
 
     intervalId && clearInterval(intervalId);
-    const id = setInterval(intervalFn, secs * 1000); // milliseconds argument to seconds argument
+    const id = setInterval(intervalFn, mins * 60 * 1000); // minutes to milliseconds
     setIntervalId(id);
   }
 

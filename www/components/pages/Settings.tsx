@@ -7,7 +7,7 @@ import { Toggle } from "../ui/switch.tsx";
 import { CSSText } from "./../ui/css-text.tsx";
 
 export type SettingsJson = {
-  "battery-query-duration-sec": number;
+  "battery-query-duration-minutes": number;
 };
 
 type Props = {
