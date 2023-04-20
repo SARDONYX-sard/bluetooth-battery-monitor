@@ -1,6 +1,6 @@
 use anyhow::Result;
 use std::error::Error;
-use tauri::{App, Manager};
+use tauri::{App, AppHandle, Manager};
 
 use crate::commands::{
     fs::settings::{read_settings, write_settings, Settings},
@@ -8,9 +8,12 @@ use crate::commands::{
 };
 
 pub fn tauri_setup(app: &mut App) -> Result<(), Box<(dyn Error + 'static)>> {
-    //! NOTE: If not declared here, ownership errors will occur within the async block!
-    let app = app.app_handle();
+    setup_inner(&app.app_handle());
+    Ok(())
+}
 
+pub fn setup_inner(app: &AppHandle) {
+    let app = app.clone();
     tauri::async_runtime::spawn(async move {
         let settings = read_settings().unwrap_or_else(|err| {
             error!("Fallback to default settings. Reason: {err}");
@@ -21,5 +24,4 @@ pub fn tauri_setup(app: &mut App) -> Result<(), Box<(dyn Error + 'static)>> {
         info!("duration minutes: {duration_mins}");
         update_info_interval(app, duration_mins).await;
     });
-    Ok(())
 }

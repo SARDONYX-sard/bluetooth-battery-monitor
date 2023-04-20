@@ -1,10 +1,17 @@
-use tauri::Manager;
 use tauri::{AppHandle, CustomMenuItem, SystemTray, SystemTrayEvent, SystemTrayMenu};
+use tauri::{Manager, SystemTrayMenuItem};
+
+use crate::setup::setup_inner;
 
 pub fn create_system_tray() -> SystemTray {
     let toggle_window = CustomMenuItem::new("toggle_window".to_string(), "Show");
+    let update_info = CustomMenuItem::new("update_info".to_string(), "Update info");
     let quit = CustomMenuItem::new("quit".to_string(), "Quit");
-    let tray_menu = SystemTrayMenu::new().add_item(toggle_window).add_item(quit);
+    let tray_menu = SystemTrayMenu::new()
+        .add_item(update_info)
+        .add_native_item(SystemTrayMenuItem::Separator)
+        .add_item(toggle_window)
+        .add_item(quit);
     SystemTray::new().with_menu(tray_menu)
 }
 
@@ -32,16 +39,19 @@ pub fn tray_event(app: &AppHandle, event: SystemTrayEvent) {
             info!("Double click");
         }
         SystemTrayEvent::MenuItemClick { id, .. } => match id.as_str() {
+            "reload_info" => setup_inner(app),
             "toggle_window" => {
                 let item_handle = app.tray_handle().get_item(&id);
                 let window = app.get_window("main").unwrap();
-
-                if window.is_visible().unwrap() {
-                    window.hide().unwrap();
-                    item_handle.set_title("Show").unwrap();
-                } else {
-                    window.show().unwrap();
-                    item_handle.set_title("Hide").unwrap();
+                match window.is_visible().unwrap() {
+                    true => {
+                        window.hide().expect("Couldn't hide window");
+                        item_handle.set_title("Show").expect("Couldn't set title");
+                    }
+                    false => {
+                        window.show().expect("Couldn't show window");
+                        item_handle.set_title("Hide").expect("Couldn't set title");
+                    }
                 }
             }
             "quit" => {
