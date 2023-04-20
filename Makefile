@@ -3,7 +3,7 @@ default: dev
 # info|debug|error(default: debug)
 LOG_LEVEL?=debug
 
-dev:
+dev: deps
 	@echo "develop mode: log level(${LOG_LEVEL})"
 	@export RUST_LOG=${LOG_LEVEL} && cargo tauri dev
 
