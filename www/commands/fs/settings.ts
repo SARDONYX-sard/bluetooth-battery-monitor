@@ -10,7 +10,7 @@ export type SettingsJson = {
 
 export const DEFAULT_SETTINGS = {
   base: {
-    autostart: false,
+    autostart: true,
     battery_query_duration_minutes: 60,
     notify_battery_level: 20,
   },
