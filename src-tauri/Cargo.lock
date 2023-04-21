@@ -154,7 +154,7 @@ dependencies = [
 
 [[package]]
 name = "bluetooth-battery-monitor"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "anyhow",
  "bincode",
