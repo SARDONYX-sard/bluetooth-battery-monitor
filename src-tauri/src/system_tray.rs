@@ -1,3 +1,4 @@
+use anyhow::{anyhow, Result};
 use tauri::{AppHandle, CustomMenuItem, SystemTray, SystemTrayEvent, SystemTrayMenu};
 use tauri::{Manager, SystemTrayMenuItem};
 
@@ -12,7 +13,9 @@ pub fn create_system_tray() -> SystemTray {
         .add_native_item(SystemTrayMenuItem::Separator)
         .add_item(toggle_window)
         .add_item(quit);
-    SystemTray::new().with_menu(tray_menu)
+    SystemTray::new()
+        .with_menu(tray_menu)
+        .with_tooltip("Getting bluetooth battery...")
 }
 
 pub fn tray_event(app: &AppHandle, event: SystemTrayEvent) {
@@ -63,7 +66,11 @@ pub fn tray_event(app: &AppHandle, event: SystemTrayEvent) {
     }
 }
 
-pub async fn update_tray_icon(app: &AppHandle, battery_level: u8) {
+pub async fn update_tray_icon(
+    app: &AppHandle,
+    device_name: &str,
+    battery_level: u64,
+) -> Result<()> {
     debug!("Change to {} battery icon", battery_level);
     let battery_icon = match battery_level {
         0 => include_bytes!("../icons/battery/battery-0.png").to_vec(),
@@ -81,5 +88,8 @@ pub async fn update_tray_icon(app: &AppHandle, battery_level: u8) {
     };
     app.tray_handle()
         .set_icon(tauri::Icon::Raw(battery_icon))
-        .unwrap();
+        .map_err(|_| anyhow!("Couldn't set new icon"))?;
+    app.tray_handle()
+        .set_tooltip(format!("{device_name} {battery_level}%").as_str())
+        .map_err(|_| anyhow!("Couldn't set new tooltip."))
 }

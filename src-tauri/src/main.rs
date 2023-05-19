@@ -3,6 +3,7 @@
     windows_subsystem = "windows"
 )]
 
+mod bluetooth;
 mod commands;
 mod setup;
 mod system_tray;
