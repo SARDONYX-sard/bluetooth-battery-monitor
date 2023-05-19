@@ -1,26 +1,29 @@
-use anyhow::{Context, Result};
+use anyhow::Result;
 use serde_json::Value;
 use tauri::AppHandle;
 
-#[cfg(target_os = "windows")]
-mod windows;
-#[cfg(target_os = "windows")]
-use self::windows as sys;
-
+use crate::bluetooth::sys;
 use crate::{commands::fs::bincode::write_data, system_tray::update_tray_icon};
 
 #[tauri::command]
 pub async fn get_bluetooth_info(app: AppHandle, instance_id: &str) -> Result<Value, tauri::Error> {
     match sys::get_bluetooth_info(instance_id) {
         Ok(device_json) => {
-            let battery_json = device_json
+            let battery_level = device_json
                 .get("battery_level")
-                .expect("Couldn't get battery_level");
-            let battery_level = battery_json
+                .expect("Not found battery_level.")
                 .as_u64()
-                .with_context(|| format!("Failed to convert :{:?}", battery_json))
-                .unwrap() as u8;
-            update_tray_icon(&app.clone(), battery_level).await;
+                .expect("Couldn't covert to u64");
+
+            let device_name = device_json
+                .get("device_name")
+                .expect("Couldn't find device")
+                .as_str()
+                .unwrap_or_default();
+
+            update_tray_icon(&app.clone(), device_name, battery_level)
+                .await
+                .err();
             write_data("device_info", device_json.clone());
             // We use `debug!` because we don't want to show it in `info!` for privacy reasons.
             debug!("Device_info Json: {}", device_json);
@@ -32,23 +35,20 @@ pub async fn get_bluetooth_info(app: AppHandle, instance_id: &str) -> Result<Val
 
 #[tauri::command]
 pub async fn get_bluetooth_info_all() -> Result<Value, tauri::Error> {
-    match sys::get_bluetooth_info_all() {
-        Ok(devices_json) => {
-            debug!("Devices_info Json: {}", devices_json);
-            write_data("device_info", devices_json.clone());
-            Ok(devices_json)
-        }
+    match get_bluetooth_info_all_inner() {
+        Ok(devices_json) => Ok(devices_json),
         Err(err) => Err(err.into()),
     }
 }
 
-pub fn get_bluetooth_info_all_() -> Result<Value> {
+/// This function exists to separate sync and async.
+fn get_bluetooth_info_all_inner() -> Result<Value, serde_json::Error> {
     match sys::get_bluetooth_info_all() {
         Ok(devices_json) => {
             debug!("Devices_info Json: {}", devices_json);
             write_data("device_info", devices_json.clone());
             Ok(devices_json)
         }
-        Err(err) => Err(err.into()),
+        Err(err) => Err(err),
     }
 }

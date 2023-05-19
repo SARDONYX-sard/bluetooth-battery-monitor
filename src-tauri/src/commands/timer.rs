@@ -9,12 +9,13 @@ use tauri::AppHandle;
 use tokio::sync::{Mutex, OnceCell};
 use tokio::time::interval;
 
-use crate::commands::fs::settings::{read_settings, Settings};
+use crate::commands::bluetooth::get_bluetooth_info_all;
+use crate::commands::fs::{
+    bincode::read_data,
+    settings::{read_settings, Settings},
+};
+use crate::commands::notify::notify;
 use crate::system_tray::update_tray_icon;
-
-use super::bluetooth::get_bluetooth_info_all_;
-use super::fs::bincode::read_data;
-use super::notify::notify;
 
 #[tauri::command]
 pub async fn update_info_interval(app: AppHandle, duration_mins: u64) {
@@ -30,16 +31,18 @@ pub async fn update_info_interval(app: AppHandle, duration_mins: u64) {
     set_interval(
         move || {
             let app = app.clone();
-            let devices_info = get_bluetooth_info_all_()
-                .expect("Parse error json")
-                .as_array()
-                .expect("Not found devices")
-                .to_owned();
-            let first_device = devices_info[0]
-                .get("bluetooth_address")
-                .expect("Not found 'bluetooth_address' key")
-                .clone();
             Box::pin(async move {
+                let devices_info = get_bluetooth_info_all()
+                    .await
+                    .expect("Parse error json")
+                    .as_array()
+                    .expect("Not found devices")
+                    .to_owned();
+                let first_device = devices_info[0]
+                    .get("bluetooth_address")
+                    .expect("Not found 'bluetooth_address' key")
+                    .clone();
+
                 let selected_device_id = match read_data("selected_device_id") {
                     Ok(device) => match device.status {
                         true => device.data,
@@ -61,18 +64,27 @@ pub async fn update_info_interval(app: AppHandle, duration_mins: u64) {
                     .expect("Not found selected device");
                 let battery_level = selected_device_info
                     .get("battery_level")
-                    .expect("Couldn't found battery level");
-                let battery = battery_level.as_u64().unwrap();
+                    .expect("Couldn't found battery level")
+                    .as_u64()
+                    .expect("Couldn't covert to u64");
+
+                let device_name = selected_device_info
+                    .get("device_name")
+                    .expect("Couldn't find device")
+                    .as_str()
+                    .unwrap_or_default();
 
                 let settings = read_settings().unwrap_or(Settings::default());
-                if battery <= settings.base.notify_battery_level.into() {
+                if battery_level <= settings.base.notify_battery_level.into() {
                     notify(
                         &app,
                         "[bluetooth battery monitor]",
                         format!("Configured battery warning.{}%", battery_level).as_str(),
                     );
                 };
-                update_tray_icon(&app, battery_level.as_u64().unwrap() as u8).await;
+                update_tray_icon(&app, device_name, battery_level)
+                    .await
+                    .err()
             })
         },
         duration,
