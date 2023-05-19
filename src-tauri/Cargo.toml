@@ -1,6 +1,6 @@
 [package]
 name = "bluetooth-battery-monitor"
-version = "0.2.0"
+version = "0.3.0"
 description = "Deno + Tauri app"
 edition = "2021"
 build = "src/build.rs"
