@@ -84,7 +84,9 @@ export function Home({
 
 function DeviceInfo({ device }: { device: DeviceJson }) {
   const lastUsed = device["last_used"];
-  if (!lastUsed) return null;
+  if (!lastUsed) {
+    return null;
+  }
   const lastUsedDate = `${lastUsed.year}/${lastUsed.month}/${lastUsed.day} ${lastUsed.hour}:${lastUsed.minute}:${lastUsed.second}`;
 
   const meterOffCss = {
@@ -128,22 +130,23 @@ function DeviceCategoryIcon({ device }: { device: DeviceJson }) {
   const iconProps: TablerIconsProps = { size: "3rem", color: connectedBgColor };
 
   switch (sub.trim()) {
-    case "Wearable Headset Device" || "Hands-free Device":
-      if (device["is_connected"]) {
-        return <IconHeadset {...iconProps} />;
-      } else {
-        return <IconHeadsetOff {...iconProps} />;
-      }
+    case "Hands-free Device":
+    case "Wearable Headset Device":
+      return device["is_connected"] ? (
+        <IconHeadset {...iconProps} />
+      ) : (
+        <IconHeadsetOff {...iconProps} />
+      );
     case "Microphone":
       return device["is_connected"] ? (
         <IconMicrophone {...iconProps} />
       ) : (
         <IconMicrophoneOff {...iconProps} />
       );
-    case "Loudspeaker" ||
-      "Video Display and Loudspeaker" ||
-      "Set-top box" ||
-      "HiFi Audio Device":
+    case "HiFi Audio Device":
+    case "Loudspeaker":
+    case "Set-top box":
+    case "Video Display and Loudspeaker":
       return device["is_connected"] ? (
         <IconDeviceSpeaker {...iconProps} />
       ) : (
@@ -161,7 +164,8 @@ function DeviceCategoryIcon({ device }: { device: DeviceJson }) {
       return <IconDeviceAudioTape />;
     case "VCR":
       return null;
-    case "Video Camera" || "Camcorder":
+    case "Camcorder":
+    case "Video Camera":
       return device["is_connected"] ? (
         <IconVideo {...iconProps} />
       ) : (
