@@ -11,6 +11,7 @@ use windows::{
             BLUETOOTH_DEVICE_SEARCH_PARAMS,
         },
         Foundation::{FALSE, HANDLE, SYSTEMTIME, TRUE},
+        System::Threading::CREATE_NO_WINDOW,
     },
 };
 
@@ -18,7 +19,6 @@ use crate::bluetooth::common::{BluetoothAddress, BluetoothClass, SystemTime};
 use crate::utils::{json::merge_json_arrays_by_key, string_changer::string_to_u16_slice};
 
 type SysBluetoothDeviceInfo = windows::Win32::Devices::Bluetooth::BLUETOOTH_DEVICE_INFO;
-const CREATE_NO_WINDOW: u32 = 0x08000000;
 
 pub fn get_bluetooth_info(instance_id: &str) -> Result<Value, serde_json::Error> {
     let script_str = &format!(
@@ -31,7 +31,7 @@ pub fn get_bluetooth_info(instance_id: &str) -> Result<Value, serde_json::Error>
 
     let output = Command::new("powershell.exe")
         .args(["-ExecutionPolicy", "ByPass", "-Command", script_str])
-        .creation_flags(CREATE_NO_WINDOW)
+        .creation_flags(CREATE_NO_WINDOW.0)
         .output()
         .expect("Failed to spawn powershell command");
     let result = String::from_utf8_lossy(&output.stdout);
@@ -56,7 +56,7 @@ pub fn get_bluetooth_info_all() -> Result<Value, serde_json::Error> {
             "-Command",
             include_str!("../../scripts/get-bluetooth-battery-all.ps1"),
         ])
-        .creation_flags(CREATE_NO_WINDOW)
+        .creation_flags(CREATE_NO_WINDOW.0)
         .output()
         .expect("Failed to spawn powershell command");
     let json_str = String::from_utf8_lossy(&output.stdout);
