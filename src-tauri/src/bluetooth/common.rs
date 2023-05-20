@@ -131,7 +131,7 @@ impl Display for BluetoothClass {
 }
 
 /// Network byte order(Big endian) u64
-#[derive(Copy, Clone, Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct BluetoothAddress(u64);
 
 pub enum ByteOrder {
@@ -153,7 +153,7 @@ impl BluetoothAddress {
     ///
     /// e.g. [0xcc, 0xbb, 0xaa, 0x22, 0x11, 0x00] => "00:11:22:aa:bb:cc"
     pub fn as_hex_string_with_colon(&self, byte_order: ByteOrder) -> String {
-        let rg_bytes: [u8; 6] = (*self).into();
+        let rg_bytes: [u8; 6] = (*self).clone().into();
         match byte_order {
             ByteOrder::BigEndian => format!(
                 "{:02x}:{:02x}:{:02x}:{:02x}:{:02x}:{:02x}",
