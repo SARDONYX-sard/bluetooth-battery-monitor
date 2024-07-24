@@ -40,10 +40,10 @@
 - [x] Localization(could be customized)
 - [x] Custom edit JavaScript & CSS
 
-## UnSupported Features(I does not have a supported device.)
+## UnSupported Features(I don't have a supported device.)
 
-- &#x2612; Bluetooth LE device search
-- &#x2612; Battery information acquisition for Bluetooth LE
+- Bluetooth LE device search
+- Battery information acquisition for Bluetooth LE
 
 ## Wiki
 
@@ -79,7 +79,7 @@
   --main-bg-color: #222a;
   --theme-color: rgb(185, 185, 90);`;
 
-  let preset =/** @type{const} */ preset2;
+  let preset = /** @type{const} */ preset2;
   const getRandomUrl = () => {
     const imgNumList = [1543801, 1547163, 4589833, 7325003, 14133639];
 
@@ -127,6 +127,6 @@
 Licensed under either of
 
 - Apache License, Version 2.0
-   ([LICENSE-APACHE](LICENSE-APACHE) or <http://www.apache.org/licenses/LICENSE-2.0>)
+  ([LICENSE-APACHE](LICENSE-APACHE) or <http://www.apache.org/licenses/LICENSE-2.0>)
 - MIT license
-   ([LICENSE-MIT](LICENSE-MIT) or <http://opensource.org/licenses/MIT>)
+  ([LICENSE-MIT](LICENSE-MIT) or <http://opensource.org/licenses/MIT>)
