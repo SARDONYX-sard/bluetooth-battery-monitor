@@ -14,7 +14,7 @@ body:
     attributes:
       label: Version
       description: What version of our software are you running?
-      placeholder: "Example: 0.1.0"
+      placeholder: 'Example: 0.1.0'
     validations:
       required: true
 

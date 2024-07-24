@@ -21,8 +21,11 @@ const defaultVersion = '2'; // 2: Bump up `minor` version is default
 const useGpg = true; // Verified commit with GPG key.
 
 // import modules
+// biome-ignore lint/correctness/noNodejsModules: <explanation>
 const fs = require('node:fs');
+// biome-ignore lint/correctness/noNodejsModules: <explanation>
 const path = require('node:path');
+// biome-ignore lint/correctness/noNodejsModules: <explanation>
 const { execSync } = require('node:child_process');
 // paths
 const basePath = path.resolve(__dirname, '..');
@@ -34,8 +37,11 @@ const packageJson = require(packageJsonPath);
 const currentVersion = packageJson.version;
 
 if (isDebug) {
+  // biome-ignore lint/suspicious/noConsoleLog: <explanation>
   console.log(packageJsonPath);
+  // biome-ignore lint/suspicious/noConsoleLog: <explanation>
   console.log(cargoTomlPath);
+  // biome-ignore lint/suspicious/noConsoleLog: <explanation>
   console.log(issueTemplatePath);
 }
 main();
@@ -49,6 +55,7 @@ function main() {
   updateIssueTemplate(newVersion);
   gitCommitAndTag(currentVersion, newVersion);
 
+  // biome-ignore lint/suspicious/noConsoleLog: <explanation>
   console.log(`Updated version: ${currentVersion} => ${newVersion}`);
 }
 
@@ -135,6 +142,7 @@ function gitCommitAndTag(currentVersion, newVersion) {
     // Create Git tag
     execSync(`git tag ${newVersion} ${tagFlags} -m "Version ${newVersion}"`);
 
+    // biome-ignore lint/suspicious/noConsoleLog: <explanation>
     console.log('Git commit and tag created successfully.');
   } catch (error) {
     throw new Error(`Failed to create Git commit and tag: ${error}`);
