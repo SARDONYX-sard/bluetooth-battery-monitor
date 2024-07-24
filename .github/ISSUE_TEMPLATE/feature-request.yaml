@@ -1,0 +1,24 @@
+---
+name: Feature Request
+description: File a feature request
+title: '[Feature]: '
+labels: ['enhancement']
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to fill out this feature request.
+  - type: textarea
+    id: expected-behavior
+    attributes:
+      label: Expected behavior
+      description: May I ask you to tell us about the behavior you expect?
+      placeholder: 'Example: Add progress bar in the GUI.'
+    validations:
+      required: true
+  - type: textarea
+    id: other
+    attributes:
+      label: other
+      description: About everything else.

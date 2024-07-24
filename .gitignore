@@ -1,6 +1,22 @@
-target
-WixTools
-dist
-**/node_modules/
+# dependencies
+node_modules/
 
-devices.json
+# next.js
+.next/
+.swc
+out/
+
+# production
+build
+
+# misc
+.DS_Store
+*.pem
+test/data/*
+!test/data/*.md
+*.log
+
+# Rust build cache
+**/target
+
+secrets/

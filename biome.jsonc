@@ -1,0 +1,49 @@
+{
+  "$schema": "https://biomejs.dev/schemas/1.7.3/schema.json",
+  "extends": [],
+  "files": {
+    "ignore": ["out", ".next", "node_modules", "target", "./test"],
+    "ignoreUnknown": true
+  },
+  "organizeImports": {
+    "enabled": true
+  },
+  "formatter": {
+    "enabled": true,
+    "formatWithErrors": true,
+    "indentWidth": 2,
+    "indentStyle": "space",
+    "lineWidth": 120
+  },
+  "linter": {
+    "ignore": ["./tools/version_up.js"],
+    "rules": {
+      "all": true,
+      "performance": {
+        "noBarrelFile": "off",
+        "noReExportAll": "off"
+      },
+      "style": {
+        "noDefaultExport": "off",
+        "noImplicitBoolean": "off"
+      }
+    }
+  },
+  "javascript": {
+    "formatter": {
+      "quoteStyle": "single",
+      "jsxQuoteStyle": "single",
+      "trailingComma": "all",
+      "semicolons": "always",
+      "arrowParentheses": "always"
+    },
+    "globals": ["test", "it", "expect", "describe", "afterEach"] // Avoid warnings when calling the test functions.
+  },
+  "json": {
+    "parser": { "allowComments": true },
+    "formatter": {
+      "enabled": true,
+      "indentStyle": "space"
+    }
+  }
+}

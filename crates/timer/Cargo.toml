@@ -1,0 +1,25 @@
+[package]
+name = "timer"
+version.workspace = true
+description = "JavaScript like timer."
+authors = ["SARDONYX-sard"]
+readme = "./readme.md"
+license = "MIT OR Apache-2.0"
+repository.workspace = true
+edition = "2021"
+rust-version = "1.70"
+
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[dependencies]
+dashmap = "5.5.3"                                           # Concurrent Hashmap
+once_cell = { version = "1.17.1" }
+snafu = "0.8.3"                                             # Define errors
+tokio = { version = "1.38.0", features = ["time", "sync"] }
+
+
+[dev-dependencies]
+pretty_assertions = "1.4.0"
+quick_tracing = { version = "0.1.5", features = ["derive"] }
+tokio = { version = "1.38.0", features = ["time", "macros", "rt"] }
+tracing = { version = "0.1.40" }                                    # Logger

@@ -1,64 +1,31 @@
 {
-  "[jsonc]": {
-    "editor.defaultFormatter": "vscode.json-language-features"
+  "[javascript][javascriptreact][typescript][typescriptreact]": {
+    "editor.defaultFormatter": "biomejs.biome"
   },
-  "[markdown]": {
-    "editor.codeActionsOnSave": {
-      "source.fixAll.markdownlint": true
-    },
-    "editor.defaultFormatter": "DavidAnson.vscode-markdownlint",
-    "editor.padding.bottom": 250,
-    "editor.quickSuggestions": {
-      "comments": false,
-      "other": true,
-      "strings": false
-    },
-    "editor.scrollBeyondLastLine": false
+  "[json][jsonc]": {
+    "editor.defaultFormatter": "biomejs.biome"
   },
-  "[rust]": {
-    "editor.formatOnSave": true
+  "[yaml]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
-  "deno.enable": true,
-  "deno.importMap": "./import_map.json",
-  "deno.inlayHints.enumMemberValues.enabled": true,
-  "deno.inlayHints.functionLikeReturnTypes.enabled": true,
-  "deno.inlayHints.parameterNames.enabled": "all",
-  "deno.inlayHints.parameterTypes.enabled": true,
-  "deno.inlayHints.variableTypes.enabled": true,
-  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "quickfix.biome": "explicit",
+    "source.fixAll.eslint": "explicit",
+    "source.fixAll.sortJSON": "never",
+    "source.organizeImports.biome": "explicit"
+  },
+  "evenBetterToml.formatter.alignComments": true,
+  // "rust-analyzer.checkOnSave": false,
+  // "editor.formatOnSave": false
   "files.exclude": {
-    "**/.dccache": true,
-    "**/.DS_Store": true,
-    "**/.gdb_history": true,
-    "**/.git": true,
-    "**/target": true
+    ".swc": true,
+    "**/node_modules": true // optional
   },
   "files.watcherExclude": {
-    "**/.dccache": true,
-    "**/.DS_Store": true,
-    "**/.gdb_history": true,
-    "**/.git": true,
-    "**/dist": true,
-    "**/node_modules": true,
-    "**/target": true
+    "**/.git/objects/**": true,
+    "**/node_modules/**": true,
+    "**/target/**": true
   },
-  "git.autoRepositoryDetection": false,
-  "git.ignoreLimitWarning": true,
-  "markdownlint.config": {
-    "default": true,
-    "MD024": false,
-    "MD025": false,
-    "MD033": false,
-    "no-hard-tabs": false
-  },
-  "rust-analyzer.check.command": "clippy",
-  "rust-analyzer.diagnostics.disabled": [
-    "unresolved-proc-macro"
-  ],
-  "rust-analyzer.inlayHints.lifetimeElisionHints.enable": "skip_trivial",
-  "rust-analyzer.inlayHints.lifetimeElisionHints.useParameterNames": true,
-  "rust-analyzer.linkedProjects": [
-    "./src-tauri/Cargo.toml"
-  ], // For rust-js-interval test error
-  "rust-analyzer.rustfmt.rangeFormatting.enable": true
+  "i18n-ally.keystyle": "nested",
+  "rust-analyzer.check.command": "clippy"
 }
