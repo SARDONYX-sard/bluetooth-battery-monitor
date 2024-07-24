@@ -1,0 +1,19 @@
+<mxfile host="65bd71144e">
+    <diagram id="QaMaUu4YvcVSk6YW6U7o" name="Page-1">
+        <mxGraphModel dx="1266" dy="1880" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="20" value="" style="verticalLabelPosition=bottom;verticalAlign=top;html=1;shape=mxgraph.basic.arc;startAngle=0;endAngle=00.7;shadow=0;labelBorderColor=default;strokeColor=#3AA2DE;strokeWidth=35;fontFamily=Times New Roman;fontSize=10;fontColor=#F5F5F5;fillColor=none;fillOpacity=100;direction=south;" parent="1" vertex="1">
+                    <mxGeometry x="20" y="9" width="480" height="480" as="geometry"/>
+                </mxCell>
+                <mxCell id="22" value="" style="verticalLabelPosition=bottom;verticalAlign=top;html=1;shape=mxgraph.basic.arc;startAngle=0;endAngle=00.7;shadow=0;labelBorderColor=default;strokeColor=#009999;strokeWidth=42;fontFamily=Times New Roman;fontSize=10;fontColor=#F5F5F5;fillColor=none;fillOpacity=100;direction=west;rotation=90;" vertex="1" parent="1">
+                    <mxGeometry x="80" y="71.5" width="360" height="355" as="geometry"/>
+                </mxCell>
+                <mxCell id="25" value="" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;strokeColor=#FFFF33;strokeWidth=35;fillColor=none;fontColor=#ffffff;" vertex="1" parent="1">
+                    <mxGeometry x="175" y="164" width="170" height="170" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>

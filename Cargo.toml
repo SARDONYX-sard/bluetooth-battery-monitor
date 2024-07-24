@@ -1,0 +1,10 @@
+[workspace.package]
+version = "0.3.0"
+description = "Bluetooth battery monitor"
+repository = "https://github.com/SARDONYX-sard/bluetooth-battery-monitor"
+readme = "README.md"
+
+[workspace]
+members = ["crates/bluetooth", "crates/timer", "gui/backend"]
+default-members = ["crates/bluetooth"]
+resolver = "2"

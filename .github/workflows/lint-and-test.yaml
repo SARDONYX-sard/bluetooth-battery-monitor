@@ -1,0 +1,91 @@
+name: Cargo Lint & Test
+
+on:
+  push:
+    branches: ['main']
+  pull_request:
+    branches: '*'
+  workflow_dispatch: # <- Setting to allow manual execution by button.
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        # platform: [macos-latest, ubuntu-20.04, windows-latest]
+        platform: [windows-latest]
+    runs-on: ${{ matrix.platform }}
+
+    steps:
+      - name: Install dependencies (ubuntu only)
+        if: matrix.platform == 'ubuntu-20.04'
+        # You can remove libayatana-appindicator3-dev if you don't use the system tray feature.
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.0-dev libayatana-appindicator3-dev librsvg2-dev
+      - uses: actions/checkout@v4.1.7
+      - name: Rust cache
+        uses: Swatinem/rust-cache@v2.7.3
+        with:
+          prefix-key: cargo-${{ matrix.platform }}
+      - name: Install components
+        run: |
+          rustup component add clippy
+          rustup component add rustfmt
+      - name: Format Check
+        run: cargo fmt --all -- --check
+      - name: Lint Check
+        run: cargo clippy --workspace -- -D warnings
+      - name: Test(Rust)
+        run: cargo test --workspace
+
+      - name: Sync node version
+        uses: actions/setup-node@v4.0.3
+        with:
+          node-version: 'lts/*'
+          cache: 'npm'
+
+      - name: Node.js cache
+        uses: actions/cache@v4.0.2
+        with:
+          path: ${{ github.workspace }}/gui/frontend/.next/cache
+          # Generate a new cache whenever packages or source files change.
+          key: ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('dar2oar_gui/frontend/src/**/*.[jt]s', 'dar2oar_gui/frontend/src/**/*.[jt]sx') }}
+          # If source files changed but packages didn't, rebuild from a prior cache.
+          restore-keys: ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json') }}-
+      - name: Install frontend dependencies
+        run: npm ci
+
+      - name: Test(Node.js)
+        run: npm test
+      - name: Build Test(GUI)
+        run: npm run build
+
+      - name: Make outputs dir
+        run: mkdir -p ./build
+      - name: Compress outputs(Windows)
+        shell: pwsh
+        if: runner.os == 'Windows'
+        run: |
+          Move-Item -Path ./target/release/bluetooth_battery_monitor.exe -Destination './build'
+
+      - name: Compress outputs(MacOS)
+        shell: bash
+        if: runner.os == 'macOS'
+        run: |
+          mv ./target/release/bluetooth_battery_monitor ./build
+      - name: Compress outputs(Linux)
+        shell: bash
+        if: runner.os == 'Linux'
+        run: |
+          mv ./target/release/bluetooth_battery_monitor ./build
+
+      - name: Upload a Build Artifact
+        uses: actions/upload-artifact@v4.3.4
+        with:
+          name: Bluetooth Battery Monitor ${{runner.os}}
+          path: |
+            ./build/

@@ -1,32 +1,30 @@
 ---
 name: Bug Report
 description: File a bug report
-title: "[Bug]: "
-labels: ["bug"]
+title: '[Bug]: '
+labels: ['bug']
 
 body:
   - type: markdown
     attributes:
       value: |
         Thanks for taking the time to fill out this bug report!
-  - type: dropdown
+  - type: input
     id: version
     attributes:
       label: Version
       description: What version of our software are you running?
-      options:
-        - 0.1.0
-        - 0.2.0 (Default)
-        - 0.3.0 (main branch:Next ver.)
+      placeholder: 'Example: 0.1.0'
     validations:
       required: true
+
   - type: textarea
     id: unexpected-behavior
     attributes:
       label: Unexpected behavior here
       description: May I ask you to tell us about the unexpected behavior?
       # yamllint disable-line rule:line-length
-      placeholder: "Example: If '0' is written in settings.toml's duration, the process will go on forever."
+      placeholder: 'Example: logger is not worked.'
     validations:
       required: true
   - type: textarea
@@ -34,7 +32,8 @@ body:
     attributes:
       label: Expected behavior
       description: May I ask you to tell us about the behavior you expect?
-      placeholder: "Example: Consider falling back to 1 if 0 is set."
+      # yamllint disable-line rule:line-length
+      placeholder: 'Example: Reflects the level specification of the logger in the GUI.'
     validations:
       required: true
   - type: textarea
@@ -44,12 +43,3 @@ body:
       # yamllint disable-line rule:line-length
       description: Please copy and paste any relevant log output. This will be automatically formatted into code, so no need for backticks.
       render: Shell
-  - type: checkboxes
-    id: terms
-    attributes:
-      label: Code of Conduct
-      # yamllint disable-line rule:line-length
-      description: By submitting this issue, you agree to follow our [Code of Conduct](https://github.com/SARDONYX-sard/bluetooth-battery-monitor/CODE_OF_CONDUCT.md)
-      options:
-        - label: I agree to follow this project's Code of Conduct
-          required: true
