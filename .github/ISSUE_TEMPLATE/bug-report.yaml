@@ -9,12 +9,15 @@ body:
     attributes:
       value: |
         Thanks for taking the time to fill out this bug report!
-  - type: input
+  - type: dropdown
     id: version
     attributes:
       label: Version
       description: What version of our software are you running?
-      placeholder: 'Example: 0.1.0'
+      options:
+        - 0.1.0
+        - 0.2.0
+        - 0.3.0
     validations:
       required: true
 
