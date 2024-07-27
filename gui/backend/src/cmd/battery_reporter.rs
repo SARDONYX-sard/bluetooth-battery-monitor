@@ -40,8 +40,6 @@ pub async fn restart_interval(window: Window) {
                 // NOTE: The callback fn cannot return a Result, so write only error log.
                 match find_bluetooth_devices().await {
                     Ok(devices) => {
-                        tracing::debug!("Got devices: {:#?}", devices);
-
                         for dev in &devices {
                             if instance_id.is_empty() {
                                 if !dev.is_connected {
