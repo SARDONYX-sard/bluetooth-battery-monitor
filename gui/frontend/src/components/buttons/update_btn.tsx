@@ -1,12 +1,14 @@
 import SyncIcon from '@mui/icons-material/Sync';
 import LoadingButton from '@mui/lab/LoadingButton';
 import { Tooltip } from '@mui/material';
-import { useState } from 'react';
 
 import { useTranslation } from '@/hooks';
 
+import type { MouseEventHandler } from 'react';
+
 type Props = Readonly<{
-  eventFn: () => Promise<void>;
+  onClick: MouseEventHandler<HTMLButtonElement> | undefined;
+  loading: boolean;
 }>;
 
 /**
@@ -15,21 +17,16 @@ type Props = Readonly<{
  * Icon ref
  * - https://mui.com/material-ui/material-icons/
  */
-export function UpdateButton({ eventFn }: Props) {
+export function RestartButton({ onClick, loading }: Props) {
   const { t } = useTranslation();
-  const [loading, setLoading] = useState<boolean>(false);
 
   return (
-    <Tooltip title={t('update-tooltip')}>
+    <Tooltip title={t('restart-tooltip')}>
       <LoadingButton
         endIcon={<SyncIcon />}
         loading={loading}
         loadingPosition='end'
-        onChange={async () => {
-          setLoading(true);
-          await eventFn();
-          setLoading(false);
-        }}
+        onClick={onClick}
         sx={{
           width: '100%',
           minHeight: '40px',
@@ -37,7 +34,7 @@ export function UpdateButton({ eventFn }: Props) {
         type='submit'
         variant='contained'
       >
-        <span>{loading ? t('updating-btn') : t('update-btn')}</span>
+        <span>{loading ? t('restarting-btn') : t('restart-btn')}</span>
       </LoadingButton>
     </Tooltip>
   );

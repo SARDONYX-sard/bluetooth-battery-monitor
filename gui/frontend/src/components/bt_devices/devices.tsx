@@ -3,33 +3,73 @@
 import { Box, Grid, List } from '@mui/material';
 import { useCallback, useEffect, useState } from 'react';
 
-import { type BluetoothDeviceInfo, FindBluetoothDevices, btCache, changeLogLevel } from '@/backend_api';
+import {
+  type BluetoothDeviceInfo,
+  changeLogLevel,
+  defaultTrayIcon,
+  deviceListener,
+  restartInterval,
+} from '@/backend_api';
+import { ConfigFields } from '@/components/bt_devices/config';
 import { DeviceCard } from '@/components/bt_devices/device';
-import { LogDirButton, LogFileButton, UpdateButton } from '@/components/buttons';
+import { LogDirButton, LogFileButton, RestartButton } from '@/components/buttons';
 import { notify } from '@/components/notifications';
 import { selectLogLevel } from '@/utils/selector';
 
-import { ConfigFields } from './update_interval';
+const getDevFromCache = (): BluetoothDeviceInfo[] | undefined => {
+  try {
+    const devJson = localStorage.getItem('devices') ?? undefined;
+    if (typeof devJson === 'string') {
+      return JSON.parse(devJson) as BluetoothDeviceInfo[];
+    }
+    return devJson;
+  } catch (err) {
+    notify.error(`${err}`);
+  }
+};
 
 export const DeviceCards = () => {
-  const [dev, setDev] = useState<BluetoothDeviceInfo[] | null>(null);
+  const [dev, setDev] = useState<BluetoothDeviceInfo[] | undefined>(getDevFromCache());
+  const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
+    let unlisten: (() => void) | undefined = undefined;
+    const setDevWrapper = (dev: BluetoothDeviceInfo[]) => {
+      setDev(dev);
+      localStorage.setItem('devices', JSON.stringify(dev));
+    };
+
     (async () => {
       await changeLogLevel(selectLogLevel(localStorage.getItem('log_level')));
       try {
-        setDev(await btCache.read());
+        unlisten = await deviceListener({ setDev: setDevWrapper });
       } catch (err) {
         notify.error(`${err}`);
       }
     })();
+
+    return () => {
+      if (unlisten) {
+        unlisten();
+      }
+    };
   }, []);
 
-  const updateHandler = useCallback(async () => {
+  const restartHandler = useCallback(async () => {
+    let unlisten: (() => void) | undefined = undefined;
+
     try {
-      const devices = await FindBluetoothDevices();
-      setDev(devices);
-      await btCache.write(devices);
+      setLoading(true);
+      await defaultTrayIcon();
+      await restartInterval();
+      unlisten = await deviceListener({
+        setDev: (_dev: BluetoothDeviceInfo[]) => {
+          setLoading(false);
+          if (unlisten) {
+            unlisten();
+          }
+        },
+      });
     } catch (err) {
       notify.error(`${err}`);
     }
@@ -54,7 +94,7 @@ export const DeviceCards = () => {
         </Grid>
 
         <Grid>
-          <UpdateButton eventFn={updateHandler} />
+          <RestartButton loading={loading} onClick={restartHandler} />
         </Grid>
         <Grid>
           <ConfigFields />

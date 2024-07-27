@@ -48,6 +48,9 @@
   "open-log-dir-btn": "Log(dir)",
   "open-log-dir-tooltip": "Open the log storage location.",
   "open-log-tooltip": "Open current log file.(Rotate to a new log file each time the application is launched.)",
+  "restart-btn": "Restart",
+  "restart-tooltip": "Apply settings & reacquire Bluetooth information.",
+  "restarting-btn": "Restarting...",
   "select-btn": "Select",
   "tab-label-backup": "Backup",
   "tab-label-editor": "Editor / Preset",
@@ -55,9 +58,8 @@
   "tab-label-notice": "Notice",
   "target-bt-id": "Display in tray",
   "target-bt-id-tooltip": "Display the battery information for this device in the taskbar's tray.",
-  "update-btn": "Update",
   "update-interval": "Update interval(mins)",
-  "update-tooltip": "Update Bluetooth information",
-  "updating-btn": "Updating...",
-  "warn-limit-battery": "Warn battery(%)"
+  "update-interval-tooltip": "Battery information acquisition interval (minutes).(App must be restarted to apply settings.)",
+  "warn-limit-battery": "Warn battery(%)",
+  "warn-limit-battery-tooltip": "Notification at what percentage of battery power remaining.(App must be restarted to apply settings.)"
 }

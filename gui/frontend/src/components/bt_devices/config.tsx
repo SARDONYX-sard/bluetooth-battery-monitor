@@ -36,8 +36,10 @@ export const ConfigFields = () => {
   );
 
   const handleAutoStart = useCallback(async () => {
-    setIsAutoStart(!isAutoStart);
-    if (isAutoStart) {
+    const newIsAuto = !isAutoStart;
+
+    setIsAutoStart(newIsAuto);
+    if (newIsAuto) {
       await enable();
     } else {
       await disable();
@@ -49,6 +51,10 @@ export const ConfigFields = () => {
     const newTime = Number.isNaN(newValue) ? 30 : newValue;
 
     if (conf) {
+      if (conf.battery_query_duration_minutes === newTime) {
+        return;
+      }
+
       setConf({
         ...conf,
         // biome-ignore lint/style/useNamingConvention: <explanation>
@@ -61,6 +67,10 @@ export const ConfigFields = () => {
     const newValue = Number(e.target.value);
     const newPer = Number.isNaN(newValue) ? 20 : newValue;
     if (conf) {
+      if (conf.notify_battery_level === newPer) {
+        return;
+      }
+
       setConf({
         ...conf,
         // biome-ignore lint/style/useNamingConvention: <explanation>
@@ -84,35 +94,39 @@ export const ConfigFields = () => {
       )}
 
       {interval !== undefined ? (
-        <TextField
-          InputLabelProps={{ shrink: true }}
-          InputProps={{ inputProps: { min: 1 } }}
-          error={interval < 1}
-          helperText={interval < 1 ? '1 <= N' : ''}
-          id='outlined-number'
-          label={t('update-interval')}
-          onChange={handleInterval}
-          sx={{ m: 1, minWidth: 105, width: 105 }}
-          type='number'
-          value={interval}
-        />
+        <Tooltip title={t('update-interval-tooltip')}>
+          <TextField
+            InputLabelProps={{ shrink: true }}
+            InputProps={{ inputProps: { min: 1 } }}
+            error={interval < 1}
+            helperText={interval < 1 ? '1 <= N' : ''}
+            id='outlined-number'
+            label={t('update-interval')}
+            onChange={handleInterval}
+            sx={{ m: 1, minWidth: 105, width: 105 }}
+            type='number'
+            value={interval}
+          />
+        </Tooltip>
       ) : (
         <Skeleton height={10} width={105} />
       )}
 
       {warnTime !== undefined ? (
-        <TextField
-          InputLabelProps={{ shrink: true }}
-          InputProps={{ inputProps: { min: 0 } }}
-          error={warnTime < 0 || warnTime >= 100}
-          helperText={warnTime < 0 || warnTime >= 100 ? '0 <= N <= 100' : ''}
-          id='outlined-number'
-          label={t('warn-limit-battery')}
-          onChange={handleWarnPerLevel}
-          sx={{ m: 1, minWidth: 105, width: 105 }}
-          type='number'
-          value={warnTime}
-        />
+        <Tooltip title={t('warn-limit-battery-tooltip')}>
+          <TextField
+            InputLabelProps={{ shrink: true }}
+            InputProps={{ inputProps: { min: 0 } }}
+            error={warnTime < 0 || 100 < warnTime}
+            helperText={warnTime < 0 || 100 < warnTime ? '0 <= N <= 100' : ''}
+            id='outlined-number'
+            label={t('warn-limit-battery')}
+            onChange={handleWarnPerLevel}
+            sx={{ m: 1, minWidth: 105, width: 105 }}
+            type='number'
+            value={warnTime}
+          />
+        </Tooltip>
       ) : (
         <Skeleton height={10} width={105} />
       )}

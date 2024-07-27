@@ -25,3 +25,14 @@ pub async fn update_tray(
     tray_handle.set_icon(tauri::Icon::Raw(battery_icon.to_vec()))?;
     tray_handle.set_tooltip(&format!("{device_name} {battery_level}%"))
 }
+
+/// Update application tray icon & name
+pub async fn default_tray(
+    app: &tauri::AppHandle,
+) -> tauri::Result<()> {
+    let battery_icon = include_bytes!("../../../icons/icon.png").as_slice();
+
+    let tray_handle = app.tray_handle();
+    tray_handle.set_icon(tauri::Icon::Raw(battery_icon.to_vec()))?;
+    tray_handle.set_tooltip("Getting bluetooth battery...")
+}

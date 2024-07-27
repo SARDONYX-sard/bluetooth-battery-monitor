@@ -23,7 +23,7 @@ export const LogLevelList = () => {
 
   return (
     <Tooltip
-      placement='top'
+      placement='right'
       title={
         <>
           <p>{t('log-level-list-tooltip')}</p>

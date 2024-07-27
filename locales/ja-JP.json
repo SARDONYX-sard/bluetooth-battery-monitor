@@ -51,7 +51,9 @@
   "progress-btn": "進捗バー",
   "progress-btn-tooltip": "詳細な進捗状況を表示します",
   "progress-btn-tooltip2": "",
-  "remove-oar-btn": "OARを削除",
+  "restart-btn": "リスタート",
+  "restart-tooltip": "設定を適用し、Bluetoothの情報を再取得します",
+  "restarting-btn": "再取得中...",
   "select-btn": "選択",
   "tab-label-backup": "バックアップ",
   "tab-label-editor": "エディタ・プリセット",
@@ -59,9 +61,8 @@
   "tab-label-notice": "通知",
   "target-bt-id": "トレイに表示",
   "target-bt-id-tooltip": "このデバイスのバッテリー情報をタスクバーのトレイに表示させます。",
-  "update-btn": "情報の更新",
   "update-interval": "更新間隔(分)",
-  "update-tooltip": "Bluetoothの情報を更新します。",
-  "updating-btn": "更新中...",
-  "warn-limit-battery": "警告容量(%)"
+  "update-interval-tooltip": "バッテリー情報の取得間隔(分) (アプリのリスタートが必要)",
+  "warn-limit-battery": "警告容量(%)",
+  "warn-limit-battery-tooltip": "通知したいバッテリー残量% (アプリのリスタートが必要)"
 }

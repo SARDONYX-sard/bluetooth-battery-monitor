@@ -1,5 +1,5 @@
 [package]
-name = "bluetooth_battery_monitor_gui"
+name = "bluetooth_battery_monitor"
 version.workspace = true
 description = "Bluetooth battery monitor GUI"
 authors = ["SARDONYX-sard"]

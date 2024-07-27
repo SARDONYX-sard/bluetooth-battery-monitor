@@ -1,26 +1,25 @@
-const formPubCacheKeys = ['logLevel'] as const;
-const formPrivateCacheKeys = [] as const;
-
 export const pubCacheKeys = [
-  ...formPubCacheKeys,
   'custom-translation-dict',
   'customCSS',
   'customJS',
   'editor-tab-select',
   'editorMode',
   'locale',
+  'logLevel',
   'presetNumber',
   'settings-tab-select',
   'snackbar-limit',
   'snackbar-position',
 ] as const;
+
 export const privateCacheKeys = [
-  ...formPrivateCacheKeys,
   'import-backup-path',
   'import-settings-path',
   'export-settings-path',
   'lang-file-path',
+  'devices',
 ] as const;
+
 export const cacheKeys = [...pubCacheKeys, ...privateCacheKeys];
 
 export type CacheKey = (typeof cacheKeys)[number];

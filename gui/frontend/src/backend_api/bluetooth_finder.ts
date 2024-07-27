@@ -40,25 +40,6 @@ export async function FindBluetoothDevices() {
  * Restart interval to get bluetooth device information.
  * @throws `Error`
  */
-export async function restartBtGetter() {
-  return await invoke<BluetoothDeviceInfo[]>('restart_interval');
+export async function restartInterval() {
+  await invoke('restart_interval');
 }
-
-export const btCache = {
-  /**
-   * Get bluetooth device information from cache.
-   * @throws `Error`
-   */
-  async read() {
-    return await invoke<BluetoothDeviceInfo[]>('read_bt_cache');
-  },
-
-  /**
-   * Write bluetooth device information to cache.
-   * @throws `Error`
-   */
-  async write(devices: BluetoothDeviceInfo[]) {
-    // biome-ignore lint/style/useNamingConvention: <explanation>
-    await invoke('write_bt_cache', { devices_json: JSON.stringify(devices) });
-  },
-};

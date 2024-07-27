@@ -10,6 +10,7 @@
     "PCWSTR",
     "repr",
     "tauri",
-    "Uncategorized"
+    "Uncategorized",
+    "unlisten"
   ]
 }
