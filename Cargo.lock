@@ -334,7 +334,7 @@ dependencies = [
 
 [[package]]
 name = "bluetooth"
-version = "0.3.0"
+version = "0.3.1"
 dependencies = [
  "chrono",
  "num-derive",
@@ -352,7 +352,7 @@ dependencies = [
 
 [[package]]
 name = "bluetooth_battery_monitor"
-version = "0.3.0"
+version = "0.3.1"
 dependencies = [
  "anyhow",
  "bluetooth",
@@ -3683,7 +3683,7 @@ dependencies = [
 
 [[package]]
 name = "timer"
-version = "0.3.0"
+version = "0.3.1"
 dependencies = [
  "dashmap",
  "once_cell",

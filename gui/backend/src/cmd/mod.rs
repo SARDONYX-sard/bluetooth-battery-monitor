@@ -17,9 +17,7 @@ pub(crate) async fn update_tray_icon(
 }
 
 #[tauri::command]
-pub(crate) async fn set_default_tray_icon(
-    app: AppHandle,
-) -> Result<(), String> {
+pub(crate) async fn set_default_tray_icon(app: AppHandle) -> Result<(), String> {
     err_log!(default_tray(&app).await)
 }
 
