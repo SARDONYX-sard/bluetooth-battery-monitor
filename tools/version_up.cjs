@@ -10,8 +10,8 @@ function usage() {
   3. patch: Increment the patch version.(e.g. 0.0.0 -> 0.0.1)
 
   Examples:
-  node version_up.js minor
-  node version_up.js 2
+  node version_up.cjs minor
+  node version_up.cjs 2
 `;
 }
 
