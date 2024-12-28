@@ -1,85 +1,62 @@
 {
-  "$schema": "../../node_modules/@tauri-apps/cli/schema.json",
-  "build": {
-    "beforeBuildCommand": "npm run build:front",
-    "beforeDevCommand": "npm run dev:front",
-    "devPath": "http://localhost:3000",
-    "distDir": "../frontend/out"
-  },
-  "package": {
-    "productName": "bluetooth_battery_monitor",
-    "version": "../../package.json"
-  },
-  "tauri": {
-    "allowlist": {
-      "all": false,
-      "dialog": {
-        "all": false,
-        "ask": false,
-        "confirm": false,
-        "message": false,
-        "open": true,
-        "save": true
-      },
-      "fs": {
-        "all": true
-      },
-      "path": {
-        "all": true
-      },
-      "shell": {
-        "all": true
-      },
-      "notification": {
-        "all": true
-      }
-    },
-    "bundle": {
-      "active": true,
-      "category": "DeveloperTool",
-      "copyright": "SARDONYX-sard",
-      "deb": {
-        "depends": []
-      },
-      "externalBin": [],
-      "icon": ["icons/32x32.png", "icons/128x128.png", "icons/128x128@2x.png", "icons/icon.icns", "icons/icon.ico"],
-      "identifier": "SARDONYX.bluetooth-battery-monitor",
-      "longDescription": "",
-      "macOS": {
-        "entitlements": null,
-        "exceptionDomain": "",
-        "frameworks": [],
-        "providerShortName": null,
-        "signingIdentity": null
-      },
-      "resources": [],
-      "shortDescription": "",
-      "targets": "all",
-      "windows": {
-        "certificateThumbprint": null,
-        "digestAlgorithm": "sha256",
-        "timestampUrl": ""
-      }
-    },
-    "systemTray": {
-      "iconPath": "icons/icon.png",
-      "iconAsTemplate": true
-    },
+  "$schema": "../../node_modules/@tauri-apps/cli/config.schema.json",
+  "app": {
     "security": {
-      "csp": null
-    },
-    "updater": {
-      "active": false
+      "csp": null,
+      "pattern": {
+        "use": "brownfield"
+      }
     },
     "windows": [
       {
+        "fullscreen": false,
         "height": 920,
         "resizable": true,
         "theme": "Dark",
         "title": "Bluetooth Battery Monitor",
-        "width": 860,
-        "visible": false
+        "transparent": true,
+        "visible": false,
+        "width": 895,
+        "windowEffects": {
+          "effects": ["micaDark"]
+        }
       }
-    ]
-  }
+    ],
+    "withGlobalTauri": true
+  },
+  "build": {
+    "beforeBuildCommand": "npm run build:front",
+    "beforeDevCommand": "npm run dev:front",
+    "devUrl": "http://localhost:3000",
+    "features": [],
+    "frontendDist": "../frontend/out"
+  },
+  "bundle": {
+    "active": true,
+    "category": "DeveloperTool",
+    "copyright": "SARDONYX-sard",
+    "externalBin": [],
+    "icon": ["icons/32x32.png", "icons/128x128.png", "icons/128x128@2x.png", "icons/icon.icns", "icons/icon.ico"],
+    "licenseFile": "../../LICENSE",
+    "longDescription": "",
+    "macOS": {
+      "entitlements": null,
+      "exceptionDomain": "",
+      "frameworks": [],
+      "providerShortName": null,
+      "signingIdentity": null
+    },
+    "resources": [],
+    "shortDescription": "",
+    "targets": "all",
+    "windows": {
+      "certificateThumbprint": null,
+      "digestAlgorithm": "sha256",
+      "timestampUrl": ""
+    }
+  },
+  "identifier": "SARDONYX.bluetooth-battery-monitor",
+  "plugins": {},
+  "productName": "bluetooth_battery_monitor",
+  "version": "../../package.json"
 }

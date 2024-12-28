@@ -1,6 +1,6 @@
 pub mod battery;
 pub mod device_searcher;
-mod register;
+mod watch;
 
 use super::device_info::{BluetoothDeviceInfo, FindBluetooth, SystemTime};
 use crate::{categories::category::Category, error::Result};

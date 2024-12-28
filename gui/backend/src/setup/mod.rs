@@ -1,13 +1,9 @@
 mod battery_reporter;
-pub mod logger;
 mod system_tray;
-mod window_event;
 
-pub use logger::LOG_INSTANCE; // Need cmd
-
-use battery_reporter::start_interval;
-use system_tray::{create_system_tray, tray_event};
-use tauri::{Builder, Wry};
+use self::battery_reporter::start_interval;
+use self::system_tray::new_tray_menu;
+use tauri::{Builder, Manager, Wry};
 
 pub(crate) trait SetupsRegister {
     /// Implements custom setup.
@@ -17,12 +13,10 @@ pub(crate) trait SetupsRegister {
 impl SetupsRegister for Builder<Wry> {
     fn impl_setup(self) -> Self {
         self.setup(|app| {
-            logger::init_logger(app)?;
-            start_interval(&app.handle());
+            crate::log::init(app)?;
+            new_tray_menu(app.app_handle())?;
+            start_interval(app.handle());
             Ok(())
         })
-        .system_tray(create_system_tray())
-        .on_system_tray_event(tray_event)
-        .on_window_event(window_event::window_event)
     }
 }

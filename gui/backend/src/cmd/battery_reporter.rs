@@ -6,7 +6,7 @@ use std::{
     sync::atomic::{AtomicU64, Ordering},
     time::Duration,
 };
-use tauri::{Manager, Window};
+use tauri::{Emitter as _, Manager, WebviewWindow};
 use timer::{clear_interval, set_interval};
 
 static INTERVAL_ID: AtomicU64 = AtomicU64::new(0);
@@ -14,14 +14,14 @@ static INTERVAL_ID: AtomicU64 = AtomicU64::new(0);
 /// # NOTE
 /// The callback fn cannot return a Result, so write only error log.
 #[tauri::command]
-pub async fn restart_interval(window: Window) {
+pub async fn restart_interval(window: WebviewWindow) {
     tracing::trace!("`restart_interval` was called.");
     let id = INTERVAL_ID.load(Ordering::Acquire);
     if id != 0 {
         clear_interval(id).await;
     };
 
-    let app = window.app_handle();
+    let app = window.app_handle().to_owned();
     let config = read_config(app.clone()).unwrap_or_else(|_| {
         let _ = err_log!(write_config(app.clone(), Default::default()));
         Default::default()

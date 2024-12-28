@@ -1,7 +1,7 @@
 use std::path::PathBuf;
 
 use crate::err_log;
-use tauri::AppHandle;
+use tauri::{AppHandle, Manager};
 
 #[derive(Debug, serde::Deserialize, serde::Serialize)]
 pub struct Config {
@@ -26,8 +26,8 @@ impl Default for Config {
 }
 
 fn get_config_path(app: &AppHandle) -> Result<PathBuf, String> {
-    let resolver = app.path_resolver();
-    let config_dir = &resolver.app_config_dir().ok_or("Not found config dir")?;
+    let resolver = app.path();
+    let config_dir = err_log!(resolver.app_config_dir())?;
     let config_path = config_dir.join(format!("{}_config.json", app.package_info().name));
     Ok(config_path)
 }

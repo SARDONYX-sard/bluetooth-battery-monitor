@@ -18,17 +18,15 @@ serde = ["dep:serde", "dep:serde_with"]
 json = ["serde", "dep:serde_json"]
 
 [dependencies]
-chrono = "0.4.38"
-num-derive = "0.4"
-num-traits = "0.2"
-parse-display = "0.9.1" # Display derive
-serde = { version = "1.0.204", features = [
-  "derive",
-], optional = true } # Implement (De)Serializer
-serde_with = { version = "3.9.0", optional = true }
-serde_json = { version = "1.0.120", optional = true } # Json converter
-snafu = "0.8.3" # Define errors
-tracing = { version = "0.1.40", optional = true } # Logger
+chrono = { workspace = true }
+num-derive = "0.4.2"
+num-traits = "0.2.19"
+parse-display = { workspace = true }                 # Display derive
+serde = { workspace = true, optional = true }        # Implement (De)Serializer
+serde_with = { version = "3.12.0", optional = true }
+serde_json = { workspace = true, optional = true }   # Json converter
+snafu = { workspace = true }
+tracing = { workspace = true, optional = true }      # Logger
 
 [target.'cfg(windows)'.dependencies]
 windows = { version = "0.58.0", features = [
@@ -46,5 +44,5 @@ windows = { version = "0.58.0", features = [
 
 
 [dev-dependencies]
-pretty_assertions = "1.4.0"
-quick_tracing = { version = "0.1.5", features = ["derive"] }
+pretty_assertions = { workspace = true }
+quick_tracing = { workspace = true }

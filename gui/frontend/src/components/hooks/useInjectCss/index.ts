@@ -1,0 +1,1 @@
+export { useInjectCss } from './useInjectCss';

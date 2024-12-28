@@ -1,10 +1,12 @@
+use tauri::{image::Image, tray::TrayIconBuilder, AppHandle};
+
 /// Update application tray icon & name
 pub async fn update_tray(
-    app: &tauri::AppHandle,
+    app: &AppHandle,
     device_name: &str,
     battery_level: u64,
 ) -> tauri::Result<()> {
-    tracing::debug!("Change to {battery_level} battery icon",);
+    tracing::debug!("Change to {battery_level} battery icon");
 
     let battery_icon = match battery_level {
         0 => include_bytes!("../../../icons/battery/battery-0.png"),
@@ -20,17 +22,23 @@ pub async fn update_tray(
         91..=100 => include_bytes!("../../../icons/battery/battery-100.png").as_slice(),
         _ => unreachable!(),
     };
+    let tooltip = &format!("{device_name} {battery_level}%");
 
-    let tray_handle = app.tray_handle();
-    tray_handle.set_icon(tauri::Icon::Raw(battery_icon.to_vec()))?;
-    tray_handle.set_tooltip(&format!("{device_name} {battery_level}%"))
+    let _ = TrayIconBuilder::new()
+        .icon(Image::from_bytes(battery_icon)?)
+        .tooltip(tooltip)
+        .build(app)?;
+
+    Ok(())
 }
 
 /// Update application tray icon & name
 pub async fn default_tray(app: &tauri::AppHandle) -> tauri::Result<()> {
     let battery_icon = include_bytes!("../../../icons/icon.png").as_slice();
 
-    let tray_handle = app.tray_handle();
-    tray_handle.set_icon(tauri::Icon::Raw(battery_icon.to_vec()))?;
-    tray_handle.set_tooltip("Getting bluetooth battery...")
+    let _ = TrayIconBuilder::new()
+        .icon(Image::from_bytes(battery_icon)?)
+        .tooltip("Getting bluetooth battery...")
+        .build(app)?;
+    Ok(())
 }

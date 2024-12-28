@@ -1,82 +1,90 @@
 use super::battery_reporter::start_interval;
-use tauri::{AppHandle, Manager as _, SystemTray, SystemTrayEvent};
+use crate::err_log;
+use parse_display::{Display, FromStr};
+use std::{str::FromStr, sync::Arc};
+use tauri::{
+    menu::{Menu, MenuItem},
+    tray::{MouseButton, TrayIcon, TrayIconBuilder},
+    AppHandle, Manager as _,
+};
 
-const RELOAD_ID: &str = "reload_info";
-const TOGGLE_WINDOW_ID: &str = "toggle_window";
-const EXIT_ID: &str = "quit";
-
-/// # Note
-/// This function is called only at setup time.
-pub fn create_system_tray() -> SystemTray {
-    use tauri::{CustomMenuItem, SystemTrayMenu, SystemTrayMenuItem};
-
-    let reload_info = CustomMenuItem::new(RELOAD_ID, "Reload");
-    let toggle_window = CustomMenuItem::new(TOGGLE_WINDOW_ID, "Show");
-    let quit = CustomMenuItem::new(EXIT_ID, "Exit");
-
-    let tray_menu = SystemTrayMenu::new()
-        .add_item(reload_info)
-        .add_native_item(SystemTrayMenuItem::Separator)
-        .add_item(toggle_window)
-        .add_item(quit);
-    SystemTray::new()
-        .with_menu(tray_menu)
-        .with_tooltip("Getting bluetooth battery...")
+#[derive(Debug, Display, FromStr)]
+enum MenuId {
+    Reload,
+    Show,
+    Quit,
 }
 
 /// # Note
 /// This function is called only at setup time.
-pub fn tray_event(app: &AppHandle, event: SystemTrayEvent) {
-    match event {
-        SystemTrayEvent::LeftClick { .. } => {
-            let item_handle = app.tray_handle().get_item("toggle_window");
-            let window = app.get_window("main").unwrap();
+pub fn new_tray_menu(app: &AppHandle) -> Result<TrayIcon, tauri::Error> {
+    let none = None::<&str>;
 
-            match window.is_visible() {
-                Ok(visible) => {
-                    if let Err(e) = if visible {
-                        window.hide().expect("Couldn't hide window");
-                        item_handle.set_title("Show")
-                    } else {
-                        window.show().expect("Couldn't show window");
-                        item_handle.set_title("Hide")
-                    } {
-                        tracing::error!("{e}");
-                    };
-                }
-                Err(e) => {
-                    tracing::error!("{e}");
-                }
-            }
-        }
-        SystemTrayEvent::MenuItemClick { id, .. } => match id.as_str() {
-            RELOAD_ID => start_interval(app),
-            TOGGLE_WINDOW_ID => {
-                let item_handle = app.tray_handle().get_item(&id);
-                let window = app.get_window("main").unwrap();
+    let reload_i = Arc::new(MenuItem::with_id(
+        app,
+        MenuId::Reload,
+        "Reload",
+        true,
+        none,
+    )?);
+    let show_i = Arc::new(MenuItem::with_id(app, MenuId::Show, "Show", true, none)?);
+    let quit_i = Arc::new(MenuItem::with_id(app, MenuId::Quit, "Exit", true, none)?);
+    let menu = Menu::with_items(app, &[reload_i.as_ref(), show_i.as_ref(), quit_i.as_ref()])?;
+    let cloned_show_i = Arc::clone(&show_i);
 
+    TrayIconBuilder::new()
+        .menu(&menu)
+        .on_tray_icon_event(move |tray, event| {
+            if let tauri::tray::TrayIconEvent::Click { button, .. } = event {
+                if button != MouseButton::Left {
+                    return;
+                }
+
+                let window = tray.app_handle().get_webview_window("main").unwrap();
                 match window.is_visible() {
                     Ok(visible) => {
-                        if let Err(e) = if visible {
-                            window.hide().expect("Couldn't hide window");
-                            item_handle.set_title("Show")
+                        if visible {
+                            let _ = err_log!(window.hide());
+                            let _ = cloned_show_i.set_text("Show");
                         } else {
-                            window.show().expect("Couldn't show window");
-                            item_handle.set_title("Hide")
-                        } {
-                            tracing::error!("{e}");
-                        };
+                            let _ = err_log!(window.show());
+                            let _ = cloned_show_i.set_text("Hide");
+                        }
                     }
                     Err(e) => {
                         tracing::error!("{e}");
                     }
                 }
             }
-            EXIT_ID => {
-                std::process::exit(0);
+        })
+        .on_menu_event(move |app, event| {
+            let event_id = MenuId::from_str(event.id.as_ref());
+            if let Err(e) = event_id {
+                tracing::error!("{e}");
+                return;
             }
-            _ => tracing::error!("Unknown event id: {id}"),
-        },
-        _ => (),
-    }
+
+            match event_id.unwrap() {
+                MenuId::Reload => start_interval(app),
+                MenuId::Show => {
+                    let window = app.get_webview_window("main").unwrap();
+                    match window.is_visible() {
+                        Ok(visible) => {
+                            if visible {
+                                let _ = err_log!(window.hide());
+                                let _ = show_i.set_text("Show");
+                            } else {
+                                let _ = err_log!(window.show());
+                                let _ = show_i.set_text("Hide");
+                            }
+                        }
+                        Err(e) => {
+                            tracing::error!("{e}");
+                        }
+                    }
+                }
+                MenuId::Quit => std::process::exit(0),
+            };
+        })
+        .build(app)
 }

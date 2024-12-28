@@ -13,13 +13,13 @@ rust-version = "1.70"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 [dependencies]
 dashmap = "5.5.3"                                           # Concurrent Hashmap
-once_cell = { version = "1.17.1" }
-snafu = "0.8.3"                                             # Define errors
+once_cell = { workspace = true }
+snafu = { workspace = true }                                # Define errors
 tokio = { version = "1.38.0", features = ["time", "sync"] }
 
 
 [dev-dependencies]
-pretty_assertions = "1.4.0"
-quick_tracing = { version = "0.1.5", features = ["derive"] }
+pretty_assertions = { workspace = true }
+quick_tracing = { workspace = true }
 tokio = { version = "1.38.0", features = ["time", "macros", "rt"] }
-tracing = { version = "0.1.40" }                                    # Logger
+tracing = { workspace = true }                                      # Logger
