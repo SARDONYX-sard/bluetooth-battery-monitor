@@ -3,6 +3,7 @@ version = "0.3.1"
 description = "Bluetooth battery monitor"
 repository = "https://github.com/SARDONYX-sard/bluetooth-battery-monitor"
 readme = "README.md"
+keywords = ["devtools"]
 
 [workspace]
 members = ["crates/bluetooth", "crates/timer", "gui/backend"]
@@ -143,7 +144,6 @@ unnested_or_patterns = "deny"
 unseparated_literal_suffix = "deny"
 unused_self = "deny"
 unwrap_in_result = "deny"
-unwrap_used = "deny"
 useless_let_if_seq = "deny"
 useless_transmute = "deny"
 verbose_file_reads = "deny"

@@ -8,6 +8,7 @@ license = "MIT OR Apache-2.0"
 repository.workspace = true
 edition = "2021"
 rust-version = "1.60"
+keywords.workspace = true
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 [build-dependencies]
@@ -54,5 +55,5 @@ tracing-appender = "0.2.3"
 # DO NOT REMOVE!!
 custom-protocol = ["tauri/custom-protocol"]
 
-[lint]
+[lints]
 workspace = true
