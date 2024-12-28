@@ -1,11 +1,8 @@
 import { Box, type SxProps, type Theme } from '@mui/material';
 
-import { ConvertButton } from '@/components/atoms/ConvertButton';
 import { LogDirButton } from '@/components/molecules/LogDirButton';
 import { LogFileButton } from '@/components/molecules/LogFileButton';
 import { LogLevelList } from '@/components/organisms/LogLevelList';
-
-import type { ComponentPropsWithRef } from 'react';
 
 const sx: SxProps<Theme> = {
   position: 'fixed',
@@ -18,10 +15,8 @@ const sx: SxProps<Theme> = {
   backgroundColor: '#252525d8',
 };
 
-type Props = ComponentPropsWithRef<typeof ConvertButton>;
-
 const MenuPadding = () => <div style={{ height: '100px' }} />;
-export const ConvertNav = (props: Props) => {
+export const ConvertNav = () => {
   return (
     <>
       <MenuPadding />
@@ -29,7 +24,6 @@ export const ConvertNav = (props: Props) => {
         <LogLevelList />
         <LogDirButton />
         <LogFileButton />
-        <ConvertButton {...props} />
       </Box>
     </>
   );
