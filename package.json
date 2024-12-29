@@ -1,5 +1,6 @@
 {
   "name": "bluetooth-battery-monitor",
+  "description": "A simple app to monitor the battery of your bluetooth devices",
   "version": "0.3.1",
   "license": "MIT",
   "homepage": "https://github.com/SARDONYX-sard/bluetooth-battery-monitor",
