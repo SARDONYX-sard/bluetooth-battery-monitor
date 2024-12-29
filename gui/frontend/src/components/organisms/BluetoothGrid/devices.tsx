@@ -2,59 +2,47 @@
 
 import { Box, Grid2 as Grid, List } from '@mui/material';
 import { useCallback, useEffect, useState } from 'react';
+import { z } from 'zod';
 
+import { useStorageState } from '@/components/hooks/useStorageState';
 import { LogDirButton } from '@/components/molecules/LogDirButton';
 import { LogFileButton } from '@/components/molecules/LogFileButton';
 import { ConfigFields } from '@/components/organisms/BluetoothGrid/config';
 import { DeviceCard } from '@/components/organisms/BluetoothGrid/device';
 import { useLogLevelContext } from '@/components/providers/LogLevelProvider';
 import { NOTIFY } from '@/lib/notify';
-import { type BluetoothDeviceInfo, restartInterval } from '@/services/api/bluetooth_finder';
+import { PRIVATE_CACHE_OBJ } from '@/lib/storage/cacheKeys';
+import { type BluetoothDeviceInfo, BluetoothDeviceInfoSchema, restartInterval } from '@/services/api/bluetooth_finder';
 import { deviceListener } from '@/services/api/device_listener';
 import { LOG } from '@/services/api/log';
 import { defaultTrayIcon } from '@/services/api/sys_tray';
 
 import { RestartButton } from './RestartButton';
 
-const getDevFromCache = (): BluetoothDeviceInfo[] | undefined => {
-  try {
-    const devJson = localStorage.getItem('devices') ?? undefined;
-    if (typeof devJson === 'string') {
-      return JSON.parse(devJson) as BluetoothDeviceInfo[];
-    }
-    return devJson;
-  } catch (err) {
-    NOTIFY.error(`${err}`);
-  }
-};
+const OptBluetoothDeviceInfoSchema = z.union([z.array(BluetoothDeviceInfoSchema), z.undefined()]).catch(undefined);
 
 export const DeviceCards = () => {
-  const [dev, setDev] = useState<BluetoothDeviceInfo[] | undefined>(getDevFromCache());
+  const [dev, setDev] = useStorageState(PRIVATE_CACHE_OBJ.devices, OptBluetoothDeviceInfoSchema);
   const [loading, setLoading] = useState<boolean>(false);
   const { logLevel } = useLogLevelContext();
 
   useEffect(() => {
-    let unlisten: (() => void) | undefined;
-    const setDevWrapper = (dev: BluetoothDeviceInfo[]) => {
-      setDev(dev);
-      localStorage.setItem('devices', JSON.stringify(dev));
-    };
-
     (async () => {
       await LOG.changeLevel(logLevel);
-      try {
-        unlisten = await deviceListener({ setDev: setDevWrapper });
-      } catch (err) {
-        NOTIFY.error(`${err}`);
-      }
     })();
+  }, [logLevel]);
 
+  useEffect(() => {
+    let unlisten: (() => void) | undefined;
+    NOTIFY.asyncTry(async () => {
+      unlisten = await deviceListener({ setDev });
+    });
     return () => {
       if (unlisten) {
         unlisten();
       }
     };
-  }, [logLevel]);
+  }, [setDev]);
 
   const restartHandler = useCallback(async () => {
     let unlisten: (() => void) | undefined;

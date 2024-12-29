@@ -6,7 +6,7 @@ import { useCallback } from 'react';
 import { CircularProgressWithLabel } from '@/components/atoms/CircularWithLabel';
 import { useTranslation } from '@/components/hooks/useTranslation';
 import { NOTIFY } from '@/lib/notify';
-import { config } from '@/services/api/backend_config';
+import { CONFIG } from '@/services/api/bluetooth_config';
 import type { BluetoothDeviceInfo } from '@/services/api/bluetooth_finder';
 import { updateTrayIcon } from '@/services/api/sys_tray';
 
@@ -22,8 +22,8 @@ export const DeviceCard = ({ device }: Props) => {
   const cardClickHandler = useCallback(async () => {
     try {
       await updateTrayIcon(friendly_name, battery_level);
-      await config.write({
-        ...(await config.read()),
+      await CONFIG.write({
+        ...(await CONFIG.read()),
         instance_id,
       });
     } catch (err) {

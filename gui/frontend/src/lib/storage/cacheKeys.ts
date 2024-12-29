@@ -7,6 +7,12 @@ import { OBJECT } from '@/lib/object-utils';
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+const MONITOR_PRIVATE_CACHE_KEYS_OBJ = {
+  devices: 'bluetooth-devices',
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 const SETTINGS_PUB_CACHE_KEYS_OBJ = {
   customCss: 'custom-css',
   customJs: 'custom-js',
@@ -43,6 +49,7 @@ export const PUB_CACHE_OBJ = {
 } as const;
 
 export const PRIVATE_CACHE_OBJ = {
+  ...MONITOR_PRIVATE_CACHE_KEYS_OBJ,
   ...SETTINGS_PRIVATE_CACHE_KEYS_OBJ,
 } as const;
 

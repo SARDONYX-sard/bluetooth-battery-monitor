@@ -5,7 +5,7 @@ import { useDebounce } from 'react-use';
 
 import { useTranslation } from '@/components/hooks/useTranslation';
 import { NOTIFY } from '@/lib/notify';
-import { type Config, config } from '@/services/api/backend_config';
+import { CONFIG, type Config } from '@/services/api/bluetooth_config';
 
 export const ConfigFields = () => {
   const { t } = useTranslation();
@@ -17,7 +17,7 @@ export const ConfigFields = () => {
   useEffect(() => {
     (async () => {
       setIsAutoStart(await isEnabled());
-      setConf(await config.read());
+      setConf(await CONFIG.read());
     })();
   }, []);
 
@@ -25,7 +25,7 @@ export const ConfigFields = () => {
     async () => {
       try {
         if (conf) {
-          await config.write(conf);
+          await CONFIG.write(conf);
         }
       } catch (err) {
         NOTIFY.error(`${err}`);

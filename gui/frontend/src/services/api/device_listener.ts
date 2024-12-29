@@ -1,7 +1,7 @@
 import { listen } from '@tauri-apps/api/event';
 
 import { NOTIFY } from '@/lib/notify';
-import type { BluetoothDeviceInfo } from '@/services/backend_api';
+import type { BluetoothDeviceInfo } from '@/services/api/bluetooth_finder';
 
 import type { EventCallback } from '@tauri-apps/api/event';
 import type { JSX } from 'react/jsx-runtime';

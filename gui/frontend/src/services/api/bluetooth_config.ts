@@ -14,7 +14,7 @@ export type Config = {
   notify_battery_level: number;
 };
 
-export const config = {
+export const CONFIG = {
   default: {
     // biome-ignore lint/style/useNamingConvention: <explanation>
     instance_id: '',
@@ -22,7 +22,7 @@ export const config = {
     battery_query_duration_minutes: 60,
     // biome-ignore lint/style/useNamingConvention: <explanation>
     notify_battery_level: 20,
-  },
+  } as const satisfies Config,
 
   /**
    * Read bluetooth finder configuration
@@ -37,4 +37,4 @@ export const config = {
   async write(config: Config) {
     await invoke('write_config', { config });
   },
-};
+} as const;

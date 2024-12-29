@@ -11,6 +11,61 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
+  lint:
+    strategy:
+      matrix:
+        platform: [windows-latest]
+    runs-on: ${{ matrix.platform }}
+
+    steps:
+      - uses: actions/checkout@v4.2.2
+        with:
+          submodules: true
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Rust cache
+        uses: Swatinem/rust-cache@v2.7.6
+        with:
+          prefix-key: cargo-debug-${{ matrix.platform }}
+
+      # NOTE: It is not necessary, but for some reason it makes an error if there is no gui dependency package.
+      - name: Install dependencies (ubuntu only)
+        if: matrix.platform == 'ubuntu-latest'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev build-essential curl wget file libxdo-dev libssl-dev libayatana-appindicator3-dev librsvg2-dev
+
+      - name: Check format
+        run: cargo fmt --all -- --check
+      - name: Lint Check
+        run: cargo clippy --workspace -- -D warnings
+
+  test:
+    strategy:
+      matrix:
+        platform: [windows-latest]
+    runs-on: ${{ matrix.platform }}
+
+    steps:
+      - uses: actions/checkout@v4.2.2
+        with:
+          submodules: true
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Rust cache
+        uses: Swatinem/rust-cache@v2.7.6
+        with:
+          prefix-key: cargo-debug-${{ matrix.platform }}
+      # https://nexte.st/docs/installation/pre-built-binaries/#using-nextest-in-github-actions
+      - name: Install nextest(Parallel Test Execution CLI)
+        uses: taiki-e/install-action@nextest
+      - name: Install dependencies (ubuntu only)
+        if: matrix.platform == 'ubuntu-latest'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev build-essential curl wget file libxdo-dev libssl-dev libayatana-appindicator3-dev librsvg2-dev
+
+      - name: Test(Rust)
+        run: cargo nextest run --workspace
+
   build:
     strategy:
       fail-fast: false
@@ -30,23 +85,7 @@ jobs:
       - name: Rust cache
         uses: Swatinem/rust-cache@v2.7.6
         with:
-          prefix-key: cargo-${{ matrix.platform }}
-      - name: Install components
-        run: |
-          rustup component add clippy
-          rustup component add rustfmt
-
-      - name: Format Check
-        run: cargo fmt --all -- --check
-      - name: Lint Check
-        run: cargo clippy --workspace -- -D warnings
-
-      # https://nexte.st/docs/installation/pre-built-binaries/#using-nextest-in-github-actions
-      - name: Install nextest(Parallel Test Execution CLI)
-        uses: taiki-e/install-action@nextest
-      - name: Test
-        run: cargo nextest run --workspace
-
+          prefix-key: cargo-release-${{ matrix.platform }}
       - name: Sync node version
         uses: actions/setup-node@v4.1.0
         with:
@@ -71,20 +110,16 @@ jobs:
 
       - name: Make outputs dir
         run: mkdir -p ./build
+
       - name: Compress outputs(Windows)
         shell: pwsh
         if: runner.os == 'Windows'
         run: |
           Move-Item -Path ./target/release/bluetooth_battery_monitor.exe -Destination './build'
 
-      - name: Compress outputs(MacOS)
+      - name: Compress outputs(Linux/MacOS)
         shell: bash
-        if: runner.os == 'macOS'
-        run: |
-          mv ./target/release/bluetooth_battery_monitor ./build
-      - name: Compress outputs(Linux)
-        shell: bash
-        if: runner.os == 'Linux'
+        if: runner.os != 'Windows'
         run: |
           mv ./target/release/bluetooth_battery_monitor ./build
 
