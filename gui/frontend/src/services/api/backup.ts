@@ -28,7 +28,8 @@ export const BACKUP = {
             delete json[key];
           }
         }
-        return json;
+
+        return json as Partial<Record<string, string>>;
       }
     }
   },
