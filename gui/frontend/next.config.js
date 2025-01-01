@@ -3,7 +3,9 @@ const nextConfig = {
   distDir: './out',
   output: 'export',
   reactStrictMode: true,
-  swcMinify: true,
+  experimental: {
+    reactCompiler: true,
+  },
 };
 
 export default nextConfig;

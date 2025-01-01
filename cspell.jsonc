@@ -9,6 +9,7 @@
     "PCSTR",
     "PCWSTR",
     "repr",
+    "serde",
     "tauri",
     "Uncategorized",
     "unlisten"

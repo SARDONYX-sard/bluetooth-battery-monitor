@@ -11,45 +11,88 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
+  lint:
+    strategy:
+      matrix:
+        platform: [windows-latest]
+    runs-on: ${{ matrix.platform }}
+
+    steps:
+      - uses: actions/checkout@v4.2.2
+        with:
+          submodules: true
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Rust cache
+        uses: Swatinem/rust-cache@v2.7.6
+        with:
+          prefix-key: cargo-debug-${{ matrix.platform }}
+
+      # NOTE: It is not necessary, but for some reason it makes an error if there is no gui dependency package.
+      - name: Install dependencies (ubuntu only)
+        if: matrix.platform == 'ubuntu-latest'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev build-essential curl wget file libxdo-dev libssl-dev libayatana-appindicator3-dev librsvg2-dev
+
+      - name: Check format
+        run: cargo fmt --all -- --check
+      - name: Lint Check
+        run: cargo clippy --workspace -- -D warnings
+
+  test:
+    strategy:
+      matrix:
+        platform: [windows-latest]
+    runs-on: ${{ matrix.platform }}
+
+    steps:
+      - uses: actions/checkout@v4.2.2
+        with:
+          submodules: true
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Rust cache
+        uses: Swatinem/rust-cache@v2.7.6
+        with:
+          prefix-key: cargo-debug-${{ matrix.platform }}
+      # https://nexte.st/docs/installation/pre-built-binaries/#using-nextest-in-github-actions
+      - name: Install nextest(Parallel Test Execution CLI)
+        uses: taiki-e/install-action@nextest
+      - name: Install dependencies (ubuntu only)
+        if: matrix.platform == 'ubuntu-latest'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev build-essential curl wget file libxdo-dev libssl-dev libayatana-appindicator3-dev librsvg2-dev
+
+      - name: Test(Rust)
+        run: cargo nextest run --workspace
+
   build:
     strategy:
       fail-fast: false
       matrix:
-        # platform: [macos-latest, ubuntu-20.04, windows-latest]
+        # platform: [macos-latest, ubuntu-latest, windows-latest]
         platform: [windows-latest]
     runs-on: ${{ matrix.platform }}
 
     steps:
       - name: Install dependencies (ubuntu only)
-        if: matrix.platform == 'ubuntu-20.04'
-        # You can remove libayatana-appindicator3-dev if you don't use the system tray feature.
+        if: matrix.platform == 'ubuntu-latest'
         run: |
           sudo apt-get update
-          sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.0-dev libayatana-appindicator3-dev librsvg2-dev
-      - uses: actions/checkout@v4.1.7
+          sudo apt-get install -y libwebkit2gtk-4.1-dev build-essential curl wget file libxdo-dev libssl-dev libayatana-appindicator3-dev librsvg2-dev
+      - uses: actions/checkout@v4.2.2
       - name: Rust cache
-        uses: Swatinem/rust-cache@v2.7.3
+        uses: Swatinem/rust-cache@v2.7.6
         with:
-          prefix-key: cargo-${{ matrix.platform }}
-      - name: Install components
-        run: |
-          rustup component add clippy
-          rustup component add rustfmt
-      - name: Format Check
-        run: cargo fmt --all -- --check
-      - name: Lint Check
-        run: cargo clippy --workspace -- -D warnings
-      - name: Test(Rust)
-        run: cargo test --workspace
-
+          prefix-key: cargo-release-${{ matrix.platform }}
       - name: Sync node version
-        uses: actions/setup-node@v4.0.3
+        uses: actions/setup-node@v4.1.0
         with:
           node-version: 'lts/*'
           cache: 'npm'
 
       - name: Node.js cache
-        uses: actions/cache@v4.0.2
+        uses: actions/cache@v4.2.0
         with:
           path: ${{ github.workspace }}/gui/frontend/.next/cache
           # Generate a new cache whenever packages or source files change.
@@ -66,25 +109,21 @@ jobs:
 
       - name: Make outputs dir
         run: mkdir -p ./build
+
       - name: Compress outputs(Windows)
         shell: pwsh
         if: runner.os == 'Windows'
         run: |
           Move-Item -Path ./target/release/bluetooth_battery_monitor.exe -Destination './build'
 
-      - name: Compress outputs(MacOS)
+      - name: Compress outputs(Linux/MacOS)
         shell: bash
-        if: runner.os == 'macOS'
-        run: |
-          mv ./target/release/bluetooth_battery_monitor ./build
-      - name: Compress outputs(Linux)
-        shell: bash
-        if: runner.os == 'Linux'
+        if: runner.os != 'Windows'
         run: |
           mv ./target/release/bluetooth_battery_monitor ./build
 
       - name: Upload a Build Artifact
-        uses: actions/upload-artifact@v4.3.4
+        uses: actions/upload-artifact@v4.5.0
         with:
           name: Bluetooth Battery Monitor ${{runner.os}}
           path: |

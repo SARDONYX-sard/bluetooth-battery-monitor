@@ -31,9 +31,8 @@ pub(crate) async fn find_bluetooth_devices() -> Result<Vec<BluetoothDeviceInfo>,
 
 #[tauri::command]
 pub(crate) async fn change_log_level(log_level: Option<&str>) -> Result<(), String> {
-    use supports::change_log_level;
     tracing::debug!("Selected log level: {:?}", log_level);
-    err_log!(change_log_level(log_level.unwrap_or("error")))
+    err_log!(crate::log::change_level(log_level.unwrap_or("error")))
 }
 
 /// Define our own `writeTextFile` api for tauri,

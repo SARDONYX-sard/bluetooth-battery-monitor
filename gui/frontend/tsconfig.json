@@ -28,13 +28,12 @@
     "forceConsistentCasingInFileNames": true
   },
   "include": [
-    "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
-    "../out/types/**/*.ts",
-    ".next/types/**/*.ts",
+    "../../vitest.config.ts",
     "./out/types/**/*.ts",
-    "../../vitest.config.ts"
+    ".next/types/**/*.ts",
+    "next-env.d.ts"
   ],
   "exclude": ["node_modules"]
 }
