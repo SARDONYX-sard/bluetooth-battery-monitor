@@ -105,7 +105,7 @@ jobs:
       - name: Test(Node.js)
         run: npm test
       - name: Build Test(GUI)
-        run: npm run build -- --no-bundle
+        run: npm run build
 
       - name: Make outputs dir
         run: mkdir -p ./build
