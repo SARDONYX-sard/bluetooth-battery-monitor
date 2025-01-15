@@ -1,12 +1,15 @@
 use std::sync::Arc;
 
 use dashmap::DashMap;
-use windows::core::{Interface, HSTRING};
+use windows::core::HSTRING;
 use windows::Devices::Enumeration::{DeviceInformation, DeviceInformationUpdate, DeviceWatcher};
 use windows::Foundation::Collections::IIterable;
-use windows::Foundation::{DateTime, IReference, TypedEventHandler};
+use windows::Foundation::TypedEventHandler;
 
-use crate::BluetoothDeviceInfo;
+use crate::device::device_info::{BluetoothDeviceInfo, SystemTime};
+
+use super::battery::BatteryInfo;
+use super::device_searcher::get_bluetooth_devices;
 
 // e0cbf06c-cd8b-4647-bb8a-263b43f0f974 is Bluetooth classic
 // https://learn.microsoft.com/en-us/windows-hardware/drivers/install/system-defined-device-setup-classes-available-to-vendors
@@ -23,8 +26,7 @@ const IS_CONNECTED: &str = "System.Devices.Aep.IsConnected"; // https://learn.mi
 const LAST_CONNECTED_TIME: &str = "System.DeviceInterface.Bluetooth.LastConnectedTime";
 
 impl Watcher {
-    #[allow(unused)]
-    pub fn new() -> windows::core::Result<Self> {
+    pub fn new() -> crate::error::Result<Self> {
         let watcher = {
             // - ref: https://learn.microsoft.com/uwp/api/windows.devices.enumeration.deviceinformationkind?view=winrt-26100
             let aqs_filter = HSTRING::from(
@@ -45,62 +47,39 @@ impl Watcher {
                 windows::Devices::Enumeration::DeviceInformationKind::AssociationEndpoint,
             )?
         };
-        let devices = Arc::new(DashMap::new());
+
+        let devices = {
+            let devices = get_bluetooth_devices()?; // From native rust
+            let batteries = BatteryInfo::news_from_script()?; // From powershell
+            Arc::new(BluetoothDeviceInfo::merge_devices(batteries, devices)?)
+        };
 
         {
-            let add_handler = TypedEventHandler::<DeviceWatcher, DeviceInformation>::new(
-                |_watcher, device_info| {
-                    if let Some(device) = device_info.as_ref() {
-                        let id = device.Id()?.to_string();
-                        let address = id_to_address(&mut id.as_str()).unwrap();
-                        let name = device.Name()?;
-                        let is_connected = device.Pairing()?.IsPaired()?;
-
-                        // if !devices.contains_key(&address) {
-                        //     let device = BluetoothDeviceInfo {
-                        //         friendly_name: device.Name()?.to_string(),
-                        //         address,
-                        //         battery_level: 0,
-                        //         category: Default::default(),
-                        //         is_connected,
-                        //         last_used: Default::default(),
-                        //     };
-                        //     devices.insert(address, value)
-                        // }
-                        println!("==================== Add ===============");
-                        println!("Name = {}", device.Name()?);
-                        println!("Id = {}", device.Id()?);
-                        println!("Kind = {}", device.Kind().map(device_kind_to_str)?);
-
-                        // ref: https://github.com/microsoft/windows-rs/issues/2604#issuecomment-1677977514
-                        let map = device.Properties()?;
-
-                        let is_connected = map
-                            .Lookup(&HSTRING::from(IS_CONNECTED))?
-                            .cast::<IReference<bool>>()?
-                            .Value()?;
-                        println!("IsConnected = {is_connected}");
-
-                        let date = map
-                            .Lookup(&HSTRING::from(LAST_CONNECTED_TIME))?
-                            .cast::<IReference<DateTime>>()?
-                            .Value()?;
-                        dbg!(windows_datetime_to_chrono(date.UniversalTime));
-                    };
-
-                    Ok(())
-                },
-            );
-            watcher.Added(&add_handler)?;
-        }
-
-        {
+            let devices = devices.clone();
             let update_handler = TypedEventHandler::<DeviceWatcher, DeviceInformationUpdate>::new(
-                |_watcher, device_info| {
+                move |_watcher, device_info| {
                     if let Some(device) = device_info.as_ref() {
-                        device.Id();
-                        println!("==================== Update ===============");
-                        print_update_device_info(device)?;
+                        match id_to_address(&mut device.Id()?.to_string().as_str()) {
+                            Ok(address) => {
+                                if let Some(mut dev) = devices.get_mut(&address) {
+                                    let battery = BatteryInfo::from_instance_id(&dev.instance_id);
+                                    match battery {
+                                        Ok(battery) => {
+                                            let dev = dev.value_mut();
+                                            dev.battery_level = battery.battery_level;
+                                            dev.is_connected = battery.is_connected.unwrap();
+                                            dev.last_update = SystemTime::now();
+                                        }
+                                        Err(e) => {
+                                            tracing::error!("{e}");
+                                        }
+                                    }
+                                };
+                            }
+                            Err(e) => {
+                                tracing::error!("{e}");
+                            }
+                        }
                     };
                     Ok(())
                 },
@@ -109,11 +88,17 @@ impl Watcher {
         }
 
         {
+            let devices = devices.clone();
             let remove_handler = TypedEventHandler::<DeviceWatcher, DeviceInformationUpdate>::new(
-                |_watcher, device_info| {
+                move |_watcher, device_info| {
                     if let Some(device) = device_info.as_ref() {
                         println!("==================== Remove ===============");
-                        print_update_device_info(device)?;
+                        match id_to_address(&mut device.Id()?.to_string().as_str()) {
+                            Ok(address) => {
+                                devices.remove(&address);
+                            }
+                            Err(e) => tracing::error!("{e}"),
+                        }
                     };
                     Ok(())
                 },
@@ -124,57 +109,16 @@ impl Watcher {
         Ok(Self { watcher, devices })
     }
 
-    #[allow(unused)]
     pub fn start(&self) -> windows::core::Result<()> {
         self.watcher.Start()
     }
 
-    #[allow(unused)]
     pub fn stop(&self) -> windows::core::Result<()> {
         self.watcher.Stop()
     }
-}
 
-fn windows_datetime_to_chrono(universal_time: i64) -> chrono::DateTime<chrono::Utc> {
-    use chrono::TimeZone as _;
-
-    // Windows FILETIME epoch (1601-01-01) to Unix epoch (1970-01-01) in 100ns units
-    const EPOCH_DIFFERENCE_100NS: i64 = 11_644_473_600 * 10_000_000;
-
-    // Adjust to Unix epoch
-    let unix_time_100ns = universal_time - EPOCH_DIFFERENCE_100NS;
-
-    // Convert 100ns to seconds and nanoseconds
-    let seconds = unix_time_100ns / 10_000_000;
-    let nanoseconds = (unix_time_100ns % 10_000_000) * 100;
-
-    // Create chrono::DateTime
-    chrono::Utc
-        .timestamp_opt(seconds, nanoseconds as u32)
-        .unwrap()
-}
-
-fn print_update_device_info(device: &DeviceInformationUpdate) -> windows::core::Result<()> {
-    println!("Id = {}", device.Id()?);
-    println!("Kind = {}", device.Kind().map(device_kind_to_str)?);
-    println!("===========================================");
-    Ok(())
-}
-
-pub fn device_kind_to_str(
-    kind: windows::Devices::Enumeration::DeviceInformationKind,
-) -> &'static str {
-    match kind.0 {
-        1 => "DeviceInterface",
-        2 => "DeviceContainer",
-        3 => "Device",
-        4 => "DeviceInterfaceClass",
-        5 => "AssociationEndpoint",
-        6 => "AssociationEndpointContainer",
-        7 => "AssociationEndpointService",
-        8 => "DevicePanel",
-        9 => "AssociationEndpointProtocol",
-        _ => "Unknown", // 0 or others
+    pub fn devices(&self) -> &DashMap<u64, BluetoothDeviceInfo> {
+        &self.devices
     }
 }
 

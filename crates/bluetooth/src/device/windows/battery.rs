@@ -25,6 +25,8 @@ pub struct BatteryInfo {
     /// e.g. "2024-06-09T12:43:36.636288+09:00"
     #[cfg_attr(feature = "serde", serde(with = "rfc3339_date_fmt"))]
     pub last_arrival_date: DateTime<Utc>,
+
+    pub is_connected: Option<bool>,
 }
 
 #[cfg(feature = "json")]
@@ -47,6 +49,22 @@ mod device_serde {
                     "-Command",
                     include_str!("../../../scripts/get-bluetooth-battery-all.ps1"),
                 ])
+                .creation_flags(CREATE_NO_WINDOW.0)
+                .output()?;
+            let json_str = String::from_utf8_lossy(&output.stdout);
+            let devices = serde_json::from_str(json_str.trim())?;
+
+            Ok(devices)
+        }
+
+        /// Create new Device info from powershell command.
+        pub fn from_instance_id(id: &str) -> Result<Self> {
+            let script_str = &format!(
+                "\n$InstanceId = \"{id}\";{}",
+                include_str!("../../../scripts/get-bluetooth-battery.ps1")
+            );
+            let output = std::process::Command::new("powershell.exe")
+                .args(["-ExecutionPolicy", "ByPass", "-Command", script_str])
                 .creation_flags(CREATE_NO_WINDOW.0)
                 .output()?;
             let json_str = String::from_utf8_lossy(&output.stdout);

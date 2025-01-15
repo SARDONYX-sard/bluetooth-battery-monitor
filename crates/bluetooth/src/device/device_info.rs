@@ -1,4 +1,5 @@
 use crate::{categories::category::Category, error::Result};
+use chrono::{Datelike as _, Timelike as _};
 
 /// Bluetooth battery info
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
@@ -21,9 +22,10 @@ pub struct BluetoothDeviceInfo {
 
     /// Native time
     /// e.g. `2024/4/19 22:42:16`
-    pub last_used: SystemTime,
+    pub last_update: SystemTime,
 }
 
+/// Local time
 #[cfg_attr(
     feature = "serde",
     derive(serde_with::DeserializeFromStr, serde_with::SerializeDisplay,)
@@ -48,6 +50,21 @@ pub struct SystemTime {
     pub hour: u16,
     pub minute: u16,
     pub second: u16,
+}
+
+impl SystemTime {
+    /// Create a new system time
+    pub fn now() -> Self {
+        let now = chrono::Local::now();
+        Self {
+            year: now.year() as u16,
+            month: now.month() as u16,
+            day: now.day() as u16,
+            hour: now.hour() as u16,
+            minute: now.minute() as u16,
+            second: now.second() as u16,
+        }
+    }
 }
 
 /// Cross-platform common methods
