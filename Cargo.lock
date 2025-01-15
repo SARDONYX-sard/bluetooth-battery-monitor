@@ -374,6 +374,7 @@ dependencies = [
  "snafu",
  "tracing",
  "windows 0.59.0",
+ "winnow 0.6.24",
 ]
 
 [[package]]
@@ -4496,7 +4497,7 @@ dependencies = [
  "serde",
  "serde_spanned",
  "toml_datetime",
- "winnow 0.6.20",
+ "winnow 0.6.24",
 ]
 
 [[package]]
@@ -5594,9 +5595,9 @@ dependencies = [
 
 [[package]]
 name = "winnow"
-version = "0.6.20"
+version = "0.6.24"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "36c1fec1a2bb5866f07c25f68c26e565c4c200aebb96d7e55710c19d3e8ac49b"
+checksum = "c8d71a593cc5c42ad7876e2c1fda56f314f3754c084128833e64f1345ff8a03a"
 dependencies = [
  "memchr",
 ]
@@ -5761,7 +5762,7 @@ dependencies = [
  "tracing",
  "uds_windows",
  "windows-sys 0.59.0",
- "winnow 0.6.20",
+ "winnow 0.6.24",
  "xdg-home",
  "zbus_macros 5.2.0",
  "zbus_names 4.1.0",
@@ -5815,7 +5816,7 @@ checksum = "856b7a38811f71846fd47856ceee8bccaec8399ff53fb370247e66081ace647b"
 dependencies = [
  "serde",
  "static_assertions",
- "winnow 0.6.20",
+ "winnow 0.6.24",
  "zvariant 5.1.0",
 ]
 
@@ -5843,7 +5844,7 @@ dependencies = [
  "serde",
  "static_assertions",
  "url",
- "winnow 0.6.20",
+ "winnow 0.6.24",
  "zvariant_derive 5.1.0",
  "zvariant_utils 3.0.2",
 ]
@@ -5896,5 +5897,5 @@ dependencies = [
  "serde",
  "static_assertions",
  "syn 2.0.87",
- "winnow 0.6.20",
+ "winnow 0.6.24",
 ]
