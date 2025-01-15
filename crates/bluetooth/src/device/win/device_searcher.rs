@@ -46,7 +46,7 @@ pub fn get_bluetooth_devices() -> Result<HashMap<u64, SysBluetoothDeviceInfo>> {
 
     let mut res = HashMap::new();
     loop {
-        match unsafe { BluetoothGetDeviceInfo(HANDLE(search_handle.0), &mut device_info) } {
+        match unsafe { BluetoothGetDeviceInfo(Some(HANDLE(search_handle.0)), &mut device_info) } {
             err_code if err_code != 0 => {
                 #[cfg(feature = "tracing")]
                 tracing::error!("Error code: {err_code}");

@@ -20,6 +20,7 @@ json = ["serde", "dep:serde_json"]
 
 [dependencies]
 chrono = { workspace = true }
+dashmap = { workspace = true }
 num-derive = "0.4.2"
 num-traits = "0.2.19"
 parse-display = { workspace = true }                 # Display derive
@@ -30,7 +31,7 @@ snafu = { workspace = true }
 tracing = { workspace = true, optional = true }      # Logger
 
 [target.'cfg(windows)'.dependencies]
-windows = { version = "0.58.0", features = [
+windows = { version = "0.59.0", features = [
   "Devices_Bluetooth_Rfcomm",
   "Devices_Enumeration",
   "Foundation",
