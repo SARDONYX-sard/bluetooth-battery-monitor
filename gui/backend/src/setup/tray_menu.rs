@@ -1,12 +1,16 @@
-use super::battery_reporter::start_interval;
-use crate::err_log;
+use crate::{cmd::device_watcher::restart_device_watcher_inner, err_log};
 use parse_display::{Display, FromStr};
-use std::{str::FromStr, sync::Arc};
+use std::{
+    str::FromStr,
+    sync::{Arc, Mutex},
+};
 use tauri::{
     menu::{Menu, MenuItem},
     tray::{MouseButton, TrayIcon, TrayIconBuilder},
     AppHandle, Manager as _,
 };
+
+pub static TRAY_ICON: Mutex<Option<TrayIcon>> = Mutex::new(None);
 
 #[derive(Debug, Display, FromStr)]
 enum MenuId {
@@ -44,10 +48,10 @@ pub fn new_tray_menu(app: &AppHandle) -> Result<TrayIcon, tauri::Error> {
                 match window.is_visible() {
                     Ok(visible) => {
                         if visible {
-                            let _ = err_log!(window.hide());
+                            err_log!(window.hide());
                             let _ = cloned_show_i.set_text("Show");
                         } else {
-                            let _ = err_log!(window.show());
+                            err_log!(window.show());
                             let _ = cloned_show_i.set_text("Hide");
                         }
                     }
@@ -57,34 +61,33 @@ pub fn new_tray_menu(app: &AppHandle) -> Result<TrayIcon, tauri::Error> {
                 }
             }
         })
-        .on_menu_event(move |app, event| {
-            let event_id = MenuId::from_str(event.id.as_ref());
-            if let Err(e) = event_id {
-                tracing::error!("{e}");
-                return;
-            }
-
-            match event_id.unwrap() {
-                MenuId::Reload => start_interval(app),
-                MenuId::Show => {
-                    let window = app.get_webview_window("main").unwrap();
-                    match window.is_visible() {
-                        Ok(visible) => {
-                            if visible {
-                                let _ = err_log!(window.hide());
-                                let _ = show_i.set_text("Show");
-                            } else {
-                                let _ = err_log!(window.show());
-                                let _ = show_i.set_text("Hide");
+        .on_menu_event(
+            move |app, event| match MenuId::from_str(event.id.as_ref()) {
+                Ok(event_id) => match event_id {
+                    MenuId::Reload => err_log!(restart_device_watcher_inner(app)),
+                    MenuId::Show => {
+                        let window = app.get_webview_window("main").unwrap();
+                        match window.is_visible() {
+                            Ok(visible) => {
+                                if visible {
+                                    err_log!(window.hide());
+                                    let _ = show_i.set_text("Show");
+                                } else {
+                                    err_log!(window.show());
+                                    let _ = show_i.set_text("Hide");
+                                }
                             }
-                        }
-                        Err(e) => {
-                            tracing::error!("{e}");
-                        }
+                            Err(e) => {
+                                tracing::error!("{e}");
+                            }
+                        };
                     }
+                    MenuId::Quit => std::process::exit(0),
+                },
+                Err(e) => {
+                    tracing::error!("{e}");
                 }
-                MenuId::Quit => std::process::exit(0),
-            };
-        })
+            },
+        )
         .build(app)
 }

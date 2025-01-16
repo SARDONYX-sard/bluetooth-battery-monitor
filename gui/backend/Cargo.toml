@@ -7,7 +7,7 @@ readme = "./readme.md"
 license = "MIT OR Apache-2.0"
 repository.workspace = true
 edition = "2021"
-rust-version = "1.60"
+rust-version = "1.80"
 keywords.workspace = true
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html

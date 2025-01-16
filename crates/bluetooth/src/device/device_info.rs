@@ -22,6 +22,10 @@ pub struct BluetoothDeviceInfo {
 
     /// Native time
     /// e.g. `2024/4/19 22:42:16`
+    pub last_used: SystemTime,
+
+    /// Native time
+    /// e.g. `2024/4/19 22:42:16`
     pub last_update: SystemTime,
 }
 

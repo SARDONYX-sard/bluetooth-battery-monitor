@@ -18,6 +18,14 @@ impl BluetoothDeviceInfo {
             is_connected: device_info.fConnected.as_bool(),
             instance_id: battery_info.instance_id,
             address: unsafe { device_info.Address.Anonymous.ullLong },
+            last_used: SystemTime {
+                year: device_info.stLastUsed.wYear,
+                month: device_info.stLastUsed.wMonth,
+                day: device_info.stLastUsed.wDay,
+                hour: device_info.stLastUsed.wHour,
+                minute: device_info.stLastUsed.wMinute,
+                second: device_info.stLastUsed.wSecond,
+            },
             last_update: SystemTime::now(),
         })
     }

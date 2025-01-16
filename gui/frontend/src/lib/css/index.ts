@@ -42,6 +42,7 @@ main {
   opacity: 0.6;
 }
 
+.MuiCard-root,
 .MuiOutlinedInput-root {
   background-color: #2424248c !important;
 }
@@ -55,7 +56,6 @@ p.Mui-error {
 .Mui-selected,
 .MuiButton-outlined,
 .MuiButton-root.MuiButton-text,
-.MuiCircularProgress-svg,
 .MuiInputBase-root.MuiOutlinedInput-root.MuiInputBase-colorPrimary.Mui-focused>fieldset,
 [class$="MuiFormLabel-root"].Mui-focused,
 [class$="MuiInputBase-root-MuiInput-root"]::after,
@@ -85,7 +85,6 @@ span.Mui-checked>svg {
   background-color: var(--hover-convert-btn-color);
 }
 
-.MuiLinearProgress-bar,
 .MuiTabs-indicator {
   background-color: var(--theme-color);
 }

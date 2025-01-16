@@ -15,7 +15,7 @@ keywords.workspace = true
 [features]
 default = ["json", "tracing"]
 tracing = ["dep:tracing"]
-serde = ["dep:serde", "dep:serde_with"]
+serde = ["dep:serde", "dep:serde_with", "dashmap/serde"]
 json = ["serde", "dep:serde_json"]
 
 [dependencies]

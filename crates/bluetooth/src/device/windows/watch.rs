@@ -2,7 +2,9 @@ use std::sync::Arc;
 
 use dashmap::DashMap;
 use windows::core::HSTRING;
-use windows::Devices::Enumeration::{DeviceInformation, DeviceInformationUpdate, DeviceWatcher};
+use windows::Devices::Enumeration::{
+    DeviceInformation, DeviceInformationKind, DeviceInformationUpdate, DeviceWatcher,
+};
 use windows::Foundation::Collections::IIterable;
 use windows::Foundation::TypedEventHandler;
 
@@ -20,13 +22,15 @@ pub struct Watcher {
     devices: Arc<DashMap<u64, BluetoothDeviceInfo>>,
 }
 
+pub type Devices = DashMap<u64, BluetoothDeviceInfo>;
+
 // ref list: https://learn.microsoft.com/ja-jp/windows/win32/properties/devices-bumper
 const DEVICE_ADDRESS: &str = "System.Devices.Aep.DeviceAddress";
 const IS_CONNECTED: &str = "System.Devices.Aep.IsConnected"; // https://learn.microsoft.com/windows/win32/properties/props-system-devices-aep-isconnected
 const LAST_CONNECTED_TIME: &str = "System.DeviceInterface.Bluetooth.LastConnectedTime";
 
 impl Watcher {
-    pub fn new() -> crate::error::Result<Self> {
+    pub fn new(update_fn: impl Fn() + Send + 'static) -> crate::error::Result<Self> {
         let watcher = {
             // - ref: https://learn.microsoft.com/uwp/api/windows.devices.enumeration.deviceinformationkind?view=winrt-26100
             let aqs_filter = HSTRING::from(
@@ -44,7 +48,7 @@ impl Watcher {
             DeviceInformation::CreateWatcherWithKindAqsFilterAndAdditionalProperties(
                 &aqs_filter,
                 &kind,
-                windows::Devices::Enumeration::DeviceInformationKind::AssociationEndpoint,
+                DeviceInformationKind::AssociationEndpoint,
             )?
         };
 
@@ -69,9 +73,11 @@ impl Watcher {
                                             dev.battery_level = battery.battery_level;
                                             dev.is_connected = battery.is_connected.unwrap();
                                             dev.last_update = SystemTime::now();
+                                            update_fn();
                                         }
                                         Err(e) => {
                                             tracing::error!("{e}");
+                                            return Ok(()); // Return Ok because only windows-only errors can be returned.
                                         }
                                     }
                                 };
@@ -110,6 +116,7 @@ impl Watcher {
     }
 
     pub fn start(&self) -> windows::core::Result<()> {
+        // https://learn.microsoft.com/en-us/uwp/api/windows.devices.enumeration.devicewatcher?view=winrt-26100
         self.watcher.Start()
     }
 
@@ -117,7 +124,7 @@ impl Watcher {
         self.watcher.Stop()
     }
 
-    pub fn devices(&self) -> &DashMap<u64, BluetoothDeviceInfo> {
+    pub fn devices(&self) -> &Devices {
         &self.devices
     }
 }
@@ -193,7 +200,7 @@ mod tests {
     #[cfg_attr(feature = "tracing", quick_tracing::try_init)]
     #[test]
     fn watch_test() -> crate::error::Result<()> {
-        let watcher = Arc::new(Watcher::new()?);
+        let watcher = Arc::new(Watcher::new(|| ())?);
         watcher.start()?;
 
         let cloned = watcher.clone();

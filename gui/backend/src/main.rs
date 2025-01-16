@@ -39,11 +39,20 @@ fn main() {
 
 /// Result -> Log & toString
 #[macro_export]
-macro_rules! err_log {
+macro_rules! err_log_to_string {
     ($exp:expr) => {
         $exp.map_err(|err| {
             tracing::error!("{err}");
             err.to_string()
         })
+    };
+}
+
+#[macro_export]
+macro_rules! err_log {
+    ($exp:expr) => {
+        if let Err(err) = $exp {
+            tracing::error!("{err}");
+        }
     };
 }

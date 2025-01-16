@@ -15,9 +15,9 @@
     "test": "vitest run",
     "test:back": " cargo test --workspace",
     "test:all": "npm test && npm run test:back",
-    "fmt": "biome format ./ && prettier --cache --write \"**/*.+(yml|yaml)\" --ignore-path ./.gitignore && cargo fmt --all",
+    "fmt": "biome format --write ./ && prettier --cache --write \"**/*.+(yml|yaml)\" --ignore-path ./.gitignore && cargo fmt --all",
     "lint": "next lint ./gui/frontend && biome lint ./ && cargo clippy --workspace",
-    "lint:fix": "npm run fmt && next lint ./gui/frontend --fix && biome check --write ./  && cargo clippy --workspace --fix --allow-staged --allow-dirty",
+    "lint:fix": "npm run fmt && next lint ./gui/frontend --fix && biome check --apply ./  && cargo clippy --workspace --fix --allow-staged --allow-dirty",
     "tauri": "tauri"
   },
   "dependencies": {

@@ -16,6 +16,9 @@ pub enum Error {
     /// Not found resource dir
     NotFoundResourceDir { source: tauri::Error },
 
+    /// Failed to reinitialize device watcher.
+    FailedInitDeviceWatcher,
+
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Logger
     /// Not found log dir
@@ -25,7 +28,7 @@ pub enum Error {
     FailedInitLog,
 
     /// Uninitialized logger.
-    UninitLog,
+    UninitializedLogger,
 
     /// Tracing log error
     #[snafu(transparent)]
@@ -38,7 +41,9 @@ pub enum Error {
     FailedReloadTracingSub {
         source: tracing_subscriber::reload::Error,
     },
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    #[snafu(transparent)]
+    Tauri { source: tauri::Error },
 }
 
 /// `Result` for this crate.

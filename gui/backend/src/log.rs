@@ -59,7 +59,7 @@ pub(crate) fn change_level(log_level: &str) -> Result<()> {
     });
     match RELOAD_HANDLE.get() {
         Some(log) => Ok(log.modify(|filter| *filter = new_filter)?),
-        None => Err(Error::UninitLog),
+        None => Err(Error::UninitializedLogger),
     }
 }
 
@@ -82,7 +82,7 @@ fn create_rotate_log(
             entry
                 .file_name()
                 .to_str()
-                .map_or(false, |name| name.starts_with(log_name))
+                .is_some_and(|name| name.starts_with(log_name))
         })
         .collect::<Vec<_>>();
 

@@ -15,21 +15,21 @@ type Props = Readonly<{
 }>;
 
 export const DeviceCard = ({ device }: Props) => {
-  const { friendly_name, battery_level, category, is_connected, last_used, instance_id } = device;
+  const { friendly_name, address, battery_level, category, is_connected, last_used } = device;
   const { t } = useTranslation();
-  const powerOffColor = '#69696978';
+  const powerOffColor = '#696969';
 
   const cardClickHandler = useCallback(async () => {
     try {
       await updateTrayIcon(friendly_name, battery_level);
       await CONFIG.write({
         ...(await CONFIG.read()),
-        instance_id,
+        address,
       });
     } catch (err) {
       NOTIFY.error(`${err}`);
     }
-  }, [battery_level, friendly_name, instance_id]);
+  }, [battery_level, friendly_name, address]);
 
   return (
     <Card sx={{ minWidth: 205, margin: 3 }}>
