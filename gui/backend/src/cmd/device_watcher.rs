@@ -15,7 +15,7 @@ pub static DEVICE_WATCHER: LazyLock<Arc<RwLock<Option<Watcher>>>> =
     LazyLock::new(|| Arc::new(RwLock::new(None)));
 
 #[tauri::command]
-pub fn get_devices() -> Result<Devices, String> {
+pub async fn get_devices() -> Result<Devices, String> {
     let watcher = err_log_to_string!(DEVICE_WATCHER.read())?;
     Ok(watcher
         .as_ref()
@@ -23,7 +23,7 @@ pub fn get_devices() -> Result<Devices, String> {
 }
 
 #[tauri::command]
-pub fn restart_device_watcher(app: AppHandle) -> Result<(), String> {
+pub async fn restart_device_watcher(app: AppHandle) -> Result<(), String> {
     err_log_to_string!(restart_device_watcher_inner(&app))
 }
 

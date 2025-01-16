@@ -7,7 +7,7 @@ use std::{
 use tauri::{
     menu::{Menu, MenuItem},
     tray::{MouseButton, TrayIcon, TrayIconBuilder},
-    AppHandle, Manager as _,
+    Manager as _,
 };
 
 pub static TRAY_ICON: Mutex<Option<TrayIcon>> = Mutex::new(None);
@@ -21,7 +21,9 @@ enum MenuId {
 
 /// # Note
 /// This function is called only at setup time.
-pub fn new_tray_menu(app: &AppHandle) -> Result<TrayIcon, tauri::Error> {
+pub fn new_tray_menu(
+    app: &tauri::App<tauri::Wry>,
+) -> Result<TrayIconBuilder<tauri::Wry>, tauri::Error> {
     let none = None::<&str>;
 
     let reload_i = Arc::new(MenuItem::with_id(
@@ -36,8 +38,10 @@ pub fn new_tray_menu(app: &AppHandle) -> Result<TrayIcon, tauri::Error> {
     let menu = Menu::with_items(app, &[reload_i.as_ref(), show_i.as_ref(), quit_i.as_ref()])?;
     let cloned_show_i = Arc::clone(&show_i);
 
-    TrayIconBuilder::new()
+    Ok(TrayIconBuilder::new()
         .menu(&menu)
+        .menu_on_left_click(true)
+        .icon(app.default_window_icon().unwrap().clone())
         .on_tray_icon_event(move |tray, event| {
             if let tauri::tray::TrayIconEvent::Click { button, .. } = event {
                 if button != MouseButton::Left {
@@ -64,7 +68,7 @@ pub fn new_tray_menu(app: &AppHandle) -> Result<TrayIcon, tauri::Error> {
         .on_menu_event(
             move |app, event| match MenuId::from_str(event.id.as_ref()) {
                 Ok(event_id) => match event_id {
-                    MenuId::Reload => err_log!(restart_device_watcher_inner(app)),
+                    MenuId::Reload => err_log!(restart_device_watcher_inner(app.app_handle())),
                     MenuId::Show => {
                         let window = app.get_webview_window("main").unwrap();
                         match window.is_visible() {
@@ -88,6 +92,5 @@ pub fn new_tray_menu(app: &AppHandle) -> Result<TrayIcon, tauri::Error> {
                     tracing::error!("{e}");
                 }
             },
-        )
-        .build(app)
+        ))
 }

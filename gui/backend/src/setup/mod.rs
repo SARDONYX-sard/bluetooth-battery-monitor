@@ -16,12 +16,12 @@ impl SetupsRegister for Builder<Wry> {
     fn impl_setup(self) -> Self {
         self.setup(|app| {
             crate::log::init(app)?;
-            let app = app.app_handle();
             if let Ok(mut guard) = TRAY_ICON.lock() {
                 if guard.is_none() {
-                    guard.replace(new_tray_menu(app)?);
+                    guard.replace(new_tray_menu(app)?.build(app)?);
                 };
             };
+            let app = app.app_handle();
             restart_device_watcher_inner(app)?;
             Ok(())
         })

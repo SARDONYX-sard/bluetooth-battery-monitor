@@ -46,11 +46,11 @@ pub fn default_tray_inner() -> tauri::Result<()> {
 }
 
 #[tauri::command]
-pub fn update_tray(device_name: &str, battery_level: u64) -> tauri::Result<()> {
+pub async fn update_tray(device_name: &str, battery_level: u64) -> tauri::Result<()> {
     update_tray_inner(device_name, battery_level)
 }
 
 #[tauri::command]
-pub fn default_tray() -> tauri::Result<()> {
+pub async fn default_tray() -> tauri::Result<()> {
     default_tray_inner()
 }
