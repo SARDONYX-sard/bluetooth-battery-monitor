@@ -1,6 +1,7 @@
 use crate::{cmd::device_watcher::restart_device_watcher_inner, err_log};
 use parse_display::{Display, FromStr};
 use std::{
+    process::Command,
     str::FromStr,
     sync::{Arc, Mutex},
 };
@@ -17,6 +18,7 @@ enum MenuId {
     Reload,
     Show,
     Quit,
+    BtOsMenu,
 }
 
 /// # Note
@@ -33,7 +35,22 @@ pub fn new_tray_menu(app: &AppHandle<tauri::Wry>) -> Result<(), tauri::Error> {
     )?);
     let show_i = Arc::new(MenuItem::with_id(app, MenuId::Show, "Show", true, none)?);
     let quit_i = Arc::new(MenuItem::with_id(app, MenuId::Quit, "Exit", true, none)?);
-    let menu = Menu::with_items(app, &[reload_i.as_ref(), show_i.as_ref(), quit_i.as_ref()])?;
+    let os_menu_i = Arc::new(MenuItem::with_id(
+        app,
+        MenuId::BtOsMenu,
+        "Bluetooth Settings(OS)",
+        true,
+        none,
+    )?);
+    let menu = Menu::with_items(
+        app,
+        &[
+            reload_i.as_ref(),
+            show_i.as_ref(),
+            os_menu_i.as_ref(),
+            quit_i.as_ref(),
+        ],
+    )?;
     let cloned_show_i = Arc::clone(&show_i);
 
     let tray = TrayIconBuilder::new()
@@ -85,6 +102,11 @@ pub fn new_tray_menu(app: &AppHandle<tauri::Wry>) -> Result<(), tauri::Error> {
                             }
                             Err(e) => tracing::error!("{e}"),
                         };
+                    }
+                    MenuId::BtOsMenu => {
+                        err_log!(Command::new("cmd.exe")
+                            .args(["-c", "\"start ms-settings:bluetooth\""])
+                            .output());
                     }
                     MenuId::Quit => std::process::exit(0),
                 },
