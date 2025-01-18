@@ -26,6 +26,11 @@ pub enum BluetoothError {
     #[snafu(transparent)]
     JsonError { source: serde_json::Error },
 
+    #[cfg(target_os = "windows")]
+    #[snafu(transparent)]
+    BluetoothError {
+        source: crate::device::windows::device_info::BluetoothDeviceInfoError,
+    },
     #[snafu(transparent)]
     #[cfg(target_os = "windows")]
     Error { source: windows::core::Error },

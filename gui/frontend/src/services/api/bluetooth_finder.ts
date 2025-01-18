@@ -32,7 +32,7 @@ export const BluetoothDeviceInfoSchema = z
      * Native time. e.g. `2024/4/19 22:42:16`
      */
     // biome-ignore lint/style/useNamingConvention: <explanation>
-    last_update: z.string(),
+    last_updated: z.string(),
   })
   .catch({
     // biome-ignore lint/style/useNamingConvention: <explanation>
@@ -48,7 +48,7 @@ export const BluetoothDeviceInfoSchema = z
     // biome-ignore lint/style/useNamingConvention: <explanation>
     last_used: 'Unknown',
     // biome-ignore lint/style/useNamingConvention: <explanation>
-    last_update: 'Unknown',
+    last_updated: 'Unknown',
   });
 
 // Optional: Create a TypeScript type from the schema for type safety.

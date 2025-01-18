@@ -14,8 +14,6 @@ use tauri_plugin_window_state::StateFlags;
 fn main() {
     #[allow(clippy::large_stack_frames)]
     if let Err(err) = tauri::Builder::default()
-        .impl_setup()
-        .impl_commands()
         .plugin(tauri_plugin_autostart::init(
             tauri_plugin_autostart::MacosLauncher::LaunchAgent,
             None,
@@ -29,7 +27,8 @@ fn main() {
                 .with_state_flags(StateFlags::all() & !StateFlags::VISIBLE)
                 .build(),
         )
-        .setup(|app| Ok(crate::log::init(app)?))
+        .impl_setup()
+        .impl_commands()
         .run(tauri::generate_context!())
     {
         tracing::error!("Error: {err}");

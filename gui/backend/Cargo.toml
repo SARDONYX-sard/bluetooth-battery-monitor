@@ -12,7 +12,7 @@ keywords.workspace = true
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 [build-dependencies]
-tauri-build = { version = "2.0.3", features = [] }
+tauri-build = { version = "2.0.5", features = [] }
 
 [dependencies]
 chrono = { workspace = true }
@@ -27,7 +27,7 @@ tracing = { workspace = true }
 tracing-subscriber = { workspace = true }
 
 # GUI: https://github.com/tauri-apps/plugins-workspace
-tauri = { version = "2.1.1", features = [
+tauri = { version = "2.2.2", features = [
   "devtools",
   "image-ico",
   "image-png",

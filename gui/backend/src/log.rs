@@ -37,7 +37,7 @@ pub(crate) fn init(app: &tauri::App) -> Result<()> {
         .with_target(false)
         .with_writer(create_rotate_log(log_dir, &log_name, 4)?);
 
-    let (filter, reload_handle) = reload::Layer::new(LevelFilter::ERROR);
+    let (filter, reload_handle) = reload::Layer::new(LevelFilter::DEBUG);
     tracing_subscriber::registry()
         .with(filter)
         .with(fmt_layer)

@@ -1,4 +1,4 @@
-use crate::error::Result;
+use crate::{errors::Result, BluetoothDeviceInfo};
 use std::{collections::HashMap, mem, ptr};
 use windows::Win32::{
     Devices::Bluetooth::{
@@ -10,7 +10,7 @@ use windows::Win32::{
 
 pub type SysBluetoothDeviceInfo = windows::Win32::Devices::Bluetooth::BLUETOOTH_DEVICE_INFO;
 
-pub fn get_bluetooth_devices() -> Result<HashMap<u64, SysBluetoothDeviceInfo>> {
+pub fn get_bluetooth_devices() -> Result<HashMap<u64, BluetoothDeviceInfo>> {
     // See: https://learn.microsoft.com/windows/win32/api/bluetoothapis/ns-bluetoothapis-bluetooth_device_search_params
     let search_params: BLUETOOTH_DEVICE_SEARCH_PARAMS = BLUETOOTH_DEVICE_SEARCH_PARAMS {
         // size of the structure (in bytes).
@@ -55,7 +55,7 @@ pub fn get_bluetooth_devices() -> Result<HashMap<u64, SysBluetoothDeviceInfo>> {
             result => result,
         };
         let addr = unsafe { device_info.Address.Anonymous.ullLong };
-        res.insert(addr, device_info);
+        res.insert(addr, device_info.into());
 
         if unsafe { BluetoothFindNextDevice(search_handle, &mut device_info).is_err() } {
             break;
@@ -65,4 +65,22 @@ pub fn get_bluetooth_devices() -> Result<HashMap<u64, SysBluetoothDeviceInfo>> {
     unsafe { BluetoothFindDeviceClose(search_handle)? };
 
     Ok(res)
+}
+
+impl From<SysBluetoothDeviceInfo> for BluetoothDeviceInfo {
+    fn from(value: SysBluetoothDeviceInfo) -> Self {
+        Self {
+            is_connected: value.fConnected.as_bool(),
+            address: unsafe { value.Address.Anonymous.ullLong },
+            last_used: crate::device::device_info::LocalTime {
+                year: value.stLastUsed.wYear,
+                month: value.stLastUsed.wMonth,
+                day: value.stLastUsed.wDay,
+                hour: value.stLastUsed.wHour,
+                minute: value.stLastUsed.wMinute,
+                second: value.stLastUsed.wSecond,
+            },
+            ..Default::default()
+        }
+    }
 }

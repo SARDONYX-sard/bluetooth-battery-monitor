@@ -32,7 +32,7 @@ pub fn update_tray_inner(device_name: &str, battery_level: u64) -> tauri::Result
 }
 
 /// Update application tray icon & name
-pub fn default_tray_inner() -> tauri::Result<()> {
+pub async fn default_tray_inner() -> tauri::Result<()> {
     const LOADING_MSG: &str = "Getting bluetooth battery...";
     let battery_icon = include_bytes!("../../icons/icon.png").as_slice();
 
@@ -52,5 +52,5 @@ pub async fn update_tray(device_name: &str, battery_level: u64) -> tauri::Result
 
 #[tauri::command]
 pub async fn default_tray() -> tauri::Result<()> {
-    default_tray_inner()
+    default_tray_inner().await
 }

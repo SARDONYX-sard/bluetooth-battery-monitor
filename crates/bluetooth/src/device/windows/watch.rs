@@ -1,28 +1,31 @@
-use std::sync::Arc;
-
-use dashmap::DashMap;
+use std::sync::{Arc, LazyLock};
 use windows::core::HSTRING;
 use windows::Devices::Enumeration::{
     DeviceInformation, DeviceInformationKind, DeviceInformationUpdate, DeviceWatcher,
+    DeviceWatcherStatus,
 };
 use windows::Foundation::Collections::IIterable;
 use windows::Foundation::TypedEventHandler;
 
-use crate::device::device_info::{BluetoothDeviceInfo, SystemTime};
+use super::device_info::get_bluetooth_devices;
+use crate::device::device_info::Devices;
 
-use super::battery::BatteryInfo;
-use super::device_searcher::get_bluetooth_devices;
-
-// e0cbf06c-cd8b-4647-bb8a-263b43f0f974 is Bluetooth classic
-// https://learn.microsoft.com/en-us/windows-hardware/drivers/install/system-defined-device-setup-classes-available-to-vendors
+pub static DEVICES: LazyLock<Arc<Devices>> = LazyLock::new(|| {
+    Arc::new({
+        match get_bluetooth_devices() {
+            Ok(devices) => devices,
+            Err(err) => {
+                tracing::error!("{err}");
+                Devices::new()
+            }
+        }
+    })
+});
 
 #[derive(Debug, Clone)]
 pub struct Watcher {
     watcher: DeviceWatcher,
-    devices: Arc<DashMap<u64, BluetoothDeviceInfo>>,
 }
-
-pub type Devices = DashMap<u64, BluetoothDeviceInfo>;
 
 // ref list: https://learn.microsoft.com/ja-jp/windows/win32/properties/devices-bumper
 const DEVICE_ADDRESS: &str = "System.Devices.Aep.DeviceAddress";
@@ -30,9 +33,10 @@ const IS_CONNECTED: &str = "System.Devices.Aep.IsConnected"; // https://learn.mi
 const LAST_CONNECTED_TIME: &str = "System.DeviceInterface.Bluetooth.LastConnectedTime";
 
 impl Watcher {
-    pub fn new(update_fn: impl Fn() + Send + 'static) -> crate::error::Result<Self> {
+    pub fn new(update_fn: impl Fn() + Send + 'static) -> crate::errors::Result<Self> {
         let watcher = {
-            // - ref: https://learn.microsoft.com/uwp/api/windows.devices.enumeration.deviceinformationkind?view=winrt-26100
+            // e0cbf06c-cd8b-4647-bb8a-263b43f0f974 is Bluetooth classic
+            // - ref: https://learn.microsoft.com/en-us/windows-hardware/drivers/install/system-defined-device-setup-classes-available-to-vendors
             let aqs_filter = HSTRING::from(
                 r#"System.Devices.Aep.ProtocolId:="{e0cbf06c-cd8b-4647-bb8a-263b43f0f974}""#,
             );
@@ -52,80 +56,66 @@ impl Watcher {
             )?
         };
 
-        let devices = {
-            let devices = get_bluetooth_devices()?; // From native rust
-            let batteries = BatteryInfo::news_from_script()?; // From powershell
-            Arc::new(BluetoothDeviceInfo::merge_devices(batteries, devices)?)
-        };
+        let update_handler = TypedEventHandler::<DeviceWatcher, DeviceInformationUpdate>::new(
+            move |_watcher, device_info| {
+                let device = match device_info.as_ref() {
+                    Some(device) => device,
+                    None => return Ok(()),
+                };
 
-        {
-            let devices = devices.clone();
-            let update_handler = TypedEventHandler::<DeviceWatcher, DeviceInformationUpdate>::new(
-                move |_watcher, device_info| {
-                    if let Some(device) = device_info.as_ref() {
-                        match id_to_address(&mut device.Id()?.to_string().as_str()) {
-                            Ok(address) => {
-                                if let Some(mut dev) = devices.get_mut(&address) {
-                                    let battery = BatteryInfo::from_instance_id(&dev.instance_id);
-                                    match battery {
-                                        Ok(battery) => {
-                                            let dev = dev.value_mut();
-                                            dev.battery_level = battery.battery_level;
-                                            dev.is_connected = battery.is_connected.unwrap();
-                                            dev.last_update = SystemTime::now();
-                                            update_fn();
-                                        }
-                                        Err(e) => {
-                                            tracing::error!("{e}");
-                                            return Ok(()); // Return Ok because only windows-only errors can be returned.
-                                        }
-                                    }
-                                };
-                            }
-                            Err(e) => {
-                                tracing::error!("{e}");
-                            }
-                        }
-                    };
-                    Ok(())
-                },
-            );
-            watcher.Updated(&update_handler)?;
-        }
+                let address = match id_to_address(&mut device.Id()?.to_string().as_str()) {
+                    Ok(address) => address,
+                    Err(e) => {
+                        tracing::error!("{e}");
+                        return Ok(());
+                    }
+                };
 
-        {
-            let devices = devices.clone();
-            let remove_handler = TypedEventHandler::<DeviceWatcher, DeviceInformationUpdate>::new(
-                move |_watcher, device_info| {
-                    if let Some(device) = device_info.as_ref() {
-                        println!("==================== Remove ===============");
-                        match id_to_address(&mut device.Id()?.to_string().as_str()) {
-                            Ok(address) => {
-                                devices.remove(&address);
-                            }
-                            Err(e) => tracing::error!("{e}"),
-                        }
-                    };
-                    Ok(())
-                },
-            );
-            watcher.Removed(&remove_handler)?;
-        }
+                match DEVICES.get_mut(&address) {
+                    Some(mut dev) => match dev.value_mut().update_info() {
+                        Ok(_) => update_fn(),
+                        Err(err) => tracing::error!("{err}"),
+                    },
+                    None => {
+                        tracing::error!("This Device address is not found in DashMap: {address}")
+                    }
+                };
 
-        Ok(Self { watcher, devices })
+                Ok(())
+            },
+        );
+
+        watcher.Updated(&update_handler)?;
+        watcher.Removed(&update_handler)?;
+
+        Ok(Self { watcher })
     }
 
     pub fn start(&self) -> windows::core::Result<()> {
-        // https://learn.microsoft.com/en-us/uwp/api/windows.devices.enumeration.devicewatcher?view=winrt-26100
-        self.watcher.Start()
+        let status = self.watcher.Status()?;
+
+        if matches!(
+            status,
+            DeviceWatcherStatus::Created
+                | DeviceWatcherStatus::Aborted
+                | DeviceWatcherStatus::Stopped
+        ) {
+            self.watcher.Start()?;
+        }
+        Ok(())
     }
 
     pub fn stop(&self) -> windows::core::Result<()> {
-        self.watcher.Stop()
-    }
+        let status = self.watcher.Status()?;
 
-    pub fn devices(&self) -> &Devices {
-        &self.devices
+        // https://learn.microsoft.com/en-us/uwp/api/windows.devices.enumeration.devicewatcher?view=winrt-26100
+        if matches!(
+            status,
+            DeviceWatcherStatus::Started | DeviceWatcherStatus::EnumerationCompleted
+        ) {
+            self.watcher.Stop()?;
+        }
+        Ok(())
     }
 }
 
@@ -199,13 +189,17 @@ mod tests {
     #[ignore = "Can't watch it on CI."]
     #[cfg_attr(feature = "tracing", quick_tracing::try_init)]
     #[test]
-    fn watch_test() -> crate::error::Result<()> {
+    fn watch_test() -> crate::errors::Result<()> {
         let watcher = Arc::new(Watcher::new(|| ())?);
         watcher.start()?;
+        dbg!("Started");
 
         let cloned = watcher.clone();
         let stop_handle = std::thread::spawn(move || -> windows::core::Result<()> {
-            std::thread::sleep(std::time::Duration::from_secs(15));
+            for i in 0..15 {
+                dbg!(i);
+                std::thread::sleep(std::time::Duration::from_secs(1));
+            }
             cloned.stop()
         });
         stop_handle.join().unwrap()?;
