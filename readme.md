@@ -21,7 +21,7 @@
 
 ## Getting Started for User
 
-- [Release Page(& Click `Asserts`)](https://github.com/SARDONYX-sard/bluetooth-battery-monitor/releases)
+- [Release Page(& Click `Assets`)](https://github.com/SARDONYX-sard/bluetooth-battery-monitor/releases)
 
 ## Viewing and clicking icons on the taskbar
 
