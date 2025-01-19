@@ -9,13 +9,13 @@ mod device_instance;
 use device_instance::DeviceInstance;
 use snafu::Snafu;
 use windows::{
-    core::{h, Error, PCWSTR},
+    core::{h, Error, HRESULT, PCWSTR},
     Wdk::Devices::Bluetooth::{DEVPKEY_Bluetooth_ClassOfDevice, DEVPKEY_Bluetooth_DeviceAddress},
     Win32::{
         Devices::{
             DeviceAndDriverInstallation::{
                 CM_Get_Device_ID_ListW, CM_Get_Device_ID_List_SizeW, CM_Locate_DevNodeW,
-                CM_LOCATE_DEVNODE_NORMAL, CR_SUCCESS,
+                CM_MapCrToWin32Err, CM_LOCATE_DEVNODE_NORMAL, CR_SUCCESS,
             },
             Properties::DEVPKEY_Device_FriendlyName,
         },
@@ -42,14 +42,14 @@ pub enum BluetoothDeviceInfoError {
     /// Failed to get device list size.
     FailedToGetDeviceListSize,
 
-    #[snafu(display("Failed to get device: {source}"))]
+    /// Failed to get device: {source}
     FailedToGetDevice { source: Error },
 
-    #[snafu(display("Failed to retrieve device property {key:?}: {source}"))]
+    /// Failed to retrieve device property {key:?}: {source}
     DevicePropertyError { key: DEVPROPKEY, source: Error },
 
-    /// Device not found or missing expected property.
-    DeviceNotFound,
+    /// Could not get Bluetooth information from instance_id: {source}
+    InvalidInstanceId { source: Error },
 
     /// Device address not found.
     DeviceAddressNotFound,
@@ -72,7 +72,9 @@ impl BluetoothDeviceInfo {
             CM_Locate_DevNodeW(&mut device.0, PCWSTR(id.as_ptr()), CM_LOCATE_DEVNODE_NORMAL)
         };
         if ret != CR_SUCCESS {
-            return Err(BluetoothDeviceInfoError::DeviceNotFound);
+            let error = unsafe { CM_MapCrToWin32Err(ret, 0) };
+            let source = Error::from_hresult(HRESULT::from_win32(error));
+            return Err(BluetoothDeviceInfoError::InvalidInstanceId { source });
         }
 
         let address = {
@@ -171,7 +173,13 @@ pub fn get_bluetooth_devices() -> Result<Devices, BluetoothDeviceInfoError> {
                 continue;
             }
 
-            let mut device_info = BluetoothDeviceInfo::from_instance_id(id)?;
+            let mut device_info = match BluetoothDeviceInfo::from_instance_id(id) {
+                Ok(info) => info,
+                Err(err) => {
+                    tracing::error!("{err}");
+                    continue;
+                }
+            };
 
             // NOTE: `is_connected` & `last_used` must be taken by device_search to get a decent value, so the information is merged.
             if let Some(sys_info) = sys_devices.remove(&device_info.address) {
