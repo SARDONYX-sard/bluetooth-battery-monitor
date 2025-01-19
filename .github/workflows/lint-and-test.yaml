@@ -9,6 +9,8 @@ on:
 
 env:
   CARGO_TERM_COLOR: always
+  BUILD_PROFILE: release-no-lto
+  APP_NAME: bluetooth_battery_monitor
 
 jobs:
   lint:
@@ -84,7 +86,7 @@ jobs:
       - name: Rust cache
         uses: Swatinem/rust-cache@v2.7.7
         with:
-          prefix-key: cargo-release-${{ matrix.platform }}
+          prefix-key: cargo-release-no-lto-${{ matrix.platform }}
       - name: Sync node version
         uses: actions/setup-node@v4.1.0
         with:
@@ -114,13 +116,13 @@ jobs:
         shell: pwsh
         if: runner.os == 'Windows'
         run: |
-          Move-Item -Path ./target/release/bluetooth_battery_monitor.exe -Destination './build'
+          Move-Item -Path ./target/${{ env.BUILD_PROFILE }}/${{ env.APP_NAME }}.exe -Destination './build'
 
       - name: Compress outputs(Linux/MacOS)
         shell: bash
         if: runner.os != 'Windows'
         run: |
-          mv ./target/release/bluetooth_battery_monitor ./build
+          mv ./target/${{ env.BUILD_PROFILE }}/${{ env.APP_NAME }} ./build
 
       - name: Upload a Build Artifact
         uses: actions/upload-artifact@v4.6.0
