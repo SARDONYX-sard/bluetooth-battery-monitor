@@ -10,7 +10,7 @@ use windows::Win32::{
 
 pub type SysBluetoothDeviceInfo = windows::Win32::Devices::Bluetooth::BLUETOOTH_DEVICE_INFO;
 
-pub fn get_bluetooth_devices() -> windows::core::Result<HashMap<u64, BluetoothDeviceInfo>> {
+pub(crate) fn get_bluetooth_devices() -> windows::core::Result<HashMap<u64, BluetoothDeviceInfo>> {
     // See: https://learn.microsoft.com/windows/win32/api/bluetoothapis/ns-bluetoothapis-bluetooth_device_search_params
     let search_params: BLUETOOTH_DEVICE_SEARCH_PARAMS = BLUETOOTH_DEVICE_SEARCH_PARAMS {
         // size of the structure (in bytes).

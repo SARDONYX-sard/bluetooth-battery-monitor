@@ -103,7 +103,7 @@ impl DeviceProperty for String {
 
         let null_index = buffer.iter().position(|&c| c == 0).unwrap_or(buffer.len());
         let truncated_buffer = &buffer[..null_index];
-        Ok(String::from_utf16_lossy(truncated_buffer))
+        Ok(Self::from_utf16_lossy(truncated_buffer))
     }
 }
 

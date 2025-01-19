@@ -31,7 +31,7 @@ impl IntervalProcess {
         F: FnMut() -> Fut + Send + 'static + Sync,
         Fut: Future<Output = ()> + Send + 'static + Sync,
     {
-        let running = self.running.clone();
+        let running = Arc::clone(&self.running);
         self.handle = Some(spawn(async move {
             let mut sleep_time = interval(duration);
             loop {

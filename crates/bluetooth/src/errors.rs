@@ -23,8 +23,6 @@ pub enum BluetoothError {
     ParseIntError { source: core::num::ParseIntError },
     #[snafu(transparent)]
     IoError { source: std::io::Error },
-    #[snafu(transparent)]
-    JsonError { source: serde_json::Error },
 
     #[cfg(target_os = "windows")]
     #[snafu(transparent)]

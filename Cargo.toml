@@ -70,6 +70,7 @@ future_not_send = "allow"
 multiple_crate_versions = "allow"
 pub_with_shorthand = "allow"
 redundant_pub_crate = "allow"
+cargo_common_metadata = "allow"
 
 char_lit_as_u8 = "deny"                     # custom deny list
 checked_conversions = "deny"

@@ -42,6 +42,11 @@ const IS_CONNECTED: &str = "System.Devices.Aep.IsConnected"; // https://learn.mi
 const LAST_CONNECTED_TIME: &str = "System.DeviceInterface.Bluetooth.LastConnectedTime";
 
 impl Watcher {
+    /// Creates a new `Watcher`.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the device watcher fails to be created.
     pub fn new(
         update_fn: impl Fn(&BluetoothDeviceInfo) + Send + 'static,
     ) -> crate::errors::Result<Self> {
@@ -88,7 +93,7 @@ impl Watcher {
                         Err(err) => tracing::error!("{err}"),
                     },
                     None => {
-                        tracing::trace!("This Device address is not found in DashMap: {address}")
+                        tracing::trace!("This Device address is not found in DashMap: {address}");
                     }
                 };
 
@@ -102,6 +107,11 @@ impl Watcher {
         Ok(Self { watcher })
     }
 
+    /// Starts the device watcher.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the device watcher fails to start.
     pub fn start(&self) -> windows::core::Result<()> {
         let status = self.watcher.Status()?;
 
@@ -116,6 +126,11 @@ impl Watcher {
         Ok(())
     }
 
+    /// Stops the device watcher.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the device watcher fails to stop.
     pub fn stop(&self) -> windows::core::Result<()> {
         let status = self.watcher.Status()?;
 
@@ -205,7 +220,7 @@ mod tests {
         watcher.start()?;
         dbg!("Started");
 
-        let cloned = watcher.clone();
+        let cloned = Arc::clone(&watcher);
         let stop_handle = std::thread::spawn(move || -> windows::core::Result<()> {
             for i in 0..15 {
                 dbg!(i);

@@ -39,12 +39,14 @@ impl DeviceInstance {
         let mut property_type: DEVPROPTYPE = DEVPROPTYPE(0);
         let mut buffer = T::new_buffer();
         let mut buffer_size: u32 = core::mem::size_of_val(&buffer) as u32;
+        let buf_ptr: *mut <T as DeviceProperty>::Buffer = &mut buffer;
+
         unsafe {
             let ret = CM_Get_DevNode_PropertyW(
                 self.0,
                 property_key,
                 &mut property_type,
-                Some(&mut buffer as *mut _ as *mut u8),
+                Some(buf_ptr.cast()),
                 &mut buffer_size,
                 0,
             );

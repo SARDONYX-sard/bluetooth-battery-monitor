@@ -108,7 +108,7 @@ impl BluetoothDeviceInfo {
     /// - is_connected
     /// - last_used
     /// - last_updated
-    pub fn update_info(&mut self) -> Result<(), BluetoothDeviceInfoError> {
+    pub(crate) fn update_info(&mut self) -> Result<(), BluetoothDeviceInfoError> {
         let device = DeviceInstance::new(self.device_instance);
 
         self.battery_level = device.get_device_property(&DEVPKEY_Bluetooth_Battery)?;
@@ -139,7 +139,7 @@ impl BluetoothDeviceInfo {
 }
 
 /// Gets the list of Bluetooth devices and their properties.
-pub fn get_bluetooth_devices() -> Result<Devices, BluetoothDeviceInfoError> {
+pub(crate) fn get_bluetooth_devices() -> Result<Devices, BluetoothDeviceInfoError> {
     let buffer = {
         let buffer_size = {
             let mut buffer_size: u32 = 0;
@@ -151,7 +151,7 @@ pub fn get_bluetooth_devices() -> Result<Devices, BluetoothDeviceInfoError> {
                 return Err(BluetoothDeviceInfoError::FailedToGetDeviceListSize);
             }
         };
-        let mut buffer = vec![0u16; buffer_size as usize];
+        let mut buffer = vec![0_u16; buffer_size as usize];
 
         let ret = unsafe { CM_Get_Device_ID_ListW(PCWSTR::null(), &mut buffer, 0) };
         if ret != CR_SUCCESS {

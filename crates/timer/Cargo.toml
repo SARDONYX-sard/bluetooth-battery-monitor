@@ -9,7 +9,7 @@ repository.workspace = true
 edition = "2021"
 rust-version = "1.70"
 keywords.workspace = true
-
+categories = ["time"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 [dependencies]
@@ -24,3 +24,6 @@ pretty_assertions = { workspace = true }
 quick_tracing = { workspace = true }
 tokio = { workspace = true, features = ["time", "macros", "rt"] }
 tracing = { workspace = true }                                    # Logger
+
+[lints]
+workspace = true

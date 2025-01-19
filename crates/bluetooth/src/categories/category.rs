@@ -48,7 +48,7 @@ impl TryFrom<Category> for u32 {
         let major =
             MajorCategory::to_u32(&major).ok_or(CategoryError::FailedToCastMajor { major })?;
 
-        let minor: u32 = match sub {
+        let minor = match sub {
             SubCategory::Category4(sub) => {
                 let minor = SubCategory4::to_u32(&sub)
                     .ok_or(CategoryError::FailedToCastCategory4 { sub })?;

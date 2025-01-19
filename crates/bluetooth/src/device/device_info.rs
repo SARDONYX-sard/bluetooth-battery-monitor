@@ -1,4 +1,4 @@
-use crate::{categories::category::Category, errors::Result};
+use crate::categories::category::Category;
 use chrono::{Datelike as _, Timelike as _};
 use dashmap::DashMap;
 
@@ -81,10 +81,4 @@ impl LocalTime {
             second: time.second() as u16,
         }
     }
-}
-
-/// Cross-platform common methods
-pub trait FindBluetooth {
-    /// Get Bluetooth devices information.
-    fn find_devices() -> Result<Vec<BluetoothDeviceInfo>>;
 }
