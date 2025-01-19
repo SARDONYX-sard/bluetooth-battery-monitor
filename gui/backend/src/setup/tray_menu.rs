@@ -21,6 +21,8 @@ enum MenuId {
     BtOsMenu,
 }
 
+const MENU_TEXT: &str = "Toggle device list";
+
 /// # Note
 /// This function is called only at setup time.
 pub fn new_tray_menu(app: &AppHandle<tauri::Wry>) -> Result<(), tauri::Error> {
@@ -33,7 +35,7 @@ pub fn new_tray_menu(app: &AppHandle<tauri::Wry>) -> Result<(), tauri::Error> {
         true,
         none,
     )?);
-    let show_i = Arc::new(MenuItem::with_id(app, MenuId::Show, "Show", true, none)?);
+    let show_i = Arc::new(MenuItem::with_id(app, MenuId::Show, MENU_TEXT, true, none)?);
     let quit_i = Arc::new(MenuItem::with_id(app, MenuId::Quit, "Exit", true, none)?);
     let os_menu_i = Arc::new(MenuItem::with_id(
         app,
@@ -51,7 +53,7 @@ pub fn new_tray_menu(app: &AppHandle<tauri::Wry>) -> Result<(), tauri::Error> {
             quit_i.as_ref(),
         ],
     )?;
-    let cloned_show_i = Arc::clone(&show_i);
+    // let cloned_show_i = Arc::clone(&show_i);
 
     let tray = TrayIconBuilder::new()
         .show_menu_on_left_click(false)
@@ -68,10 +70,10 @@ pub fn new_tray_menu(app: &AppHandle<tauri::Wry>) -> Result<(), tauri::Error> {
                     Ok(visible) => {
                         if visible {
                             err_log!(window.hide());
-                            let _ = cloned_show_i.set_text("Show");
+                            // let _ = cloned_show_i.set_text(MENU_TEXT);
                         } else {
                             err_log!(window.show());
-                            let _ = cloned_show_i.set_text("Hide");
+                            // let _ = cloned_show_i.set_text(MENU_TEXT);
                         }
                     }
                     Err(e) => {
@@ -96,10 +98,10 @@ pub fn new_tray_menu(app: &AppHandle<tauri::Wry>) -> Result<(), tauri::Error> {
                             Ok(visible) => {
                                 if visible {
                                     err_log!(window.hide());
-                                    let _ = show_i.set_text("Show");
+                                    // let _ = show_i.set_text(MENU_TEXT);
                                 } else {
                                     err_log!(window.show());
-                                    let _ = show_i.set_text("Hide");
+                                    // let _ = show_i.set_text(MENU_TEXT);
                                 }
                             }
                             Err(e) => tracing::error!("{e}"),
