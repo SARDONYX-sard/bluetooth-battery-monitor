@@ -16,7 +16,7 @@ jobs:
     runs-on: ${{ matrix.platform }}
 
     steps:
-      - uses: actions/checkout@v4.1.7
+      - uses: actions/checkout@v4.2.2
 
       - name: Install dependencies (ubuntu only)
         if: matrix.platform == 'ubuntu-20.04'
@@ -29,18 +29,18 @@ jobs:
         uses: dtolnay/rust-toolchain@stable
 
       - name: Rust cache
-        uses: Swatinem/rust-cache@v2.7.3
+        uses: Swatinem/rust-cache@v2.7.7
         with:
           prefix-key: cargo-${{ matrix.platform }}
 
       - name: Sync node version and setup cache
-        uses: actions/setup-node@v4.0.3
+        uses: actions/setup-node@v4.1.0
         with:
           node-version: 'lts/*'
           cache: 'npm'
 
       - name: Node.js cache
-        uses: actions/cache@v4.0.2
+        uses: actions/cache@v4.2.0
         with:
           path: ${{ github.workspace }}/dar2oar_gui/frontend/.next/cache
           # Generate a new cache whenever packages or source files change.
@@ -57,7 +57,7 @@ jobs:
           tag: ${{ github.ref_name }}
 
       - name: Create Github Release
-        uses: tauri-apps/tauri-action@action-v0.5.9
+        uses: tauri-apps/tauri-action@action-v0.5.18
 
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -68,7 +68,7 @@ jobs:
           prerelease: false
 
       - name: Commit CHANGELOG.md
-        uses: stefanzweifel/git-auto-commit-action@v5.0.1
+        uses: stefanzweifel/git-auto-commit-action@v5.1.0
         with:
           branch: main
           commit_message: 'docs: update CHANGELOG.md for ${{ github.ref_name }} [skip ci]'
