@@ -1,6 +1,6 @@
 'use client';
 
-import { Box, List } from '@mui/material';
+import { Box, Skeleton, Stack } from '@mui/material';
 import { useEffect } from 'react';
 
 import { DeviceCard } from '@/components/organisms/BluetoothGrid/DeviceCard';
@@ -32,19 +32,38 @@ export const DeviceCards = () => {
     <Box
       sx={{
         display: 'grid',
-        placeItems: 'center',
+        gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', // Adjusts number of columns based on screen size
+        gap: '16px', // Space between cards
         paddingTop: '15px',
         minHeight: '100%',
         width: '90%',
       }}
     >
-      <List>
-        {devices
-          ? OBJECT.entries(devices).map(([address, dev]) => {
-              return <DeviceCard device={dev} key={address} />;
-            })
-          : null}
-      </List>
+      {devices ? (
+        OBJECT.entries(devices)
+          .sort(([_, a], [__, b]) => {
+            // sort by is_connected first (true first)
+            if (a.is_connected !== b.is_connected) {
+              return a.is_connected ? -1 : 1;
+            }
+
+            return new Date(b.last_used).getTime() - new Date(a.last_used).getTime(); // sort in ascending order based on last_used
+          })
+          .map(([address, dev]) => {
+            return <DeviceCard device={dev} key={address} />;
+          })
+      ) : (
+        <LoadingSkeletons />
+      )}
     </Box>
   );
 };
+
+const LoadingSkeletons = () => (
+  <Stack spacing={2}>
+    {Array.from({ length: 5 }).map((_, index) => (
+      // biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
+      <Skeleton height={60} key={index} sx={{ borderRadius: '8px', width: '100%' }} variant='rectangular' />
+    ))}
+  </Stack>
+);

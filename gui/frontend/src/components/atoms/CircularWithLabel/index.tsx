@@ -12,7 +12,7 @@ export function CircularProgressWithLabel(props: CircularProgressProps & { progC
 
   return (
     <Box sx={{ position: 'relative', display: 'inline-flex' }}>
-      <CircularProgress color='inherit' style={style} variant='determinate' {...rest} value={value} />
+      <CircularProgress color='primary' style={style} variant='determinate' {...rest} value={value} />
       <Box
         sx={{
           top: 0,

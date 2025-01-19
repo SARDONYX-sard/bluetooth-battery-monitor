@@ -1,3 +1,7 @@
+// ref:
+// - https://www.bluetoothgoodies.com/battery-monitor/faq/
+// - https://stackoverflow.com/questions/71736070/how-to-get-bluetooth-device-battery-percentage-using-powershell-on-windows
+
 mod buffer;
 mod dev_prop;
 mod device_instance;
@@ -13,7 +17,7 @@ use windows::{
                 CM_Get_Device_ID_ListW, CM_Get_Device_ID_List_SizeW, CM_Locate_DevNodeW,
                 CM_LOCATE_DEVNODE_NORMAL, CR_SUCCESS,
             },
-            Properties::{DEVPKEY_Device_FriendlyName, DEVPKEY_Device_LastArrivalDate},
+            Properties::DEVPKEY_Device_FriendlyName,
         },
         Foundation::DEVPROPKEY,
     },
@@ -25,16 +29,11 @@ use crate::{
     BluetoothDeviceInfo,
 };
 
+/// Apple's proprietary extension but battery information supported by most HFP profile devices
 #[allow(non_upper_case_globals)]
 const DEVPKEY_Bluetooth_Battery: DEVPROPKEY = DEVPROPKEY {
     fmtid: windows::core::GUID::from_u128(0x104ea319_6ee2_4701_bd47_8ddbf425bbe5),
     pid: 2,
-};
-
-#[allow(non_upper_case_globals)]
-const DEVPKEY_Bluetooth_IsConnected: DEVPROPKEY = DEVPROPKEY {
-    fmtid: windows::core::GUID::from_u128(0x83da6326_97a6_4088_9453_a1923f573b29),
-    pid: 15,
 };
 
 /// Custom error type using snafu
@@ -60,6 +59,10 @@ pub enum BluetoothDeviceInfoError {
 
     #[snafu(transparent)]
     CategoryError { source: CategoryError },
+
+    #[snafu(transparent)]
+    #[cfg(target_os = "windows")]
+    Error { source: windows::core::Error },
 }
 
 impl BluetoothDeviceInfo {
@@ -83,10 +86,6 @@ impl BluetoothDeviceInfo {
                 device.get_device_property::<u32>(&DEVPKEY_Bluetooth_ClassOfDevice)?;
             Category::try_from(bluetooth_class)?
         };
-        let last_used = {
-            let utc_time = device.get_device_property(&DEVPKEY_Device_LastArrivalDate)?;
-            LocalTime::from_utc(utc_time)
-        };
 
         Ok(Self {
             instance_id: String::from_utf16_lossy(id),
@@ -94,8 +93,8 @@ impl BluetoothDeviceInfo {
             battery_level: device.get_device_property(&DEVPKEY_Bluetooth_Battery)?,
             address,
             category,
-            is_connected: device.get_device_property(&DEVPKEY_Bluetooth_IsConnected)?,
-            last_used,
+            is_connected: false, // dummy(It can only be obtained by device_searcher.)
+            last_used: LocalTime::default(), // dummy(It can only be obtained by device_searcher.)
             last_updated: LocalTime::now(),
             device_instance: device.0,
         })
@@ -124,6 +123,7 @@ impl BluetoothDeviceInfo {
             devices.remove(&self.address)
         };
 
+        // NOTE: `is_connected` & `last_used` must be taken by device_search to get a decent value, so the information is merged.
         self.is_connected = sys_device
             .as_ref()
             .map(|device| device.is_connected)
@@ -164,12 +164,21 @@ pub fn get_bluetooth_devices() -> Result<Devices, BluetoothDeviceInfoError> {
     let devices = {
         let filter = h!(r#"BTHENUM\{0000111e-0000-1000-8000-00805f9b34fb}_"#); // Instance ID prefix of bluetooth device with battery information.
 
+        let mut sys_devices = super::device_searcher::get_bluetooth_devices()?;
         let devices = Devices::new();
         for id in buffer.split(|&c| c == 0).filter(|s| !s.is_empty()) {
             if !id.starts_with(filter) {
                 continue;
             }
-            let device_info = BluetoothDeviceInfo::from_instance_id(id)?;
+
+            let mut device_info = BluetoothDeviceInfo::from_instance_id(id)?;
+
+            // NOTE: `is_connected` & `last_used` must be taken by device_search to get a decent value, so the information is merged.
+            if let Some(sys_info) = sys_devices.remove(&device_info.address) {
+                device_info.is_connected = sys_info.is_connected;
+                device_info.last_used = sys_info.last_used;
+            }
+
             devices.insert(device_info.address, device_info);
         }
 

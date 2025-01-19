@@ -1,4 +1,4 @@
-use crate::{errors::Result, BluetoothDeviceInfo};
+use crate::BluetoothDeviceInfo;
 use std::{collections::HashMap, mem, ptr};
 use windows::Win32::{
     Devices::Bluetooth::{
@@ -10,7 +10,7 @@ use windows::Win32::{
 
 pub type SysBluetoothDeviceInfo = windows::Win32::Devices::Bluetooth::BLUETOOTH_DEVICE_INFO;
 
-pub fn get_bluetooth_devices() -> Result<HashMap<u64, BluetoothDeviceInfo>> {
+pub fn get_bluetooth_devices() -> windows::core::Result<HashMap<u64, BluetoothDeviceInfo>> {
     // See: https://learn.microsoft.com/windows/win32/api/bluetoothapis/ns-bluetoothapis-bluetooth_device_search_params
     let search_params: BLUETOOTH_DEVICE_SEARCH_PARAMS = BLUETOOTH_DEVICE_SEARCH_PARAMS {
         // size of the structure (in bytes).
@@ -41,7 +41,7 @@ pub fn get_bluetooth_devices() -> Result<HashMap<u64, BluetoothDeviceInfo>> {
 
     let search_handle = unsafe { BluetoothFindFirstDevice(&search_params, &mut device_info)? };
     if search_handle.is_invalid() {
-        return Err(windows::core::Error::from_win32().into());
+        return Err(windows::core::Error::from_win32());
     };
 
     let mut res = HashMap::new();

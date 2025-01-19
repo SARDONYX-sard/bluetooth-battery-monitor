@@ -1,3 +1,8 @@
+// SPDX-License-Identifier: Apache-2.0 OR MIT
+// from kevinmehall nusb crate
+// ref
+// - https://github.com/kevinmehall/nusb/blob/v0.1.12/src/platform/windows_winusb/cfgmgr32.rs
+
 use chrono::{DateTime, Utc};
 use snafu::Snafu;
 use windows::{

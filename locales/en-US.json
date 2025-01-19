@@ -62,8 +62,14 @@
   "tab-list-position-top": "Top",
   "target-bt-id": "Display in tray",
   "target-bt-id-tooltip": "Display the battery information for this device in the taskbar's tray.",
-  "update-interval": "Update interval(mins)",
-  "update-interval-tooltip": "Battery information acquisition interval (minutes).(App must be restarted to apply settings.)",
   "warn-limit-battery": "Warn battery(%)",
-  "warn-limit-battery-tooltip": "Notification at what percentage of battery power remaining.(App must be restarted to apply settings.)"
+  "warn-limit-battery-tooltip": "Notification at what percentage of battery power remaining.",
+  "relativeTime": {
+    "seconds": "seconds ago",
+    "minutes": "minutes ago",
+    "hours": "hours ago",
+    "days": "days ago"
+  },
+  "last-updated": "Last updated",
+  "last-used": "Last used"
 }

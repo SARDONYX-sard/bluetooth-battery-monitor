@@ -65,8 +65,14 @@
   "tab-list-position-top": "上",
   "target-bt-id": "トレイに表示",
   "target-bt-id-tooltip": "このデバイスのバッテリー情報をタスクバーのトレイに表示させます。",
-  "update-interval": "更新間隔(分)",
-  "update-interval-tooltip": "バッテリー情報の取得間隔(分) (アプリのリスタートが必要)",
   "warn-limit-battery": "警告容量(%)",
-  "warn-limit-battery-tooltip": "通知したいバッテリー残量% (アプリのリスタートが必要)"
+  "warn-limit-battery-tooltip": "通知したいバッテリー残量%",
+  "relativeTime": {
+    "seconds": "秒前",
+    "minutes": "分前",
+    "hours": "時間前",
+    "days": "日前"
+  },
+  "last-updated": "最終更新日",
+  "last-used": "最終使用日"
 }

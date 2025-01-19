@@ -4,7 +4,6 @@ import { PageNavigation } from '@/components/organisms/PageNavigation';
 import { GlobalProvider } from '@/components/providers';
 import { LANG } from '@/lib/i18n';
 import { LOG } from '@/services/api/log';
-import { showWindow } from '@/services/api/window';
 
 import type { ReactNode } from 'react';
 
@@ -16,8 +15,6 @@ type Props = Readonly<{
 }>;
 
 const ClientLayout = ({ children }: Props) => {
-  showWindow();
-
   return (
     <GlobalProvider>
       {children}

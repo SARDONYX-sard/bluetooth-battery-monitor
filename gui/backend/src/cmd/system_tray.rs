@@ -2,23 +2,48 @@ use crate::setup::TRAY_ICON;
 use tauri::image::Image;
 
 /// Update application tray icon & name
-pub fn update_tray_inner(device_name: &str, battery_level: u64) -> tauri::Result<()> {
+///
+/// # Panics
+/// 0 <= battery_level <= 100
+pub fn update_tray_inner(
+    device_name: &str,
+    battery_level: u64,
+    is_connected: bool,
+) -> tauri::Result<()> {
     tracing::debug!("Change to {battery_level} battery icon");
 
-    let battery_icon = match battery_level {
-        0 => include_bytes!("../../icons/battery/battery-0.png"),
-        1..=10 => include_bytes!("../../icons/battery/battery-10.png").as_slice(),
-        11..=20 => include_bytes!("../../icons/battery/battery-20.png").as_slice(),
-        21..=30 => include_bytes!("../../icons/battery/battery-30.png").as_slice(),
-        31..=40 => include_bytes!("../../icons/battery/battery-40.png").as_slice(),
-        41..=50 => include_bytes!("../../icons/battery/battery-50.png").as_slice(),
-        51..=60 => include_bytes!("../../icons/battery/battery-60.png").as_slice(),
-        61..=70 => include_bytes!("../../icons/battery/battery-70.png").as_slice(),
-        71..=80 => include_bytes!("../../icons/battery/battery-80.png").as_slice(),
-        81..=90 => include_bytes!("../../icons/battery/battery-90.png").as_slice(),
-        91..=100 => include_bytes!("../../icons/battery/battery-100.png").as_slice(),
-        _ => unreachable!(),
+    let battery_icon = if is_connected {
+        match battery_level {
+            0 => include_bytes!("../../icons/battery/battery-0.png"),
+            1..=10 => include_bytes!("../../icons/battery/battery-10.png").as_slice(),
+            11..=20 => include_bytes!("../../icons/battery/battery-20.png").as_slice(),
+            21..=30 => include_bytes!("../../icons/battery/battery-30.png").as_slice(),
+            31..=40 => include_bytes!("../../icons/battery/battery-40.png").as_slice(),
+            41..=50 => include_bytes!("../../icons/battery/battery-50.png").as_slice(),
+            51..=60 => include_bytes!("../../icons/battery/battery-60.png").as_slice(),
+            61..=70 => include_bytes!("../../icons/battery/battery-70.png").as_slice(),
+            71..=80 => include_bytes!("../../icons/battery/battery-80.png").as_slice(),
+            81..=90 => include_bytes!("../../icons/battery/battery-90.png").as_slice(),
+            91..=100 => include_bytes!("../../icons/battery/battery-100.png").as_slice(),
+            _ => unreachable!(),
+        }
+    } else {
+        match battery_level {
+            0 => include_bytes!("../../icons/battery_power_off/battery-0.png"),
+            1..=10 => include_bytes!("../../icons/battery_power_off/battery-10.png").as_slice(),
+            11..=20 => include_bytes!("../../icons/battery_power_off/battery-20.png").as_slice(),
+            21..=30 => include_bytes!("../../icons/battery_power_off/battery-30.png").as_slice(),
+            31..=40 => include_bytes!("../../icons/battery_power_off/battery-40.png").as_slice(),
+            41..=50 => include_bytes!("../../icons/battery_power_off/battery-50.png").as_slice(),
+            51..=60 => include_bytes!("../../icons/battery_power_off/battery-60.png").as_slice(),
+            61..=70 => include_bytes!("../../icons/battery_power_off/battery-70.png").as_slice(),
+            71..=80 => include_bytes!("../../icons/battery_power_off/battery-80.png").as_slice(),
+            81..=90 => include_bytes!("../../icons/battery_power_off/battery-90.png").as_slice(),
+            91..=100 => include_bytes!("../../icons/battery_power_off/battery-100.png").as_slice(),
+            _ => unreachable!(),
+        }
     };
+
     let tooltip = &format!("{device_name} {battery_level}%");
 
     if let Ok(mut guard) = TRAY_ICON.lock() {
@@ -46,8 +71,12 @@ pub async fn default_tray_inner() -> tauri::Result<()> {
 }
 
 #[tauri::command]
-pub async fn update_tray(device_name: &str, battery_level: u64) -> tauri::Result<()> {
-    update_tray_inner(device_name, battery_level)
+pub async fn update_tray(
+    device_name: &str,
+    battery_level: u64,
+    is_connected: bool,
+) -> tauri::Result<()> {
+    update_tray_inner(device_name, battery_level, is_connected)
 }
 
 #[tauri::command]

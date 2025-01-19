@@ -89,7 +89,7 @@ fn update_devices(app: &AppHandle, info: &BluetoothDeviceInfo) {
         .emit("bt_monitor://update_devices", &info)
     {
         tracing::error!("{err}");
-    };
+    }
 
     let config = read_config(app.clone()).unwrap_or_else(|_| {
         err_log!(write_config(app.clone(), Default::default()));
@@ -98,14 +98,18 @@ fn update_devices(app: &AppHandle, info: &BluetoothDeviceInfo) {
 
     if info.address != config.address {
         return;
-    };
+    }
     update_tray(app, config.notify_battery_level, info);
 }
 
 fn update_tray(app: &AppHandle, notify_battery_level: u64, info: &BluetoothDeviceInfo) {
     let friendly_name = &info.friendly_name;
     let battery_level = info.battery_level as u64;
-    err_log!(update_tray_inner(friendly_name, battery_level));
+    err_log!(update_tray_inner(
+        friendly_name,
+        battery_level,
+        info.is_connected
+    ));
 
     if info.is_connected && battery_level <= notify_battery_level {
         let notify_msg = format!("Battery power is low: {battery_level}%");

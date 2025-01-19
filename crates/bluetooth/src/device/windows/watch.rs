@@ -28,6 +28,14 @@ pub struct Watcher {
     watcher: DeviceWatcher,
 }
 
+impl Drop for Watcher {
+    fn drop(&mut self) {
+        if let Err(err) = self.stop() {
+            tracing::error!("Failed to stop device watcher: {err}");
+        };
+    }
+}
+
 // ref list: https://learn.microsoft.com/ja-jp/windows/win32/properties/devices-bumper
 const DEVICE_ADDRESS: &str = "System.Devices.Aep.DeviceAddress";
 const IS_CONNECTED: &str = "System.Devices.Aep.IsConnected"; // https://learn.microsoft.com/windows/win32/properties/props-system-devices-aep-isconnected

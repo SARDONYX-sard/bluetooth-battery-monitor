@@ -11,12 +11,11 @@ import {
 import { z } from 'zod';
 
 import { useStorageState } from '@/components/hooks/useStorageState';
+import { NOTIFY } from '@/lib/notify';
 import { PRIVATE_CACHE_OBJ } from '@/lib/storage/cacheKeys';
 import { numberSchema } from '@/lib/zod/schema-utils';
 import { BluetoothDeviceInfoSchema, type Devices } from '@/services/api/bluetooth_finder';
-
-import { NOTIFY } from '../../../lib/notify';
-import { deviceListener } from '../../../services/api/device_listener';
+import { deviceListener } from '@/services/api/device_listener';
 
 type ContextType = {
   devices: Devices | undefined;
