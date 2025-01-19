@@ -4,13 +4,10 @@ import { useCallback } from 'react';
 import { useTranslation } from '@/components/hooks/useTranslation';
 import { LoadingButtonWithToolTip } from '@/components/molecules/LoadingButtonWithToolTip';
 import { NOTIFY } from '@/lib/notify';
-import { type Devices, restartDeviceWatcher } from '@/services/api/bluetooth_finder';
-import { deviceListener } from '@/services/api/device_listener';
+import { getDevices, restartDeviceWatcher } from '@/services/api/bluetooth_finder';
 import { defaultTrayIcon } from '@/services/api/sys_tray';
 
 import { useDevicesContext } from './DevicesProvider';
-
-let unlisten: (() => void) | undefined;
 
 /**
  * Update bluetooth information
@@ -27,18 +24,9 @@ export function RestartButton() {
       try {
         setLoading(true);
         await defaultTrayIcon();
-
-        if (unlisten) {
-          unlisten();
-        }
-        unlisten = await deviceListener({
-          setDev: (devices: Devices) => {
-            setLoading(false);
-            setDevices(devices);
-          },
-        });
-
         await restartDeviceWatcher();
+        setDevices(await getDevices());
+        setLoading(false);
       } catch (err) {
         NOTIFY.error(`${err}`);
       }

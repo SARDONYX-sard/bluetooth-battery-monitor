@@ -104,8 +104,8 @@ pub fn new_tray_menu(app: &AppHandle<tauri::Wry>) -> Result<(), tauri::Error> {
                         };
                     }
                     MenuId::BtOsMenu => {
-                        err_log!(Command::new("cmd.exe")
-                            .args(["-c", "\"start ms-settings:bluetooth\""])
+                        err_log!(Command::new("cmd")
+                            .args(["/c", "start", "ms-settings:bluetooth"])
                             .output());
                     }
                     MenuId::Quit => std::process::exit(0),

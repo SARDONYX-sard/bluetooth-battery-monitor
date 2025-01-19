@@ -9,6 +9,7 @@ use windows::Foundation::TypedEventHandler;
 
 use super::device_info::get_bluetooth_devices;
 use crate::device::device_info::Devices;
+use crate::BluetoothDeviceInfo;
 
 pub static DEVICES: LazyLock<Arc<Devices>> = LazyLock::new(|| {
     Arc::new({
@@ -33,7 +34,9 @@ const IS_CONNECTED: &str = "System.Devices.Aep.IsConnected"; // https://learn.mi
 const LAST_CONNECTED_TIME: &str = "System.DeviceInterface.Bluetooth.LastConnectedTime";
 
 impl Watcher {
-    pub fn new(update_fn: impl Fn() + Send + 'static) -> crate::errors::Result<Self> {
+    pub fn new(
+        update_fn: impl Fn(&BluetoothDeviceInfo) + Send + 'static,
+    ) -> crate::errors::Result<Self> {
         let watcher = {
             // e0cbf06c-cd8b-4647-bb8a-263b43f0f974 is Bluetooth classic
             // - ref: https://learn.microsoft.com/en-us/windows-hardware/drivers/install/system-defined-device-setup-classes-available-to-vendors
@@ -73,11 +76,11 @@ impl Watcher {
 
                 match DEVICES.get_mut(&address) {
                     Some(mut dev) => match dev.value_mut().update_info() {
-                        Ok(_) => update_fn(),
+                        Ok(_) => update_fn(dev.value()),
                         Err(err) => tracing::error!("{err}"),
                     },
                     None => {
-                        tracing::error!("This Device address is not found in DashMap: {address}")
+                        tracing::trace!("This Device address is not found in DashMap: {address}")
                     }
                 };
 
@@ -190,7 +193,7 @@ mod tests {
     #[cfg_attr(feature = "tracing", quick_tracing::try_init)]
     #[test]
     fn watch_test() -> crate::errors::Result<()> {
-        let watcher = Arc::new(Watcher::new(|| ())?);
+        let watcher = Arc::new(Watcher::new(|_| ())?);
         watcher.start()?;
         dbg!("Started");
 
