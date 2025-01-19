@@ -28,6 +28,7 @@ impl Default for Config {
 fn get_config_path(app: &AppHandle) -> Result<PathBuf, String> {
     let resolver = app.path();
     let config_dir = err_log_to_string!(resolver.app_config_dir())?;
+    err_log_to_string!(std::fs::create_dir_all(&config_dir))?;
     let config_path = config_dir.join(format!("{}_config.json", app.package_info().name));
     Ok(config_path)
 }
