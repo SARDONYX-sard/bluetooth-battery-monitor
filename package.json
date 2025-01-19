@@ -9,7 +9,7 @@
   "scripts": {
     "dev": "tauri dev",
     "dev:front": "next ./gui/frontend",
-    "build": "rimraf ./gui/frontend/out && tauri build --no-bundle",
+    "build": "rimraf ./gui/frontend/out && tauri build --no-bundle -- --profile release-no-lto",
     "build:front": "next build ./gui/frontend",
     "build:icons": "cargo tauri icon ./gui/backend/icons/icon.png",
     "test": "vitest run",
