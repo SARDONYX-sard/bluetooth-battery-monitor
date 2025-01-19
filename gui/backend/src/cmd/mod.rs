@@ -1,38 +1,15 @@
-pub(crate) mod battery_reporter;
 mod config;
-mod supports;
+pub(crate) mod device_watcher;
+pub mod supports;
+pub(super) mod system_tray;
 
-use crate::err_log;
-use bluetooth::{device::device_info::FindBluetooth as _, BluetoothDeviceInfo};
-use supports::{default_tray, update_tray};
-use tauri::{AppHandle, Builder, Wry};
-
-#[tauri::command]
-pub(crate) async fn update_tray_icon(
-    app: AppHandle,
-    device_name: &str,
-    battery_level: u64,
-) -> Result<(), String> {
-    err_log!(update_tray(&app, device_name, battery_level).await)
-}
-
-#[tauri::command]
-pub(crate) async fn set_default_tray_icon(app: AppHandle) -> Result<(), String> {
-    err_log!(default_tray(&app).await)
-}
-
-#[tauri::command]
-pub(crate) async fn find_bluetooth_devices() -> Result<Vec<BluetoothDeviceInfo>, String> {
-    tracing::trace!("`find_bluetooth_devices` was called.");
-    let devices = err_log!(BluetoothDeviceInfo::find_devices())?;
-    tracing::debug!("Got devices: {:#?}", devices);
-    Ok(devices)
-}
+use crate::err_log_to_string;
+use tauri::{Builder, Wry};
 
 #[tauri::command]
 pub(crate) async fn change_log_level(log_level: Option<&str>) -> Result<(), String> {
     tracing::debug!("Selected log level: {:?}", log_level);
-    err_log!(crate::log::change_level(log_level.unwrap_or("error")))
+    err_log_to_string!(crate::log::change_level(log_level.unwrap_or("error")))
 }
 
 /// Define our own `writeTextFile` api for tauri,
@@ -40,7 +17,7 @@ pub(crate) async fn change_log_level(log_level: Option<&str>) -> Result<(), Stri
 /// (there was a case that the order of some data in contents was switched).
 #[tauri::command]
 pub(crate) async fn write_file(path: &str, content: &str) -> Result<(), String> {
-    err_log!(std::fs::write(path, content))
+    err_log_to_string!(std::fs::write(path, content))
 }
 
 pub(crate) trait CommandsRegister {
@@ -52,11 +29,11 @@ impl CommandsRegister for Builder<Wry> {
     fn impl_commands(self) -> Self {
         self.invoke_handler(tauri::generate_handler![
             change_log_level,
-            find_bluetooth_devices,
-            set_default_tray_icon,
-            update_tray_icon,
+            device_watcher::restart_device_watcher,
+            device_watcher::get_devices,
+            system_tray::default_tray,
+            system_tray::update_tray,
             write_file,
-            battery_reporter::restart_interval,
             config::read_config,
             config::write_config,
         ])

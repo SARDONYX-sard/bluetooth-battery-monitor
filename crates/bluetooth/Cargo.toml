@@ -7,7 +7,7 @@ readme = "./readme.md"
 license = "MIT OR Apache-2.0"
 repository.workspace = true
 edition = "2021"
-rust-version = "1.70"
+rust-version = "1.80"
 keywords.workspace = true
 
 
@@ -15,11 +15,12 @@ keywords.workspace = true
 [features]
 default = ["json", "tracing"]
 tracing = ["dep:tracing"]
-serde = ["dep:serde", "dep:serde_with"]
+serde = ["dep:serde", "dep:serde_with", "dashmap/serde"]
 json = ["serde", "dep:serde_json"]
 
 [dependencies]
-chrono = { workspace = true }
+chrono = { workspace = true, features = ["serde"] }
+dashmap = { workspace = true }
 num-derive = "0.4.2"
 num-traits = "0.2.19"
 parse-display = { workspace = true }                 # Display derive
@@ -28,19 +29,25 @@ serde_with = { version = "3.12.0", optional = true }
 serde_json = { workspace = true, optional = true }   # Json converter
 snafu = { workspace = true }
 tracing = { workspace = true, optional = true }      # Logger
+winnow = { workspace = true }
 
 [target.'cfg(windows)'.dependencies]
-windows = { version = "0.58.0", features = [
+windows = { version = "0.59.0", features = [
   "Devices_Bluetooth_Rfcomm",
   "Devices_Enumeration",
   "Foundation",
   "Foundation_Collections",
+  "Wdk",
+  "Wdk_Devices",
+  "Wdk_Devices_Bluetooth",
   "Win32_Devices_Bluetooth",
+  "Win32_Devices_DeviceAndDriverInstallation",
+  "Win32_Devices_Properties",
   "Win32_Foundation",
   "Win32_Networking_WinSock",
+  "Win32_System_Registry",
   "Win32_System_Rpc",
   "Win32_System_Threading",
-  "Win32_System_Registry",
 ] }
 
 

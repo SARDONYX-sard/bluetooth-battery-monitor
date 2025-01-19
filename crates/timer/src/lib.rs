@@ -84,7 +84,7 @@ pub async fn clear_interval(id: u64) {
 pub async fn is_running_interval(id: u64) -> bool {
     INTERVAL_PROCESSES
         .get(&id)
-        .map_or(false, |process| process.running.load(Ordering::Relaxed))
+        .is_some_and(|process| process.running.load(Ordering::Relaxed))
 }
 
 #[cfg(test)]

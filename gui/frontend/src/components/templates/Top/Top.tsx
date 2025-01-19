@@ -4,6 +4,8 @@ import { Suspense } from 'react';
 
 import { useInjectJs } from '@/components/hooks/useInjectJs';
 import { DeviceCards } from '@/components/organisms/BluetoothGrid';
+import { DevicesProvider } from '@/components/organisms/BluetoothGrid/DevicesProvider';
+import { FixedNav } from '@/components/organisms/FixedNav';
 
 const sx: SxProps<Theme> = {
   display: 'flex',
@@ -18,9 +20,18 @@ export const Top = () => {
 
   return (
     <Box component='main' sx={sx}>
-      <Suspense fallback={<Skeleton height={'70vh'} width={'90%'} />}>
-        <DeviceCards />
-      </Suspense>
+      <DevicesProvider>
+        <TopInner />
+      </DevicesProvider>
     </Box>
+  );
+};
+
+const TopInner = () => {
+  return (
+    <Suspense fallback={<Skeleton height={'70vh'} width={'90%'} />}>
+      <DeviceCards />
+      <FixedNav />
+    </Suspense>
   );
 };

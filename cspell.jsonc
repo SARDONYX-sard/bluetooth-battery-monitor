@@ -1,8 +1,16 @@
 {
   "words": [
     "BTHENUM",
+    "chrono",
     "Classof",
     "dashmap",
+    "DEVNODE",
+    "DEVPKEY",
+    "DEVPROP",
+    "DEVPROPKEY",
+    "DEVPROPTYPE",
+    "FILETIME",
+    "fmtid",
     "HKEY",
     "HSTRING",
     "LOCALMFG",

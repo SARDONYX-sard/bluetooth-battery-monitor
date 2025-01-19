@@ -27,6 +27,12 @@ export const BluetoothDeviceInfoSchema = z
      */
     // biome-ignore lint/style/useNamingConvention: <explanation>
     last_used: z.string(),
+
+    /**
+     * Native time. e.g. `2024/4/19 22:42:16`
+     */
+    // biome-ignore lint/style/useNamingConvention: <explanation>
+    last_updated: z.string(),
   })
   .catch({
     // biome-ignore lint/style/useNamingConvention: <explanation>
@@ -41,23 +47,27 @@ export const BluetoothDeviceInfoSchema = z
     is_connected: false,
     // biome-ignore lint/style/useNamingConvention: <explanation>
     last_used: 'Unknown',
+    // biome-ignore lint/style/useNamingConvention: <explanation>
+    last_updated: 'Unknown',
   });
 
 // Optional: Create a TypeScript type from the schema for type safety.
 export type BluetoothDeviceInfo = z.infer<typeof BluetoothDeviceInfoSchema>;
 
+export type Devices = Record<number, BluetoothDeviceInfo>;
+
 /**
- * Find bluetooth devices information.
+ * Restart device watcher to get bluetooth devices information.
  * @throws `Error`
  */
-export async function FindBluetoothDevices() {
-  return await invoke<BluetoothDeviceInfo[]>('find_bluetooth_devices');
+export async function restartDeviceWatcher() {
+  await invoke('restart_device_watcher');
 }
 
 /**
- * Restart interval to get bluetooth device information.
+ * Get devices information
  * @throws `Error`
  */
-export async function restartInterval() {
-  await invoke('restart_interval');
+export async function getDevices() {
+  return await invoke<Devices>('get_devices');
 }

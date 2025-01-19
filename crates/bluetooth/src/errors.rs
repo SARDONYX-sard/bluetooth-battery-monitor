@@ -14,6 +14,11 @@ pub enum BluetoothError {
     #[snafu(display("Failed to cast sub category5 as u32: {sub}"))]
     FailedToCastCat5Error { sub: SubCategory5 },
 
+    #[snafu(display("Failed to parse: {err}"))]
+    WinnowError {
+        err: winnow::error::ErrMode<winnow::error::ContextError>,
+    },
+
     #[snafu(transparent)]
     ParseIntError { source: core::num::ParseIntError },
     #[snafu(transparent)]
@@ -21,6 +26,11 @@ pub enum BluetoothError {
     #[snafu(transparent)]
     JsonError { source: serde_json::Error },
 
+    #[cfg(target_os = "windows")]
+    #[snafu(transparent)]
+    BluetoothError {
+        source: crate::device::windows::device_info::BluetoothDeviceInfoError,
+    },
     #[snafu(transparent)]
     #[cfg(target_os = "windows")]
     Error { source: windows::core::Error },

@@ -1,9 +1,8 @@
 import { invoke } from '@tauri-apps/api/core';
 
 export type Config = {
-  /** e.g. `BTHENUM\\{0000111E-0000-1000-8000-00805F9B34FB}_LOCALMFG&005D...` */
-  // biome-ignore lint/style/useNamingConvention: <explanation>
-  instance_id: string;
+  /** e.g. `0` */
+  address: number;
 
   /** e.g. `60`(minutes) == 1hour */
   // biome-ignore lint/style/useNamingConvention: <explanation>
@@ -16,8 +15,7 @@ export type Config = {
 
 export const CONFIG = {
   default: {
-    // biome-ignore lint/style/useNamingConvention: <explanation>
-    instance_id: '',
+    address: 0,
     // biome-ignore lint/style/useNamingConvention: <explanation>
     battery_query_duration_minutes: 60,
     // biome-ignore lint/style/useNamingConvention: <explanation>

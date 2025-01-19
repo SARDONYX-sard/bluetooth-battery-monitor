@@ -6,11 +6,13 @@ import Typography from '@mui/material/Typography';
  * https://mui.com/material-ui/react-progress/#circular-with-label
  */
 export function CircularProgressWithLabel(props: CircularProgressProps & { progColor?: string; value: number }) {
-  const style = { color: props.progColor };
+  const { progColor, value, ...rest } = props;
+
+  const style = { color: progColor };
 
   return (
     <Box sx={{ position: 'relative', display: 'inline-flex' }}>
-      <CircularProgress style={style} variant='determinate' {...props} />
+      <CircularProgress color='primary' style={style} variant='determinate' {...rest} value={value} />
       <Box
         sx={{
           top: 0,
@@ -23,9 +25,7 @@ export function CircularProgressWithLabel(props: CircularProgressProps & { progC
           justifyContent: 'center',
         }}
       >
-        <Typography color='text.secondary' component='div' variant='caption'>{`${Math.round(
-          props.value,
-        )}%`}</Typography>
+        <Typography color='text.secondary' component='div' variant='caption'>{`${Math.round(value)}%`}</Typography>
       </Box>
     </Box>
   );

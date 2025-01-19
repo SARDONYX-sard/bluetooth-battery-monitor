@@ -5,13 +5,18 @@ import type { I18nKeys } from '@/lib/i18n';
 import type { FlatNamespace, KeyPrefix } from 'i18next';
 
 type $Tuple<T> = readonly [T?, ...T[]];
+
 type UseTranslation = <
   Ns extends FlatNamespace | $Tuple<FlatNamespace> | undefined = undefined,
   KeyPre extends KeyPrefix<FallbackNs<Ns>> = undefined,
 >(
   ns?: Ns,
   options?: UseTranslationOptions<KeyPre>,
-) => { t: (key: I18nKeys) => string };
+) => {
+  t: <T extends I18nKeys>(key: T) => string;
+};
+
+// - ref: https://www.i18next.com/overview/typescript
 
 /**
  * useTranslation(react-i18next) Wrapper for type completion of translation keys.

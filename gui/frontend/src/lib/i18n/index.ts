@@ -26,7 +26,12 @@ const RESOURCES = {
 type ValidI18n = keyof typeof RESOURCES;
 /** Values of i18n selectable items */
 type I18nListValue = 'auto' | ValidI18n;
-export type I18nKeys = keyof (typeof RESOURCES)['en-US']['translation'];
+
+type FlattenKeys<T extends object, P extends string = ''> = {
+  [K in keyof T]: T[K] extends object ? FlattenKeys<T[K], `${P}${K & string}.`> : `${P}${K & string}`;
+}[keyof T];
+
+export type I18nKeys = FlattenKeys<(typeof RESOURCES)['en-US']['translation']>;
 
 /**
  * Default if `null` or `undefined`.

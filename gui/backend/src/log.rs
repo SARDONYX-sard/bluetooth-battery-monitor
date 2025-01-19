@@ -37,7 +37,7 @@ pub(crate) fn init(app: &tauri::App) -> Result<()> {
         .with_target(false)
         .with_writer(create_rotate_log(log_dir, &log_name, 4)?);
 
-    let (filter, reload_handle) = reload::Layer::new(LevelFilter::ERROR);
+    let (filter, reload_handle) = reload::Layer::new(LevelFilter::DEBUG);
     tracing_subscriber::registry()
         .with(filter)
         .with(fmt_layer)
@@ -59,7 +59,7 @@ pub(crate) fn change_level(log_level: &str) -> Result<()> {
     });
     match RELOAD_HANDLE.get() {
         Some(log) => Ok(log.modify(|filter| *filter = new_filter)?),
-        None => Err(Error::UninitLog),
+        None => Err(Error::UninitializedLogger),
     }
 }
 
@@ -82,7 +82,7 @@ fn create_rotate_log(
             entry
                 .file_name()
                 .to_str()
-                .map_or(false, |name| name.starts_with(log_name))
+                .is_some_and(|name| name.starts_with(log_name))
         })
         .collect::<Vec<_>>();
 

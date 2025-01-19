@@ -1,15 +1,13 @@
 import SyncIcon from '@mui/icons-material/Sync';
-import LoadingButton from '@mui/lab/LoadingButton';
-import { Tooltip } from '@mui/material';
+import { useCallback } from 'react';
 
 import { useTranslation } from '@/components/hooks/useTranslation';
+import { LoadingButtonWithToolTip } from '@/components/molecules/LoadingButtonWithToolTip';
+import { NOTIFY } from '@/lib/notify';
+import { getDevices, restartDeviceWatcher } from '@/services/api/bluetooth_finder';
+import { defaultTrayIcon } from '@/services/api/sys_tray';
 
-import type { MouseEventHandler } from 'react';
-
-type Props = Readonly<{
-  onClick: MouseEventHandler<HTMLButtonElement> | undefined;
-  loading: boolean;
-}>;
+import { useDevicesContext } from './DevicesProvider';
 
 /**
  * Update bluetooth information
@@ -17,25 +15,34 @@ type Props = Readonly<{
  * Icon ref
  * - https://mui.com/material-ui/material-icons/
  */
-export function RestartButton({ onClick, loading }: Props) {
+export function RestartButton() {
   const { t } = useTranslation();
+  const { setDevices, setLoading, loading } = useDevicesContext();
+
+  const restartHandler = useCallback(() => {
+    (async () => {
+      try {
+        setLoading(true);
+        await defaultTrayIcon();
+        await restartDeviceWatcher();
+        setDevices(await getDevices());
+        setLoading(false);
+      } catch (err) {
+        NOTIFY.error(`${err}`);
+      }
+    })();
+  }, [setDevices, setLoading]);
 
   return (
-    <Tooltip title={t('restart-tooltip')}>
-      <LoadingButton
-        endIcon={<SyncIcon />}
-        loading={loading}
-        loadingPosition='end'
-        onClick={onClick}
-        sx={{
-          width: '100%',
-          minHeight: '40px',
-        }}
-        type='submit'
-        variant='contained'
-      >
-        <span>{loading ? t('restarting-btn') : t('restart-btn')}</span>
-      </LoadingButton>
-    </Tooltip>
+    <LoadingButtonWithToolTip
+      buttonName={loading ? t('restarting-btn') : t('restart-btn')}
+      icon={<SyncIcon />}
+      loading={loading}
+      loadingPosition='end'
+      onClick={restartHandler}
+      tooltipTitle={t('restart-tooltip')}
+      type='submit'
+      variant='outlined'
+    />
   );
 }

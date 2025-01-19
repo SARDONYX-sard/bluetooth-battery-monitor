@@ -15,6 +15,7 @@
     "preserveConstEnums": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
+    "strictNullChecks": true,
     "jsx": "preserve",
     "incremental": true,
     "plugins": [

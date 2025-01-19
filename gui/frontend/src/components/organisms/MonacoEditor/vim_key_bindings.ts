@@ -1,6 +1,6 @@
-import type { MonacoEditor, VimModeRef, VimStatusRef } from './MonacoEditor';
 import type MonacoVim from 'monaco-vim';
 import type { Vim } from 'monaco-vim';
+import type { MonacoEditor, VimModeRef, VimStatusRef } from './MonacoEditor';
 
 type DefineVimExCommand = {
   actionId: string;
