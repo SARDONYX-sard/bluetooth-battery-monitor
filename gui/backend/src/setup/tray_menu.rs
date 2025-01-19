@@ -7,7 +7,7 @@ use std::{
 };
 use tauri::{
     menu::{Menu, MenuItem},
-    tray::{MouseButton, TrayIcon, TrayIconBuilder},
+    tray::{MouseButton, MouseButtonState, TrayIcon, TrayIconBuilder},
     AppHandle, Manager as _,
 };
 
@@ -57,10 +57,12 @@ pub fn new_tray_menu(app: &AppHandle<tauri::Wry>) -> Result<(), tauri::Error> {
         .show_menu_on_left_click(false)
         .menu(&menu)
         .on_tray_icon_event(move |tray, event| {
-            if let tauri::tray::TrayIconEvent::Click { button, .. } = event {
-                if button != MouseButton::Left {
-                    return;
-                }
+            if let tauri::tray::TrayIconEvent::Click {
+                button: MouseButton::Left,
+                button_state: MouseButtonState::Up,
+                ..
+            } = event
+            {
                 let window = tray.app_handle().get_webview_window("main").unwrap();
                 match window.is_visible() {
                     Ok(visible) => {
