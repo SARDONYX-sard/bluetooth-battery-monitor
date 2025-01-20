@@ -20,10 +20,12 @@ export const I18nList = () => {
     LANG.set(cacheLocale);
   };
 
+  // Sort by Alphabet
   const menuItems = [
     { value: 'auto', label: t('lang-preset-auto') },
     { value: 'en-US', label: 'English(US)' },
     { value: 'ja-JP', label: 'Japanese' },
+    { value: 'ko-KR', label: 'Korean' },
     { value: 'custom', label: t('lang-preset-custom') },
   ] as const;
 
