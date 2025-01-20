@@ -23,3 +23,5 @@ It should be added like any other language selection.
 
 - [menuItems](../gui/frontend/src/components/organisms/I18nList/I18nList.tsx)
 - [RESOURCES & normalize](../gui/frontend/src/lib/i18n/index.ts)
+
+Example: [here](https://github.com/SARDONYX-sard/bluetooth-battery-monitor/pull/21/files)
