@@ -9,6 +9,7 @@ import { schemaStorage } from '@/lib/storage/schemaStorage';
 
 import dictEnUs from '@/../../locales/en-US.json';
 import dictJaJp from '@/../../locales/ja-JP.json';
+import dictKoKr from '@/../../locales/ko-KR.json';
 
 /** The keys in RESOURCE are language tags according to the BCP-47 standard.
     - See: https://partnerhub.warnermediagroup.com/metadata/languages */
@@ -18,6 +19,9 @@ const RESOURCES = {
   },
   'ja-JP': {
     translation: dictJaJp,
+  },
+  'ko-KR': {
+    translation: dictKoKr,
   },
   custom: { translation: NOTIFY.try(() => JSON.parse(STORAGE.get('custom-translation-dict') ?? '{}')) },
 } as const satisfies Resource;
@@ -42,6 +46,9 @@ const normalize = (str: string | null): ValidI18n => {
     case 'ja':
     case 'ja-JP':
       return 'ja-JP';
+    case 'ko-KR':
+      return 'ko-KR';
+
     case 'custom':
       return 'custom';
     default:
