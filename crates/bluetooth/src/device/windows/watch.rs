@@ -137,7 +137,9 @@ impl Watcher {
         // https://learn.microsoft.com/en-us/uwp/api/windows.devices.enumeration.devicewatcher?view=winrt-26100
         if matches!(
             status,
-            DeviceWatcherStatus::Started | DeviceWatcherStatus::EnumerationCompleted
+            DeviceWatcherStatus::Started
+                | DeviceWatcherStatus::Aborted
+                | DeviceWatcherStatus::EnumerationCompleted
         ) {
             self.watcher.Stop()?;
         }
