@@ -38,9 +38,9 @@ pub enum DevicePropertyError {
     DevicePropertyError { source: Error },
 
     #[snafu(display(
-        "Expected device property type {:?}, but got {:?}",
-        DevPropType::from_u32(*expected),
-        DevPropType::from_u32(*actual),
+        "Expected device property type {}, but got {}",
+        DevPropType::from_u32(*expected).map_or("Unknown", |t|t.as_str()),
+        DevPropType::from_u32(*actual).map_or("Unknown", |t|t.as_str()),
     ))]
     TypeError { actual: u32, expected: u32 },
 }
