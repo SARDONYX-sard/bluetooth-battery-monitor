@@ -4,6 +4,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.1] - 2025-01-20
+### :sparkles: New Features
+- [`468dde7`](https://github.com/SARDONYX-sard/bluetooth-battery-monitor/commit/468dde7957aca6e8987dc6886b90ac587a705184) - add Aborted status *(commit by [@SARDONYX-sard](https://github.com/SARDONYX-sard))*
+
+### :bug: Bug Fixes
+- [`248b0ad`](https://github.com/SARDONYX-sard/bluetooth-battery-monitor/commit/248b0ad6205588632ea660f84c52a7c1eba332dc) - fix config error *(commit by [@SARDONYX-sard](https://github.com/SARDONYX-sard))*
+- [`525b2ed`](https://github.com/SARDONYX-sard/bluetooth-battery-monitor/commit/525b2ed991a28334a26b46a62a88bae7e97c1a66) - ignore invalid device instance id *(commit by [@SARDONYX-sard](https://github.com/SARDONYX-sard))*
+- [`d81cd18`](https://github.com/SARDONYX-sard/bluetooth-battery-monitor/commit/d81cd18c68301b5f02f3de059c4b427b6604dad2) - fix by lint *(commit by [@SARDONYX-sard](https://github.com/SARDONYX-sard))*
+
+### :wrench: Chores
+- [`efd34cf`](https://github.com/SARDONYX-sard/bluetooth-battery-monitor/commit/efd34cf2937200acd7025ccb5421c5c5785efffc) - **template**: add `0.4.0` *(commit by [@SARDONYX-sard](https://github.com/SARDONYX-sard))*
+
+
 ## [0.4.0] - 2025-01-19
 ### :boom: BREAKING CHANGES
 - due to [`c7130b6`](https://github.com/SARDONYX-sard/bluetooth-battery-monitor/commit/c7130b62e819226bb93f689345c07e6ce5f3d469) - rename module name *(commit by [@SARDONYX-sard](https://github.com/SARDONYX-sard))*:
@@ -46,3 +59,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [0.3.1]: https://github.com/SARDONYX-sard/bluetooth-battery-monitor/compare/0.3.0...0.3.1
 [0.4.0]: https://github.com/SARDONYX-sard/bluetooth-battery-monitor/compare/0.3.1...0.4.0
+[0.4.1]: https://github.com/SARDONYX-sard/bluetooth-battery-monitor/compare/0.4.0...0.4.1
