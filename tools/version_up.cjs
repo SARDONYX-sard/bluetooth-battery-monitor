@@ -37,11 +37,11 @@ const packageJson = require(packageJsonPath);
 const currentVersion = packageJson.version;
 
 if (isDebug) {
-  // biome-ignore lint/suspicious/noConsoleLog: <explanation>
+  // biome-ignore lint/suspicious/noConsole: <explanation>
   console.log(packageJsonPath);
-  // biome-ignore lint/suspicious/noConsoleLog: <explanation>
+  // biome-ignore lint/suspicious/noConsole: <explanation>
   console.log(cargoTomlPath);
-  // biome-ignore lint/suspicious/noConsoleLog: <explanation>
+  // biome-ignore lint/suspicious/noConsole: <explanation>
   console.log(issueTemplatePath);
 }
 main();
@@ -55,7 +55,7 @@ function main() {
   updateIssueTemplate(newVersion);
   gitCommitAndTag(currentVersion, newVersion);
 
-  // biome-ignore lint/suspicious/noConsoleLog: <explanation>
+  // biome-ignore lint/suspicious/noConsole: <explanation>
   console.log(`Updated version: ${currentVersion} => ${newVersion}`);
 }
 
@@ -91,31 +91,32 @@ function updatePackageJson(newVersion) {
   fs.writeFileSync(packageJsonPath, `${JSON.stringify(packageJson, null, 2)}\n`);
 }
 
+const cargoRegexp = /\[workspace\.package\]\nversion = "(.*)"/;
+
 /**
  * @param {string} newVersion
  */
 function updateCargoToml(newVersion) {
   let cargoToml = fs.readFileSync(cargoTomlPath, 'utf8');
-  cargoToml = cargoToml.replace(
-    /\[workspace\.package\]\nversion = "(.*)"/,
-    `[workspace.package]\nversion = "${newVersion}"`,
-  );
+  cargoToml = cargoToml.replace(cargoRegexp, `[workspace.package]\nversion = "${newVersion}"`);
   fs.writeFileSync(cargoTomlPath, cargoToml);
 }
+
+const issueRegexp = /options:\n((\s+- .*\n)+)/;
 
 /**
  * @param {string} newVersion
  */
 function updateIssueTemplate(newVersion) {
   let issueTemplate = fs.readFileSync(issueTemplatePath, 'utf8');
-  const versionList = issueTemplate.match(/options:\n((\s+- .*\n)+)/)?.[1];
+  const versionList = issueTemplate.match(issueRegexp)?.[1];
   if (versionList == null) {
     throw new Error('Invalid version');
   }
 
   const versions = versionList.split('\n').map((v) => v.trim().slice(2));
   if (!versions.includes(newVersion)) {
-    issueTemplate = issueTemplate.replace(/options:\n((\s+- .*\n)+)/, `options:\n$1        - ${newVersion}\n`);
+    issueTemplate = issueTemplate.replace(issueRegexp, `options:\n$1        - ${newVersion}\n`);
     fs.writeFileSync(issueTemplatePath, issueTemplate);
   }
 }
@@ -142,7 +143,7 @@ function gitCommitAndTag(currentVersion, newVersion) {
     // Create Git tag
     execSync(`git tag ${newVersion} ${tagFlags} -m "Version ${newVersion}"`);
 
-    // biome-ignore lint/suspicious/noConsoleLog: <explanation>
+    // biome-ignore lint/suspicious/noConsole: <explanation>
     console.log('Git commit and tag created successfully.');
   } catch (error) {
     throw new Error(`Failed to create Git commit and tag: ${error}`);
