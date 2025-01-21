@@ -13,6 +13,7 @@ use tauri_plugin_window_state::StateFlags;
 fn main() {
     #[allow(clippy::large_stack_frames)]
     if let Err(err) = tauri::Builder::default()
+        .plugin(tauri_plugin_updater::Builder::new().build())
         .plugin(tauri_plugin_autostart::init(
             tauri_plugin_autostart::MacosLauncher::LaunchAgent,
             None,
