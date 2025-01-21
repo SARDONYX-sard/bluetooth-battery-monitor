@@ -4,6 +4,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.2] - 2025-01-21
+### :sparkles: New Features
+- [`d0b3726`](https://github.com/SARDONYX-sard/bluetooth-battery-monitor/commit/d0b3726c80c128ec227a0de1c885abea29eff7da) - change TypeError display *(commit by [@SARDONYX-sard](https://github.com/SARDONYX-sard))*
+- [`f48bab1`](https://github.com/SARDONYX-sard/bluetooth-battery-monitor/commit/f48bab1b8461d09eec0277c14907383884b37100) - **i18n**: add `Korean` language selector *(commit by [@SARDONYX-sard](https://github.com/SARDONYX-sard))*
+- [`5fe695a`](https://github.com/SARDONYX-sard/bluetooth-battery-monitor/commit/5fe695aad56adf643dac04e692998151f38b0ad8) - add interval command *(commit by [@SARDONYX-sard](https://github.com/SARDONYX-sard))*
+- [`362e898`](https://github.com/SARDONYX-sard/bluetooth-battery-monitor/commit/362e8983056716061cfdb01bd05e3c7d012499ca) - insert interval on setup *(commit by [@SARDONYX-sard](https://github.com/SARDONYX-sard))*
+
+### :recycle: Refactors
+- [`9254c88`](https://github.com/SARDONYX-sard/bluetooth-battery-monitor/commit/9254c885776bb03ef6e2ec00e0f82828624cf7c9) - separate to files *(commit by [@SARDONYX-sard](https://github.com/SARDONYX-sard))*
+
+### :wrench: Chores
+- [`ff6cf1d`](https://github.com/SARDONYX-sard/bluetooth-battery-monitor/commit/ff6cf1d9f968248994bc11b8d55df687415d3270) - **github**: add `0.4.1` selector in issue template *(commit by [@SARDONYX-sard](https://github.com/SARDONYX-sard))*
+- [`2669417`](https://github.com/SARDONYX-sard/bluetooth-battery-monitor/commit/2669417e822ba1399751e44d14a0710ce11a7c00) - **locale**: sort key by alpha *(commit by [@SARDONYX-sard](https://github.com/SARDONYX-sard))*
+
+
 ## [0.4.1] - 2025-01-20
 ### :sparkles: New Features
 - [`468dde7`](https://github.com/SARDONYX-sard/bluetooth-battery-monitor/commit/468dde7957aca6e8987dc6886b90ac587a705184) - add Aborted status *(commit by [@SARDONYX-sard](https://github.com/SARDONYX-sard))*
@@ -60,3 +75,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [0.3.1]: https://github.com/SARDONYX-sard/bluetooth-battery-monitor/compare/0.3.0...0.3.1
 [0.4.0]: https://github.com/SARDONYX-sard/bluetooth-battery-monitor/compare/0.3.1...0.4.0
 [0.4.1]: https://github.com/SARDONYX-sard/bluetooth-battery-monitor/compare/0.4.0...0.4.1
+[0.4.2]: https://github.com/SARDONYX-sard/bluetooth-battery-monitor/compare/0.4.1...0.4.2
