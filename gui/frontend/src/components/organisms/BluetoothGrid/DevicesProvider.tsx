@@ -15,7 +15,7 @@ import { NOTIFY } from '@/lib/notify';
 import { PRIVATE_CACHE_OBJ } from '@/lib/storage/cacheKeys';
 import { numberSchema } from '@/lib/zod/schema-utils';
 import { BluetoothDeviceInfoSchema, type Devices } from '@/services/api/bluetooth_finder';
-import { deviceListener } from '@/services/api/device_listener';
+import { deviceListener, devicesListener } from '@/services/api/device_listener';
 
 type ContextType = {
   devices: Devices | undefined;
@@ -30,16 +30,18 @@ export const OptBluetoothDeviceInfoSchema = z
   .union([z.record(numberSchema, BluetoothDeviceInfoSchema), z.undefined()])
   .catch(undefined);
 
-let unlisten: (() => void) | undefined;
+let unlistenUpdate: (() => void) | undefined;
+let unlistenRestart: (() => void) | undefined;
 
 type Props = { children: ReactNode };
 export const DevicesProvider: FC<Props> = ({ children }) => {
   const [devices, setDevices] = useStorageState(PRIVATE_CACHE_OBJ.devices, OptBluetoothDeviceInfoSchema);
   const [loading, setLoading] = useState<boolean>(false);
 
+  // Update a device information
   useEffect(() => {
     NOTIFY.asyncTry(async () => {
-      unlisten = await deviceListener({
+      unlistenUpdate = await deviceListener({
         setDev: (newDevice) => {
           setDevices((prev) => {
             if (prev) {
@@ -52,8 +54,25 @@ export const DevicesProvider: FC<Props> = ({ children }) => {
     });
 
     return () => {
-      if (unlisten) {
-        unlisten();
+      if (unlistenUpdate) {
+        unlistenUpdate();
+      }
+    };
+  }, [setDevices]);
+
+  // Restart(Replace all devices)
+  useEffect(() => {
+    NOTIFY.asyncTry(async () => {
+      unlistenRestart = await devicesListener({
+        setDev: (newDevices) => {
+          setDevices(newDevices);
+        },
+      });
+    });
+
+    return () => {
+      if (unlistenRestart) {
+        unlistenRestart();
       }
     };
   }, [setDevices]);

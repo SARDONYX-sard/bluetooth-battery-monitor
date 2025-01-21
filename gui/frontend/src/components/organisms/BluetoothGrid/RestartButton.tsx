@@ -4,8 +4,7 @@ import { useCallback } from 'react';
 import { useTranslation } from '@/components/hooks/useTranslation';
 import { LoadingButtonWithToolTip } from '@/components/molecules/LoadingButtonWithToolTip';
 import { NOTIFY } from '@/lib/notify';
-import { getDevices, restartDeviceWatcher } from '@/services/api/bluetooth_finder';
-import { defaultTrayIcon } from '@/services/api/sys_tray';
+import { getDevices, restartDeviceWatcher, restartInterval } from '@/services/api/bluetooth_finder';
 
 import { useDevicesContext } from './DevicesProvider';
 
@@ -23,8 +22,8 @@ export function RestartButton() {
     (async () => {
       try {
         setLoading(true);
-        await defaultTrayIcon();
-        await restartDeviceWatcher();
+        await restartInterval();
+        await restartDeviceWatcher(); // set loading icon(by backend) & set device icon
         setDevices(await getDevices());
         setLoading(false);
       } catch (err) {

@@ -61,7 +61,7 @@ pub async fn restart_interval(app: AppHandle) {
                     err_log!(update_tray_inner(dev_name, battery_level, dev.is_connected));
                 };
 
-                err_log!(window.emit("bt_monitor://update_devices", &devices));
+                err_log!(window.emit("bt_monitor://restart_devices", &devices));
 
                 // Replace all
                 for (address, device) in devices {
