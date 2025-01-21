@@ -20,7 +20,7 @@ static INTERVAL_ID: AtomicU64 = AtomicU64::new(0);
 /// The callback fn cannot return a Result, so write only error log.
 #[tauri::command]
 pub async fn restart_interval(app: AppHandle) {
-    tracing::trace!("`restart_interval` was called.");
+    tracing::debug!("`restart_interval` was called.");
     let id = INTERVAL_ID.load(Ordering::Acquire);
     if id != 0 {
         clear_interval(id).await;
@@ -34,8 +34,8 @@ pub async fn restart_interval(app: AppHandle) {
 
     let id = set_interval(
         move || {
-            // Callbacks in the interval may survive until program termination in the worst case.
-            // Therefore, they become 'static' and must be cloned.
+            tracing::debug!("`restart_interval` closure was called.");
+
             let app = app.clone();
             let address = config.address;
             let window = app.get_webview_window("main").unwrap();

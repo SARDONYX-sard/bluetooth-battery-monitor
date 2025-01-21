@@ -1,9 +1,9 @@
 mod config;
-mod interval;
 mod supports;
 mod system_tray;
 
 pub(super) mod device_watcher;
+pub(super) mod interval;
 
 use crate::err_log_to_string;
 use tauri::{Builder, Wry};
