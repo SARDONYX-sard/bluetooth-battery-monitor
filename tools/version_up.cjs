@@ -20,6 +20,10 @@ const isDebug = false;
 const defaultVersion = '2'; // 2: Bump up `minor` version is default
 const useGpg = true; // Verified commit with GPG key.
 
+// CONSTANTS(The variables need to be declared well above the hoist of the function they are used in.)
+const cargoRegexp = /\[workspace\.package\]\nversion = "(.*)"/;
+const issueRegexp = /options:\n((\s+- .*\n)+)/;
+
 // import modules
 // biome-ignore lint/correctness/noNodejsModules: <explanation>
 const fs = require('node:fs');
@@ -91,8 +95,6 @@ function updatePackageJson(newVersion) {
   fs.writeFileSync(packageJsonPath, `${JSON.stringify(packageJson, null, 2)}\n`);
 }
 
-const cargoRegexp = /\[workspace\.package\]\nversion = "(.*)"/;
-
 /**
  * @param {string} newVersion
  */
@@ -101,8 +103,6 @@ function updateCargoToml(newVersion) {
   cargoToml = cargoToml.replace(cargoRegexp, `[workspace.package]\nversion = "${newVersion}"`);
   fs.writeFileSync(cargoTomlPath, cargoToml);
 }
-
-const issueRegexp = /options:\n((\s+- .*\n)+)/;
 
 /**
  * @param {string} newVersion

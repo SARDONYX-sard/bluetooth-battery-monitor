@@ -1,5 +1,5 @@
 [workspace.package]
-version = "0.4.2"
+version = "0.4.3"
 description = "Bluetooth battery monitor"
 repository = "https://github.com/SARDONYX-sard/bluetooth-battery-monitor"
 readme = "README.md"
