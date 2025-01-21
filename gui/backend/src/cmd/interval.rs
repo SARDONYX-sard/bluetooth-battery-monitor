@@ -1,3 +1,6 @@
+/// # Why need this code?
+/// DeviceWatcher triggers when a device is connected or disconnected, but cannot WATCH DEVPKEY for battery information.
+/// ThatFor this reason, it is currently not possible to use the ITherefore, it is currently using interval processing.
 use super::config::{read_config, write_config_sync};
 use crate::cmd::supports::notify;
 use crate::cmd::system_tray::update_tray_inner;
@@ -10,6 +13,7 @@ use std::{
 use tauri::{AppHandle, Emitter as _, Manager as _};
 use timer::{clear_interval, set_interval};
 
+/// The task is singleton.
 static INTERVAL_ID: AtomicU64 = AtomicU64::new(0);
 
 /// # NOTE
