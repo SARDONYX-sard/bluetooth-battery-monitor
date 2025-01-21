@@ -68,6 +68,7 @@ jobs:
           releaseBody: ${{ steps.changelog.outputs.changes }}
           tagName: ${{ github.ref_name }} # This only works if your workflow triggers on new tags.
           prerelease: false
+          includeUpdaterJson: true # build latest.json(For updater)
 
       - name: Commit CHANGELOG.md
         uses: stefanzweifel/git-auto-commit-action@v5.1.0
