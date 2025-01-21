@@ -108,20 +108,31 @@ impl BluetoothDeviceInfo {
     /// - is_connected
     /// - last_used
     /// - last_updated
-    pub(crate) fn update_info(
-        &mut self,
-        is_connected: bool,
-    ) -> Result<(), BluetoothDeviceInfoError> {
+    pub(crate) fn update_info(&mut self) -> Result<(), BluetoothDeviceInfoError> {
         let device = DeviceInstance::new(self.device_instance);
 
         self.battery_level = device.get_device_property(&DEVPKEY_Bluetooth_Battery)?;
         self.last_updated = LocalTime::now();
 
         // NOTE: `is_connected` & `last_used` must be taken by device_search to get a decent value, so the information is merged.
-        self.is_connected = is_connected;
-        if is_connected {
-            self.last_used = LocalTime::now();
-        }
+        let sys_device = {
+            let mut devices = match super::device_searcher::get_bluetooth_devices() {
+                Ok(devices) => devices,
+                Err(err) => {
+                    tracing::error!("{err}");
+                    return Ok(());
+                }
+            };
+            devices.remove(&self.address)
+        };
+        // NOTE: `is_connected` & `last_used` must be taken by device_search to get a decent value, so the information is merged.
+        self.is_connected = sys_device
+            .as_ref()
+            .map(|device| device.is_connected)
+            .unwrap_or_default();
+        self.last_used = sys_device
+            .map(|device| device.last_used)
+            .unwrap_or_default();
 
         Ok(())
     }

@@ -97,19 +97,21 @@ impl Watcher {
 
                 match DEVICES.get_mut(&address) {
                     Some(mut dev) => {
-                        let map = device.Properties()?;
-
                         // for prop in &map {
                         //     dbg!(address);
                         //     type_to_value(prop)?;
                         // }
 
-                        // In my tests, the only properties selected by kind that exist are the ones the device was able to get via pnp.
-                        //  Therefore, any device that exists in DashMap should be able to retrieve it.
-                        let is_connected =
-                            map.HasKey(&HSTRING::from(IS_CONNECTED)).unwrap_or_default();
+                        // Not use this pattern
+                        // ```
+                        // let map = device.Properties()?;
+                        // let is_connected = map.HasKey(&HSTRING::from(IS_CONNECTED)).unwrap_or_default();
+                        // ```
+                        // Why?
+                        // There were times when the information from props was unreliable.
+                        // The information is obtained when connected, but for some reason this value may not be obtained when not connected.
 
-                        match dev.value_mut().update_info(is_connected) {
+                        match dev.value_mut().update_info() {
                             Ok(()) => update_fn(dev.value()),
                             Err(err) => tracing::error!("{err}"),
                         }
