@@ -71,3 +71,11 @@ export async function restartDeviceWatcher() {
 export async function getDevices() {
   return await invoke<Devices>('get_devices');
 }
+
+/**
+ * Restart interval to get bluetooth device information.
+ * @throws `Error`
+ */
+export async function restartInterval() {
+  await invoke('restart_interval');
+}

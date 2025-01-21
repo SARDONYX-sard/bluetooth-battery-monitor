@@ -70,7 +70,7 @@ impl LocalTime {
         }
     }
 
-    pub fn from_utc(utc_time: chrono::DateTime<chrono::Utc>) -> Self {
+    pub fn from_utc(utc_time: &chrono::DateTime<chrono::Utc>) -> Self {
         let time = utc_time.with_timezone(&chrono::Local);
         Self {
             year: time.year() as u16,

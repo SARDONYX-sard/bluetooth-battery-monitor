@@ -5,13 +5,12 @@ use tauri::image::Image;
 ///
 /// # Panics
 /// 0 <= battery_level <= 100
+#[tracing::instrument(level = "trace")]
 pub fn update_tray_inner(
     device_name: &str,
     battery_level: u64,
     is_connected: bool,
 ) -> tauri::Result<()> {
-    tracing::debug!("Change to {battery_level} battery icon");
-
     let battery_icon = if is_connected {
         match battery_level {
             0 => include_bytes!("../../icons/battery/battery-0.png"),

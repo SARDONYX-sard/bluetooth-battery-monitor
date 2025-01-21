@@ -1,3 +1,5 @@
+mod address_parser;
 pub mod device_info;
-pub mod device_searcher;
+mod device_searcher;
+pub mod inspect;
 pub mod watch;

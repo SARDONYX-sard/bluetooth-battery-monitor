@@ -3,7 +3,10 @@ mod window_event;
 
 use self::tray_menu::new_tray_menu;
 use self::window_event::window_event;
-use crate::{cmd::device_watcher::restart_device_watcher_inner, err_log};
+use crate::{
+    cmd::{device_watcher::restart_device_watcher_inner, interval::restart_interval},
+    err_log,
+};
 use tauri::{Builder, Manager, Wry};
 pub use tray_menu::TRAY_ICON;
 
@@ -23,6 +26,7 @@ impl SetupsRegister for Builder<Wry> {
             tauri::async_runtime::spawn(async move {
                 let app = app;
                 err_log!(restart_device_watcher_inner(&app).await);
+                restart_interval(app).await;
             });
 
             Ok(())

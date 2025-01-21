@@ -31,6 +31,8 @@
   "lang-preset-auto": "Auto",
   "lang-preset-custom": "Custom",
   "lang-preset-label": "Language",
+  "last-updated": "Last updated",
+  "last-used": "Last used",
   "log-level-list-label": "Log Level",
   "log-level-list-tooltip": "Minor log level encompasses the more critical log levels. (i.e. Error ⊂ Info)",
   "log-level-list-tooltip2": "Debug: Logs data on the way of the converted condition.",
@@ -48,6 +50,12 @@
   "open-log-dir-btn": "Log(dir)",
   "open-log-dir-tooltip": "Open the log storage location.",
   "open-log-tooltip": "Open current log file.(Rotate to a new log file each time the application is launched.)",
+  "relativeTime": {
+    "days": "days ago",
+    "hours": "hours ago",
+    "minutes": "minutes ago",
+    "seconds": "seconds ago"
+  },
   "restart-btn": "Restart",
   "restart-tooltip": "Apply settings & reacquire Bluetooth information.",
   "restarting-btn": "Restarting...",
@@ -62,14 +70,8 @@
   "tab-list-position-top": "Top",
   "target-bt-id": "Display in tray",
   "target-bt-id-tooltip": "Display the battery information for this device in the taskbar's tray.",
+  "update-interval": "Update interval(mins)",
+  "update-interval-tooltip": "Battery information acquisition interval (minutes).",
   "warn-limit-battery": "Warn battery(%)",
-  "warn-limit-battery-tooltip": "Notification at what percentage of battery power remaining.",
-  "relativeTime": {
-    "seconds": "seconds ago",
-    "minutes": "minutes ago",
-    "hours": "hours ago",
-    "days": "days ago"
-  },
-  "last-updated": "Last updated",
-  "last-used": "Last used"
+  "warn-limit-battery-tooltip": "Notification at what percentage of battery power remaining."
 }

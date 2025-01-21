@@ -11,6 +11,7 @@ export const ConfigFields = () => {
   const { t } = useTranslation();
   const [isAutoStart, setIsAutoStart] = useState<boolean | null>(null);
   const [conf, setConf] = useState<Config | null>(null);
+  const interval = conf?.battery_query_duration_minutes;
   const warnTime = conf?.notify_battery_level;
 
   useEffect(() => {
@@ -45,6 +46,23 @@ export const ConfigFields = () => {
     }
   }, [isAutoStart]);
 
+  const handleInterval: ChangeEventHandler<HTMLInputElement | HTMLTextAreaElement> = (e) => {
+    const newValue = Number(e.target.value);
+    const newTime = Number.isNaN(newValue) ? 30 : newValue;
+
+    if (conf) {
+      if (conf.battery_query_duration_minutes === newTime) {
+        return;
+      }
+
+      setConf({
+        ...conf,
+        // biome-ignore lint/style/useNamingConvention: <explanation>
+        battery_query_duration_minutes: newTime,
+      });
+    }
+  };
+
   const handleWarnPerLevel: ChangeEventHandler<HTMLInputElement | HTMLTextAreaElement> = (e) => {
     const newValue = Number(e.target.value);
     const newPer = Number.isNaN(newValue) ? 20 : newValue;
@@ -69,6 +87,25 @@ export const ConfigFields = () => {
             control={<Checkbox checked={isAutoStart} onClick={handleAutoStart} />}
             label={t('autostart-label')}
             sx={{ m: 1, minWidth: 105 }}
+          />
+        </Tooltip>
+      ) : (
+        <Skeleton height={10} width={105} />
+      )}
+
+      {interval !== undefined ? (
+        <Tooltip title={t('update-interval-tooltip')}>
+          <TextField
+            InputLabelProps={{ shrink: true }}
+            InputProps={{ inputProps: { min: 1 } }}
+            error={interval < 1}
+            helperText={interval < 1 ? '1 <= N' : ''}
+            id='outlined-number'
+            label={t('update-interval')}
+            onChange={handleInterval}
+            sx={{ m: 1, minWidth: 105, width: 105 }}
+            type='number'
+            value={interval}
           />
         </Tooltip>
       ) : (

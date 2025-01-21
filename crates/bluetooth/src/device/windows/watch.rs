@@ -7,6 +7,7 @@ use windows::Devices::Enumeration::{
 use windows::Foundation::Collections::IIterable;
 use windows::Foundation::TypedEventHandler;
 
+use super::address_parser::id_to_address;
 use super::device_info::get_bluetooth_devices;
 use crate::device::device_info::Devices;
 use crate::BluetoothDeviceInfo;
@@ -36,10 +37,16 @@ impl Drop for Watcher {
     }
 }
 
-// ref list: https://learn.microsoft.com/ja-jp/windows/win32/properties/devices-bumper
+// Watch targets list
+// ref: https://learn.microsoft.com/windows/win32/properties/devices-bumper
 const DEVICE_ADDRESS: &str = "System.Devices.Aep.DeviceAddress";
-const IS_CONNECTED: &str = "System.Devices.Aep.IsConnected"; // https://learn.microsoft.com/windows/win32/properties/props-system-devices-aep-isconnected
+/// https://learn.microsoft.com/windows/win32/properties/props-system-devices-aep-isconnected
+const IS_CONNECTED: &str = "System.Devices.Aep.IsConnected";
 const LAST_CONNECTED_TIME: &str = "System.DeviceInterface.Bluetooth.LastConnectedTime";
+
+/// TODO: It is unclear whether DEVPKEY watch is possible in PKEY queries. If it is not possible, we may need to switch to interval format.
+/// DEVPKEY_Bluetooth_Battery
+const BLUETOOTH_BATTERY: &str = "{104ea319-6ee2-4701-bd47-8ddbf425bbe5} 2";
 
 impl Watcher {
     /// Creates a new `Watcher`.
@@ -60,6 +67,7 @@ impl Watcher {
             // NOTE: For some reason, I can't get it without specifying `kind`.(I've actually tried it myself and confirmed it).
             // ref: https://zenn.dev/link/comments/5e86a7fdbe07a7
             let kind: IIterable<HSTRING> = vec![
+                HSTRING::from(BLUETOOTH_BATTERY),
                 HSTRING::from(DEVICE_ADDRESS),
                 HSTRING::from(IS_CONNECTED), // IsConnected is important, without it the update event will not be triggered on disconnect and add.
                 HSTRING::from(LAST_CONNECTED_TIME),
@@ -88,10 +96,24 @@ impl Watcher {
                 };
 
                 match DEVICES.get_mut(&address) {
-                    Some(mut dev) => match dev.value_mut().update_info() {
-                        Ok(_) => update_fn(dev.value()),
-                        Err(err) => tracing::error!("{err}"),
-                    },
+                    Some(mut dev) => {
+                        let map = device.Properties()?;
+
+                        // for prop in &map {
+                        //     dbg!(address);
+                        //     type_to_value(prop)?;
+                        // }
+
+                        // In my tests, the only properties selected by kind that exist are the ones the device was able to get via pnp.
+                        //  Therefore, any device that exists in DashMap should be able to retrieve it.
+                        let is_connected =
+                            map.HasKey(&HSTRING::from(IS_CONNECTED)).unwrap_or_default();
+
+                        match dev.value_mut().update_info(is_connected) {
+                            Ok(()) => update_fn(dev.value()),
+                            Err(err) => tracing::error!("{err}"),
+                        }
+                    }
                     None => {
                         tracing::trace!("This Device address is not found in DashMap: {address}");
                     }
@@ -147,90 +169,30 @@ impl Watcher {
     }
 }
 
-/// Convert address string (e.g., `Bluetooth#Bluetooth00:00:00:ff:ff:00-de:ad:be:ee:ee:ef`) into a u64.
-fn id_to_address(id: &mut &str) -> winnow::PResult<u64> {
-    use winnow::prelude::Parser as _;
-
-    let input = id;
-    let prefix = "Bluetooth#Bluetooth";
-    let _ = (prefix, hex_address, '-').parse_next(input)?;
-
-    // Convert address string (e.g., "00:00:00:ff:ff:00") into a u64.
-    let address = hex_address.parse_next(input)?;
-    let combined = ((address.0 as u64) << 40)
-        | ((address.1 as u64) << 32)
-        | ((address.2 as u64) << 24)
-        | ((address.3 as u64) << 16)
-        | ((address.4 as u64) << 8)
-        | (address.5 as u64);
-    Ok(combined)
-}
-
-fn hex_primary(input: &mut &str) -> winnow::PResult<u8> {
-    use winnow::token::take_while;
-    use winnow::Parser;
-
-    take_while(2, |c: char| c.is_ascii_hexdigit())
-        .try_map(|input| u8::from_str_radix(input, 16))
-        .parse_next(input)
-}
-
-/// Parse hex address e.g. `de:ad:be:ee:ee:ef`
-fn hex_address(input: &mut &str) -> winnow::PResult<(u8, u8, u8, u8, u8, u8)> {
-    use winnow::seq;
-    use winnow::Parser as _;
-
-    seq! {
-        hex_primary,
-        _: ':',
-        hex_primary,
-        _: ':',
-        hex_primary,
-        _: ':',
-
-        hex_primary,
-        _: ':',
-        hex_primary,
-        _: ':',
-        hex_primary,
-    }
-    .parse_next(input)
-}
-
-/// Watch bluetooth classic devices.
-#[allow(unused)]
 #[cfg(test)]
 mod tests {
     use super::*;
     use std::sync::Arc;
-    use winnow::Parser as _;
-
-    #[test]
-    fn test_id_to_address() {
-        let id = "Bluetooth#Bluetooth00:00:00:ff:ff:00-de:ad:be:ee:ee:ef";
-        let address = id_to_address
-            .parse(id)
-            .unwrap_or_else(|err| panic!("{err}"));
-        assert_eq!(address, 0xdeadbeeeeeef);
-    }
 
     #[ignore = "Can't watch it on CI."]
-    #[cfg_attr(feature = "tracing", quick_tracing::try_init)]
+    #[quick_tracing::try_init]
     #[test]
     fn watch_test() -> crate::errors::Result<()> {
+        tracing::debug!("{:#?}", DEVICES.as_ref());
+
         let watcher = Arc::new(Watcher::new(|_| ())?);
         watcher.start()?;
-        dbg!("Started");
+        tracing::info!("Started");
 
-        let cloned = Arc::clone(&watcher);
-        let stop_handle = std::thread::spawn(move || -> windows::core::Result<()> {
-            for i in 0..15 {
-                dbg!(i);
-                std::thread::sleep(std::time::Duration::from_secs(1));
-            }
-            cloned.stop()
-        });
-        stop_handle.join().unwrap()?;
+        std::thread::sleep(std::time::Duration::from_secs(15));
+        watcher.stop()?;
+
+        // let cloned = Arc::clone(&watcher);
+        // let stop_handle = std::thread::spawn(move || -> windows::core::Result<()> {
+        //     std::thread::sleep(std::time::Duration::from_secs(15));
+        //     cloned.stop()
+        // });
+        // stop_handle.join().unwrap()?;
 
         Ok(())
     }

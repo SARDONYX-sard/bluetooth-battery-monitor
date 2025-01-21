@@ -31,6 +31,8 @@
   "lang-preset-auto": "自動",
   "lang-preset-custom": "カスタム",
   "lang-preset-label": "言語",
+  "last-updated": "最終更新日",
+  "last-used": "最終使用日",
   "log-level-list-label": "ログレベル",
   "log-level-list-tooltip": "軽度なログレベルはより重大なログレベルを包含します。(Error ⊂ Info)",
   "log-level-list-tooltip2": "Debug: 変換されたconditionの途中データを記録します",
@@ -51,6 +53,12 @@
   "progress-btn": "進捗バー",
   "progress-btn-tooltip": "詳細な進捗状況を表示します",
   "progress-btn-tooltip2": "",
+  "relativeTime": {
+    "days": "日前",
+    "hours": "時間前",
+    "minutes": "分前",
+    "seconds": "秒前"
+  },
   "restart-btn": "リスタート",
   "restart-tooltip": "設定を適用し、Bluetoothの情報を再取得します",
   "restarting-btn": "再取得中...",
@@ -65,14 +73,8 @@
   "tab-list-position-top": "上",
   "target-bt-id": "トレイに表示",
   "target-bt-id-tooltip": "このデバイスのバッテリー情報をタスクバーのトレイに表示させます。",
+  "update-interval": "更新間隔(分)",
+  "update-interval-tooltip": "バッテリー情報の取得間隔(分)",
   "warn-limit-battery": "警告容量(%)",
-  "warn-limit-battery-tooltip": "通知したいバッテリー残量%",
-  "relativeTime": {
-    "seconds": "秒前",
-    "minutes": "分前",
-    "hours": "時間前",
-    "days": "日前"
-  },
-  "last-updated": "最終更新日",
-  "last-used": "最終使用日"
+  "warn-limit-battery-tooltip": "通知したいバッテリー残量%"
 }

@@ -31,6 +31,8 @@
   "lang-preset-auto": "자동",
   "lang-preset-custom": "사용자 지정",
   "lang-preset-label": "언어",
+  "last-updated": "최근 업데이트",
+  "last-used": "최근 사용",
   "log-level-list-label": "로그 수준",
   "log-level-list-tooltip": "마이너 로그 수준은 더 중요한 로그 수준을 포함합니다. (예: 오류 ⊂ 정보)",
   "log-level-list-tooltip2": "디버그: 변환된 조건의 진행 과정에 대한 데이터를 기록합니다.",
@@ -48,6 +50,12 @@
   "open-log-dir-btn": "로그 (디렉터리)",
   "open-log-dir-tooltip": "로그 저장 위치를 엽니다.",
   "open-log-tooltip": "현재 로그 파일을 엽니다. (응용 프로그램이 실행될 때마다 새 로그 파일로 회전합니다.)",
+  "relativeTime": {
+    "days": "일 전",
+    "hours": "시간 전",
+    "minutes": "분 전",
+    "seconds": "초 전"
+  },
   "restart-btn": "다시 시작",
   "restart-tooltip": "설정을 적용하고 블루투스 정보를 다시 획득합니다.",
   "restarting-btn": "다시 시작...",
@@ -63,13 +71,5 @@
   "target-bt-id": "트레이에 표시",
   "target-bt-id-tooltip": "작업 표시줄의 트레이에 이 장치의 배터리 정보를 표시합니다.",
   "warn-limit-battery": "배터리 경고(%)",
-  "warn-limit-battery-tooltip": "배터리 잔량이 몇 퍼센트 남았는지 알려줍니다.",
-  "relativeTime": {
-    "seconds": "초 전",
-    "minutes": "분 전",
-    "hours": "시간 전",
-    "days": "일 전"
-  },
-  "last-updated": "최근 업데이트",
-  "last-used": "최근 사용"
+  "warn-limit-battery-tooltip": "배터리 잔량이 몇 퍼센트 남았는지 알려줍니다."
 }
