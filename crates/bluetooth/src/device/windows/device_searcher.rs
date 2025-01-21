@@ -1,4 +1,4 @@
-use crate::BluetoothDeviceInfo;
+use crate::{categories::category::Category, BluetoothDeviceInfo};
 use std::{collections::HashMap, mem, ptr};
 use windows::Win32::{
     Devices::Bluetooth::{
@@ -70,8 +70,9 @@ pub(crate) fn get_bluetooth_devices() -> windows::core::Result<HashMap<u64, Blue
 impl From<SysBluetoothDeviceInfo> for BluetoothDeviceInfo {
     fn from(value: SysBluetoothDeviceInfo) -> Self {
         Self {
-            is_connected: value.fConnected.as_bool(),
             address: unsafe { value.Address.Anonymous.ullLong },
+            category: Category::try_from(value.ulClassofDevice).unwrap_or_default(),
+            is_connected: value.fConnected.as_bool(),
             last_used: crate::device::device_info::LocalTime {
                 year: value.stLastUsed.wYear,
                 month: value.stLastUsed.wMonth,

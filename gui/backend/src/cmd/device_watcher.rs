@@ -1,7 +1,6 @@
-use super::config::read_config;
-use super::config::write_config;
 use super::supports::notify::notify;
 use super::system_tray::{default_tray_inner, update_tray_inner};
+use crate::cmd::config::{read_config_sync, write_config_sync};
 use crate::err_log;
 use crate::err_log_to_string;
 use crate::error::Error;
@@ -47,8 +46,8 @@ pub async fn restart_device_watcher_inner(app: &AppHandle) -> crate::error::Resu
                 };
 
                 // Update tray icon
-                let config = read_config(app.clone()).unwrap_or_else(|_| {
-                    err_log!(write_config(app.clone(), Default::default()));
+                let config = read_config_sync(app.clone()).unwrap_or_else(|_| {
+                    err_log!(write_config_sync(app.clone(), Default::default()));
                     Default::default()
                 });
                 if let Some(info) = devices.get(&config.address) {
@@ -91,8 +90,8 @@ fn update_devices(app: &AppHandle, info: &BluetoothDeviceInfo) {
         tracing::error!("{err}");
     }
 
-    let config = read_config(app.clone()).unwrap_or_else(|_| {
-        err_log!(write_config(app.clone(), Default::default()));
+    let config = read_config_sync(app.clone()).unwrap_or_else(|_| {
+        err_log!(write_config_sync(app.clone(), Default::default()));
         Default::default()
     });
 

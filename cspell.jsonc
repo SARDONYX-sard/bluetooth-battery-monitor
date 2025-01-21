@@ -18,6 +18,7 @@
     "LOCALMFG",
     "PCSTR",
     "PCWSTR",
+    "PKEY",
     "repr",
     "serde",
     "tauri",
