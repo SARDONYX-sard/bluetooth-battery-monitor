@@ -4,7 +4,7 @@
 // issue: https://github.com/suren-atoyan/monaco-react/issues/136#issuecomment-731420078
 import Editor, { type OnMount } from '@monaco-editor/react';
 import { isTauri } from '@tauri-apps/api/core';
-import { type ComponentPropsWithoutRef, type MutableRefObject, memo, useCallback, useEffect, useRef } from 'react';
+import { type ComponentPropsWithoutRef, type RefObject, memo, useCallback, useEffect, useRef } from 'react';
 
 import { start } from '@/services/api/shell';
 
@@ -15,8 +15,8 @@ import type monaco from 'monaco-editor/esm/vs/editor/editor.api';
 import type { VimEnvironment } from 'monaco-vim';
 
 export type MonacoEditor = monaco.editor.IStandaloneCodeEditor;
-export type VimModeRef = MutableRefObject<VimEnvironment | null>;
-export type VimStatusRef = MutableRefObject<HTMLDivElement | null>;
+export type VimModeRef = RefObject<VimEnvironment | null>;
+export type VimStatusRef = RefObject<HTMLDivElement | null>;
 
 type Props = ComponentPropsWithoutRef<typeof Editor> & {
   id?: string;
