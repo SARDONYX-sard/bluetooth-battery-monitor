@@ -2,7 +2,7 @@ import SyncIcon from '@mui/icons-material/Sync';
 import { useCallback } from 'react';
 
 import { useTranslation } from '@/components/hooks/useTranslation';
-import { LoadingButtonWithToolTip } from '@/components/molecules/LoadingButtonWithToolTip';
+import { ButtonWithToolTip } from '@/components/molecules/ButtonWithToolTip';
 import { NOTIFY } from '@/lib/notify';
 import { getDevices, restartDeviceWatcher, restartInterval } from '@/services/api/bluetooth_finder';
 
@@ -33,7 +33,7 @@ export function RestartButton() {
   }, [setDevices, setLoading]);
 
   return (
-    <LoadingButtonWithToolTip
+    <ButtonWithToolTip
       buttonName={loading ? t('restarting-btn') : t('restart-btn')}
       icon={<SyncIcon />}
       loading={loading}
