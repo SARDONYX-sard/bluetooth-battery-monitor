@@ -59,11 +59,15 @@ p.Mui-error {
 .MuiInputBase-root.MuiOutlinedInput-root.MuiInputBase-colorPrimary.Mui-focused>fieldset,
 [class$="MuiFormLabel-root"].Mui-focused,
 [class$="MuiInputBase-root-MuiInput-root"]::after,
-label.Mui-focused,
 a,
+label.Mui-focused,
 span.Mui-checked>svg {
   color: var(--theme-color) !important;
   border-color: var(--theme-color);
+}
+
+.MuiCircularProgress-colorPrimary {
+  color: var(--theme-color); /** NOTE: avoid adding !important as it will overwrite the power off color */
 }
 
 .MuiButton-outlined {

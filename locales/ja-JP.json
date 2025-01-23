@@ -50,9 +50,6 @@
   "open-log-dir-btn": "ログ(dir)",
   "open-log-dir-tooltip": "ログの格納場所を開きます。",
   "open-log-tooltip": "現在のログファイルを開きます。(アプリを起動するたびに新しいログファイルにローテーションします)",
-  "progress-btn": "進捗バー",
-  "progress-btn-tooltip": "詳細な進捗状況を表示します",
-  "progress-btn-tooltip2": "",
   "relativeTime": {
     "days": "日前",
     "hours": "時間前",
@@ -75,6 +72,16 @@
   "target-bt-id-tooltip": "このデバイスのバッテリー情報をタスクバーのトレイに表示させます。",
   "update-interval": "更新間隔(分)",
   "update-interval-tooltip": "バッテリー情報の取得間隔(分)",
+  "updater": {
+    "dialog": {
+      "message": "アプリケーションを再起動してアップデートを適用しますか？",
+      "title": "アップデートの確認"
+    },
+    "tooltip": {
+      "downloading": "アップデートの準備中...",
+      "update": "アップデートを適用するには再起動してください"
+    }
+  },
   "warn-limit-battery": "警告容量(%)",
   "warn-limit-battery-tooltip": "通知したいバッテリー残量%"
 }

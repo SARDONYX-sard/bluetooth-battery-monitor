@@ -79,10 +79,12 @@ export const ConfigFields = () => {
     }
   };
 
+  const placement = 'top';
+
   return (
     <>
       {isAutoStart !== null ? (
-        <Tooltip title={t('autostart-tooltip')}>
+        <Tooltip arrow={true} placement={placement} title={t('autostart-tooltip')}>
           <FormControlLabel
             control={<Checkbox checked={isAutoStart} onClick={handleAutoStart} />}
             label={t('autostart-label')}
@@ -94,15 +96,23 @@ export const ConfigFields = () => {
       )}
 
       {interval !== undefined ? (
-        <Tooltip title={t('update-interval-tooltip')}>
+        <Tooltip arrow={true} placement={placement} title={t('update-interval-tooltip')}>
           <TextField
-            InputLabelProps={{ shrink: true }}
-            InputProps={{ inputProps: { min: 1 } }}
             error={interval < 1}
             helperText={interval < 1 ? '1 <= N' : ''}
             id='outlined-number'
             label={t('update-interval')}
             onChange={handleInterval}
+            slotProps={{
+              inputLabel: {
+                shrink: true,
+              },
+              input: {
+                inputProps: {
+                  min: 1,
+                },
+              },
+            }}
             sx={{ m: 1, minWidth: 105, width: 105 }}
             type='number'
             value={interval}
@@ -113,15 +123,23 @@ export const ConfigFields = () => {
       )}
 
       {warnTime !== undefined ? (
-        <Tooltip title={t('warn-limit-battery-tooltip')}>
+        <Tooltip arrow={true} placement={placement} title={t('warn-limit-battery-tooltip')}>
           <TextField
-            InputLabelProps={{ shrink: true }}
-            InputProps={{ inputProps: { min: 0 } }}
             error={warnTime < 0 || warnTime > 100}
             helperText={warnTime < 0 || warnTime > 100 ? '0 <= N <= 100' : ''}
             id='outlined-number'
             label={t('warn-limit-battery')}
             onChange={handleWarnPerLevel}
+            slotProps={{
+              inputLabel: {
+                shrink: true,
+              },
+              input: {
+                inputProps: {
+                  min: 0,
+                },
+              },
+            }}
             sx={{ m: 1, minWidth: 105, width: 105 }}
             type='number'
             value={warnTime}
