@@ -3,22 +3,20 @@
 // ref
 // - https://github.com/kevinmehall/nusb/blob/v0.1.12/src/platform/windows_winusb/cfgmgr32.rs
 
+mod errors;
+
 use chrono::{DateTime, Utc};
-use snafu::Snafu;
-use windows::{
-    core::Error,
-    Win32::{
-        Devices::Properties::{
-            DEVPROPTYPE, DEVPROP_TYPE_BOOLEAN, DEVPROP_TYPE_BYTE, DEVPROP_TYPE_DOUBLE,
-            DEVPROP_TYPE_FILETIME, DEVPROP_TYPE_FLOAT, DEVPROP_TYPE_INT16, DEVPROP_TYPE_INT32,
-            DEVPROP_TYPE_INT64, DEVPROP_TYPE_SBYTE, DEVPROP_TYPE_STRING, DEVPROP_TYPE_UINT16,
-            DEVPROP_TYPE_UINT32, DEVPROP_TYPE_UINT64,
-        },
-        Foundation::FILETIME,
+use windows::Win32::{
+    Devices::Properties::{
+        DEVPROPTYPE, DEVPROP_TYPE_BOOLEAN, DEVPROP_TYPE_BYTE, DEVPROP_TYPE_DOUBLE,
+        DEVPROP_TYPE_FILETIME, DEVPROP_TYPE_FLOAT, DEVPROP_TYPE_INT16, DEVPROP_TYPE_INT32,
+        DEVPROP_TYPE_INT64, DEVPROP_TYPE_SBYTE, DEVPROP_TYPE_STRING, DEVPROP_TYPE_UINT16,
+        DEVPROP_TYPE_UINT32, DEVPROP_TYPE_UINT64,
     },
+    Foundation::FILETIME,
 };
 
-use super::dev_prop::DevPropType;
+pub use errors::DevicePropertyError;
 
 pub trait DeviceProperty: Sized {
     type Buffer;
@@ -29,20 +27,6 @@ pub trait DeviceProperty: Sized {
         buffer: Self::Buffer,
         property_type: DEVPROPTYPE,
     ) -> Result<Self, DevicePropertyError>;
-}
-
-/// Custom error type using snafu
-#[derive(Debug, Snafu)]
-pub enum DevicePropertyError {
-    #[snafu(display("Failed to retrieve device property: {}", source))]
-    DevicePropertyError { source: Error },
-
-    #[snafu(display(
-        "Expected device property type {}, but got {}",
-        DevPropType::from_u32(*expected).map_or("Unknown", |t|t.as_str()),
-        DevPropType::from_u32(*actual).map_or("Unknown", |t|t.as_str()),
-    ))]
-    TypeError { actual: u32, expected: u32 },
 }
 
 // Add similar implementations for other types:

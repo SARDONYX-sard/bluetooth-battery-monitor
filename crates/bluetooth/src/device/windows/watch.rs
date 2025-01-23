@@ -9,6 +9,7 @@ use windows::Foundation::TypedEventHandler;
 
 use super::address_parser::id_to_address;
 use super::device_info::get_bluetooth_devices;
+use super::inspect::RevealValue as _;
 use crate::device::device_info::Devices;
 use crate::BluetoothDeviceInfo;
 
@@ -97,21 +98,14 @@ impl Watcher {
 
                 match DEVICES.get_mut(&address) {
                     Some(mut dev) => {
-                        // for prop in &map {
-                        //     dbg!(address);
-                        //     type_to_value(prop)?;
-                        // }
+                        let map = device.Properties()?;
 
-                        // Not use this pattern
-                        // ```
-                        // let map = device.Properties()?;
-                        // let is_connected = map.HasKey(&HSTRING::from(IS_CONNECTED)).unwrap_or_default();
-                        // ```
-                        // Why?
-                        // There were times when the information from props was unreliable.
-                        // The information is obtained when connected, but for some reason this value may not be obtained when not connected.
+                        let is_connected = map
+                            .Lookup(&HSTRING::from(IS_CONNECTED))
+                            .map(|inspect| bool::reveal(&inspect).unwrap_or_default())
+                            .unwrap_or_default();
 
-                        match dev.value_mut().update_info() {
+                        match dev.value_mut().update_info(is_connected) {
                             Ok(()) => update_fn(dev.value()),
                             Err(err) => tracing::error!("{err}"),
                         }
