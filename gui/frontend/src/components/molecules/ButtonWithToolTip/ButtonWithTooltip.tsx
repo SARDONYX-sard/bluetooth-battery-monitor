@@ -36,7 +36,7 @@ export const ButtonWithToolTip = ({
   }, [minScreenWidth]);
 
   return (
-    <Tooltip placement='top' title={tooltipTitle}>
+    <Tooltip arrow={true} placement='top' title={tooltipTitle}>
       <Button
         ref={buttonRef}
         startIcon={canShowText ? icon : undefined}

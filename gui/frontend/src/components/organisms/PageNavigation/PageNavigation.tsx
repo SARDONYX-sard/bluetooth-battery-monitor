@@ -6,6 +6,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { z } from 'zod';
 
+import { NavigationWithUpdater } from '@/components/organisms/Updater/NavigationUpdater';
 import { PUB_CACHE_OBJ } from '@/lib/storage/cacheKeys';
 import { schemaStorage } from '@/lib/storage/schemaStorage';
 
@@ -74,14 +75,12 @@ export function PageNavigation() {
           bottom: 0,
           width: '100%',
           zIndex: '100',
-          '.Mui-selected': {
-            color: '#99e4ee',
-          },
         }}
         value={selectedPage}
       >
         <BottomNavigationAction icon={<MonitorIcon />} label='Monitor' />
         <BottomNavigationAction icon={<SettingsIcon />} label='Settings' />
+        <NavigationWithUpdater />
       </BottomNavigation>
     </>
   );

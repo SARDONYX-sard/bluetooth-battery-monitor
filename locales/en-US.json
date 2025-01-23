@@ -72,6 +72,16 @@
   "target-bt-id-tooltip": "Display the battery information for this device in the taskbar's tray.",
   "update-interval": "Update interval(mins)",
   "update-interval-tooltip": "Battery information acquisition interval (minutes).",
+  "updater": {
+    "dialog": {
+      "message": "Are you sure you want to restart the application to apply the update?",
+      "title": "Confirm Update"
+    },
+    "tooltip": {
+      "downloading": "Preparing the update...",
+      "update": "Restart to apply the update"
+    }
+  },
   "warn-limit-battery": "Warn battery(%)",
   "warn-limit-battery-tooltip": "Notification at what percentage of battery power remaining."
 }
