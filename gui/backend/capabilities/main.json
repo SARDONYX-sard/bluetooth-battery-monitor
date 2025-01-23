@@ -17,6 +17,7 @@
     "fs:allow-read-text-file",
     "fs:allow-resource-read-recursive",
     "notification:default",
+    "process:allow-restart",
     "shell:allow-open"
   ]
 }

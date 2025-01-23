@@ -8,25 +8,20 @@ mod setup;
 
 use cmd::CommandsRegister as _;
 use setup::SetupsRegister as _;
-use tauri_plugin_window_state::StateFlags;
 
 fn main() {
     #[allow(clippy::large_stack_frames)]
     if let Err(err) = tauri::Builder::default()
-        .plugin(tauri_plugin_updater::Builder::new().build())
         .plugin(tauri_plugin_autostart::init(
             tauri_plugin_autostart::MacosLauncher::LaunchAgent,
             None,
         ))
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_fs::init())
+        .plugin(tauri_plugin_process::init())
         .plugin(tauri_plugin_shell::init())
-        .plugin(
-            // Avoid auto show(To avoid white flash screen): https://github.com/tauri-apps/plugins-workspace/issues/344
-            tauri_plugin_window_state::Builder::default()
-                .with_state_flags(StateFlags::all() & !StateFlags::VISIBLE)
-                .build(),
-        )
+        .plugin(tauri_plugin_updater::Builder::new().build())
+        .plugin(build_window_state_plugin_with_hide())
         .impl_setup()
         .impl_commands()
         .run(tauri::generate_context!())
@@ -34,6 +29,16 @@ fn main() {
         tracing::error!("Error: {err}");
         std::process::exit(1);
     }
+}
+
+/// Avoid auto show(To avoid white flash screen)
+/// - ref: https://github.com/tauri-apps/plugins-workspace/issues/344
+fn build_window_state_plugin_with_hide<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
+    use tauri_plugin_window_state::{Builder, StateFlags};
+
+    Builder::default()
+        .with_state_flags(StateFlags::all() & !StateFlags::VISIBLE)
+        .build()
 }
 
 /// Result -> Log & toString
