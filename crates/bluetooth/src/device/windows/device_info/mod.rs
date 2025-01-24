@@ -116,10 +116,12 @@ impl BluetoothDeviceInfo {
             let device = DeviceInstance::new(self.device_instance);
             device.get_device_property(&DEVPKEY_Bluetooth_Battery)?
         };
-        self.is_connected = is_connected;
-        if is_connected {
+
+        // Intent: update the last used date when the switch to connected/disconnected occurs
+        if self.is_connected != is_connected {
             self.last_used = LocalTime::now();
         }
+        self.is_connected = is_connected;
         self.last_updated = LocalTime::now();
 
         Ok(())
