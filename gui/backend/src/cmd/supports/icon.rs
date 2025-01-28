@@ -43,8 +43,8 @@ pub(crate) fn create_battery_image(
 
     // Set font size and text position
     let scale = PxScale {
-        x: width as f32 * 0.7, // Scale relative to icon size
-        y: height as f32 * 0.7,
+        x: width as f32 * 0.95, // Scale relative to icon size
+        y: height as f32 * 0.95,
     };
     let text = format!("{}", battery_level); // Convert battery level to string
 
