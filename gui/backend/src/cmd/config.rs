@@ -1,3 +1,4 @@
+use super::system_tray::IconType;
 use crate::err_log_to_string;
 use std::{fs::read_to_string, path::PathBuf};
 use tauri::{AppHandle, Manager};
@@ -12,6 +13,10 @@ pub struct Config {
 
     /// e.g. `20`(%)
     pub notify_battery_level: u64,
+
+    /// "circle" | "number_box"
+    #[serde(default)]
+    pub icon_type: IconType,
 }
 
 impl Default for Config {
@@ -20,6 +25,7 @@ impl Default for Config {
             address: 0,
             battery_query_duration_minutes: 60,
             notify_battery_level: 20,
+            icon_type: IconType::Circle,
         }
     }
 }
@@ -51,8 +57,8 @@ pub async fn read_config(app: AppHandle) -> Result<Config, String> {
             }
         },
         Err(err) => {
-            let err = format!("Failed to read config: {err}");
-            tracing::error!("{err}");
+            let err = format!("Failed to read config => Fallback to default: {err}");
+            tracing::info!("{err}");
             Config::default()
         }
     })

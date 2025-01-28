@@ -26,6 +26,11 @@ tokio = { workspace = true }
 tracing = { workspace = true }
 tracing-subscriber = { workspace = true }
 
+# Icon
+ab_glyph = "0.2.29"
+image = "0.25"
+imageproc = "0.25"
+
 # GUI: https://github.com/tauri-apps/plugins-workspace
 tauri = { version = "2.2.2", features = [
   "devtools",

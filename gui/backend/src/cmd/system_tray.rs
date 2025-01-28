@@ -1,6 +1,16 @@
 use crate::setup::TRAY_ICON;
 use tauri::image::Image;
 
+#[derive(Debug, Clone, Copy, Default, serde::Deserialize, serde::Serialize)]
+#[serde(rename_all = "snake_case")]
+pub enum IconType {
+    /// Battery information is displayed in a circle
+    #[default]
+    Circle,
+    /// Battery information is displayed numerically
+    NumberBox,
+}
+
 /// Update application tray icon & name
 ///
 /// # Panics
@@ -10,6 +20,7 @@ pub fn update_tray_inner(
     device_name: &str,
     battery_level: u64,
     is_connected: bool,
+    icon_type: IconType,
 ) -> tauri::Result<()> {
     let battery_icon = if is_connected {
         match battery_level {
@@ -43,11 +54,23 @@ pub fn update_tray_inner(
         }
     };
 
-    let tooltip = &format!("{device_name} {battery_level}%");
-
     if let Ok(mut guard) = TRAY_ICON.lock() {
         if let Some(tray) = guard.as_mut() {
-            tray.set_icon(Some(Image::from_bytes(battery_icon)?))?;
+            match icon_type {
+                IconType::Circle => {
+                    tray.set_icon(Some(Image::from_bytes(battery_icon)?))?;
+                }
+                IconType::NumberBox => {
+                    tray.set_icon(Some(crate::cmd::supports::icon::create_battery_image(
+                        64,
+                        64,
+                        battery_level,
+                        is_connected,
+                    )))?;
+                }
+            }
+
+            let tooltip = format!("{device_name} {battery_level}%");
             tray.set_tooltip(Some(tooltip))?;
         };
     };
@@ -58,11 +81,11 @@ pub fn update_tray_inner(
 /// Update application tray icon & name
 pub async fn default_tray_inner() -> tauri::Result<()> {
     const LOADING_MSG: &str = "Getting bluetooth battery...";
-    let battery_icon = include_bytes!("../../icons/icon.png").as_slice();
+    const DEFAULT_ICON: &[u8] = include_bytes!("../../icons/icon.png").as_slice();
 
     if let Ok(mut guard) = TRAY_ICON.lock() {
         if let Some(tray) = guard.as_mut() {
-            tray.set_icon(Some(Image::from_bytes(battery_icon)?))?;
+            tray.set_icon(Some(Image::from_bytes(DEFAULT_ICON)?))?;
             tray.set_tooltip(Some(LOADING_MSG))?;
         };
     };
@@ -74,8 +97,9 @@ pub async fn update_tray(
     device_name: &str,
     battery_level: u64,
     is_connected: bool,
+    icon_type: IconType,
 ) -> tauri::Result<()> {
-    update_tray_inner(device_name, battery_level, is_connected)
+    update_tray_inner(device_name, battery_level, is_connected, icon_type)
 }
 
 #[tauri::command]

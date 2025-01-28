@@ -1,0 +1,1 @@
+export { IconTypeList } from './IconTypeList';

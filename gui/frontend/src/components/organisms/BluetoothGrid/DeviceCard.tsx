@@ -11,18 +11,19 @@ import { useTranslation } from '@/components/hooks/useTranslation';
 import { NOTIFY } from '@/lib/notify';
 import { CONFIG } from '@/services/api/bluetooth_config';
 import type { BluetoothDeviceInfo } from '@/services/api/bluetooth_finder';
-import { updateTrayIcon } from '@/services/api/sys_tray';
+import { type IconType, updateTrayIcon } from '@/services/api/sys_tray';
 
 type Props = Readonly<{
   device: BluetoothDeviceInfo;
+  iconType: IconType;
 }>;
 
-export const DeviceCard = ({ device }: Props) => {
+export const DeviceCard = ({ device, iconType }: Props) => {
   const { friendly_name, address, battery_level, is_connected, last_used, last_updated } = device;
 
   const cardClickHandler = useCallback(async () => {
     try {
-      await updateTrayIcon(friendly_name, battery_level, is_connected);
+      await updateTrayIcon(friendly_name, battery_level, is_connected, iconType);
       await CONFIG.write({
         ...(await CONFIG.read()),
         address,
@@ -30,7 +31,7 @@ export const DeviceCard = ({ device }: Props) => {
     } catch (err) {
       NOTIFY.error(`${err}`);
     }
-  }, [friendly_name, battery_level, is_connected, address]);
+  }, [friendly_name, battery_level, is_connected, iconType, address]);
 
   const powerOffColor = '#696969';
   const batteryColor = is_connected ? getBatteryColor(battery_level) : powerOffColor;

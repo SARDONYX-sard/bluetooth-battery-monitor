@@ -58,7 +58,12 @@ pub async fn restart_interval(app: AppHandle) {
                     }
 
                     let dev_name = &dev.friendly_name;
-                    err_log!(update_tray_inner(dev_name, battery_level, dev.is_connected));
+                    err_log!(update_tray_inner(
+                        dev_name,
+                        battery_level,
+                        dev.is_connected,
+                        config.icon_type
+                    ));
                 };
 
                 err_log!(window.emit("bt_monitor://restart_devices", &devices));

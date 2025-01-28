@@ -1,5 +1,5 @@
 use super::supports::notify::notify;
-use super::system_tray::{default_tray_inner, update_tray_inner};
+use super::system_tray::{default_tray_inner, update_tray_inner, IconType};
 use crate::cmd::config::{read_config_sync, write_config_sync};
 use crate::err_log;
 use crate::err_log_to_string;
@@ -51,7 +51,12 @@ pub async fn restart_device_watcher_inner(app: &AppHandle) -> crate::error::Resu
                     Default::default()
                 });
                 if let Some(info) = devices.get(&config.address) {
-                    update_tray(app, config.notify_battery_level, info.value());
+                    update_tray(
+                        app,
+                        config.notify_battery_level,
+                        config.icon_type,
+                        info.value(),
+                    );
                 }
             }
 
@@ -98,16 +103,22 @@ fn update_devices(app: &AppHandle, info: &BluetoothDeviceInfo) {
     if info.address != config.address {
         return;
     }
-    update_tray(app, config.notify_battery_level, info);
+    update_tray(app, config.notify_battery_level, config.icon_type, info);
 }
 
-fn update_tray(app: &AppHandle, notify_battery_level: u64, info: &BluetoothDeviceInfo) {
+fn update_tray(
+    app: &AppHandle,
+    notify_battery_level: u64,
+    icon_type: IconType,
+    info: &BluetoothDeviceInfo,
+) {
     let friendly_name = &info.friendly_name;
     let battery_level = info.battery_level as u64;
     err_log!(update_tray_inner(
         friendly_name,
         battery_level,
-        info.is_connected
+        info.is_connected,
+        icon_type
     ));
 
     if info.is_connected && battery_level <= notify_battery_level {

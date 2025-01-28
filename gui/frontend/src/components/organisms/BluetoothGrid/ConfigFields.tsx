@@ -1,153 +1,109 @@
-import { Checkbox, FormControlLabel, Skeleton, TextField, Tooltip } from '@mui/material';
-import { disable, enable, isEnabled } from '@tauri-apps/plugin-autostart';
-import { type ChangeEventHandler, useCallback, useEffect, useState } from 'react';
 import { useDebounce } from 'react-use';
 
-import { useTranslation } from '@/components/hooks/useTranslation';
+import type { IconTypeListProps } from '@/components/organisms/IconTypeList/IconTypeList';
 import { NOTIFY } from '@/lib/notify';
-import { CONFIG, type Config } from '@/services/api/bluetooth_config';
+import { CONFIG } from '@/services/api/bluetooth_config';
+import { normalizeIconType, updateTrayIcon } from '@/services/api/sys_tray';
+
+import { IconTypeList } from '../IconTypeList';
+
+import { AutoStartSwitch } from './AutoStartSwitch';
+import { useDevicesContext } from './DevicesProvider';
+import { NumericField } from './NumericField';
+
+import type { ChangeEvent } from 'react';
 
 export const ConfigFields = () => {
-  const { t } = useTranslation();
-  const [isAutoStart, setIsAutoStart] = useState<boolean | null>(null);
-  const [conf, setConf] = useState<Config | null>(null);
-  const interval = conf?.battery_query_duration_minutes;
-  const warnTime = conf?.notify_battery_level;
-
-  useEffect(() => {
-    (async () => {
-      await NOTIFY.asyncTry(async () => setIsAutoStart(await isEnabled()));
-      await NOTIFY.asyncTry(async () => setConf(await CONFIG.read()));
-    })();
-  }, []);
+  const { config, setConfig, devices } = useDevicesContext();
+  const interval = config?.battery_query_duration_minutes ?? 60;
+  const warnTime = config?.notify_battery_level ?? 20;
+  const iconType = config?.icon_type ?? 'circle';
 
   useDebounce(
     async () => {
       try {
-        if (conf) {
-          await CONFIG.write(conf);
+        if (config) {
+          await CONFIG.write(config);
         }
       } catch (err) {
         NOTIFY.error(`${err}`);
       }
     },
     2000,
-    [conf],
+    [config],
   );
 
-  const handleAutoStart = useCallback(async () => {
-    const newIsAuto = !isAutoStart;
-
-    setIsAutoStart(newIsAuto);
-    if (newIsAuto) {
-      await enable();
-    } else {
-      await disable();
-    }
-  }, [isAutoStart]);
-
-  const handleInterval: ChangeEventHandler<HTMLInputElement | HTMLTextAreaElement> = (e) => {
+  const handleInterval = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const newValue = Number(e.target.value);
     const newTime = Number.isNaN(newValue) ? 30 : newValue;
 
-    if (conf) {
-      if (conf.battery_query_duration_minutes === newTime) {
+    if (config) {
+      if (config.battery_query_duration_minutes === newTime) {
         return;
       }
 
-      setConf({
-        ...conf,
+      setConfig({
+        ...config,
         // biome-ignore lint/style/useNamingConvention: <explanation>
         battery_query_duration_minutes: newTime,
       });
     }
   };
 
-  const handleWarnPerLevel: ChangeEventHandler<HTMLInputElement | HTMLTextAreaElement> = (e) => {
+  const handleWarnPerLevel = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const newValue = Number(e.target.value);
     const newPer = Number.isNaN(newValue) ? 20 : newValue;
-    if (conf) {
-      if (conf.notify_battery_level === newPer) {
+    if (config) {
+      if (config.notify_battery_level === newPer) {
         return;
       }
 
-      setConf({
-        ...conf,
+      setConfig({
+        ...config,
         // biome-ignore lint/style/useNamingConvention: <explanation>
         notify_battery_level: newPer,
       });
     }
   };
 
-  const placement = 'top';
+  const handleIconType: IconTypeListProps['handleIconType'] = async (e) => {
+    if (config) {
+      const newIconType = normalizeIconType(e.target.value);
+      const device = devices?.[config.address];
+      if (device) {
+        const { friendly_name, battery_level, is_connected } = device;
+        await updateTrayIcon(friendly_name, battery_level, is_connected, newIconType);
+      }
+      setConfig({
+        ...config,
+        // biome-ignore lint/style/useNamingConvention: <explanation>
+        icon_type: newIconType,
+      });
+    }
+  };
 
   return (
     <>
-      {isAutoStart !== null ? (
-        <Tooltip arrow={true} placement={placement} title={t('autostart-tooltip')}>
-          <FormControlLabel
-            control={<Checkbox checked={isAutoStart} onClick={handleAutoStart} />}
-            label={t('autostart-label')}
-            sx={{ m: 1, minWidth: 105 }}
-          />
-        </Tooltip>
-      ) : (
-        <Skeleton height={10} width={105} />
-      )}
-
-      {interval !== undefined ? (
-        <Tooltip arrow={true} placement={placement} title={t('update-interval-tooltip')}>
-          <TextField
-            error={interval < 1}
-            helperText={interval < 1 ? '1 <= N' : ''}
-            id='outlined-number'
-            label={t('update-interval')}
-            onChange={handleInterval}
-            slotProps={{
-              inputLabel: {
-                shrink: true,
-              },
-              input: {
-                inputProps: {
-                  min: 1,
-                },
-              },
-            }}
-            sx={{ m: 1, minWidth: 105, width: 105 }}
-            type='number'
-            value={interval}
-          />
-        </Tooltip>
-      ) : (
-        <Skeleton height={10} width={105} />
-      )}
-
-      {warnTime !== undefined ? (
-        <Tooltip arrow={true} placement={placement} title={t('warn-limit-battery-tooltip')}>
-          <TextField
-            error={warnTime < 0 || warnTime > 100}
-            helperText={warnTime < 0 || warnTime > 100 ? '0 <= N <= 100' : ''}
-            id='outlined-number'
-            label={t('warn-limit-battery')}
-            onChange={handleWarnPerLevel}
-            slotProps={{
-              inputLabel: {
-                shrink: true,
-              },
-              input: {
-                inputProps: {
-                  min: 0,
-                },
-              },
-            }}
-            sx={{ m: 1, minWidth: 105, width: 105 }}
-            type='number'
-            value={warnTime}
-          />
-        </Tooltip>
-      ) : (
-        <Skeleton height={10} width={105} />
-      )}
+      <AutoStartSwitch />
+      <NumericField
+        errorCondition={interval < 1}
+        errorMessage='1 <= N'
+        label='update-interval'
+        minValue={1}
+        onChange={handleInterval}
+        tooltipKey='update-interval-tooltip'
+        value={interval}
+      />
+      <NumericField
+        errorCondition={warnTime < 0 || warnTime > 100}
+        errorMessage='0 <= N <= 100'
+        label='warn-limit-battery'
+        minValue={0}
+        onChange={handleWarnPerLevel}
+        tooltipKey='warn-limit-battery-tooltip'
+        value={warnTime}
+      />
+      <IconTypeList handleIconType={handleIconType} iconType={iconType} />
     </>
   );
 };

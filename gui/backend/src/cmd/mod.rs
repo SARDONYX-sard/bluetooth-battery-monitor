@@ -1,5 +1,5 @@
 mod config;
-mod supports;
+pub mod supports;
 mod system_tray;
 
 pub(super) mod device_watcher;

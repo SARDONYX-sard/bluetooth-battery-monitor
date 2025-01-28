@@ -14,6 +14,7 @@ import { useStorageState } from '@/components/hooks/useStorageState';
 import { NOTIFY } from '@/lib/notify';
 import { PRIVATE_CACHE_OBJ } from '@/lib/storage/cacheKeys';
 import { numberSchema } from '@/lib/zod/schema-utils';
+import { CONFIG, type Config } from '@/services/api/bluetooth_config';
 import { BluetoothDeviceInfoSchema, type Devices } from '@/services/api/bluetooth_finder';
 import { deviceListener, devicesListener } from '@/services/api/device_listener';
 
@@ -22,6 +23,9 @@ type ContextType = {
   setDevices: Dispatch<SetStateAction<Devices | undefined>>;
   loading: boolean;
   setLoading: Dispatch<SetStateAction<boolean>>;
+
+  config: Config | undefined;
+  setConfig: Dispatch<SetStateAction<Config | undefined>>;
 };
 
 const Context = createContext<ContextType | undefined>(undefined);
@@ -37,6 +41,7 @@ type Props = { children: ReactNode };
 export const DevicesProvider: FC<Props> = ({ children }) => {
   const [devices, setDevices] = useStorageState(PRIVATE_CACHE_OBJ.devices, OptBluetoothDeviceInfoSchema);
   const [loading, setLoading] = useState<boolean>(false);
+  const [config, setConfig] = useState<Config | undefined>(undefined);
 
   // Update a device information
   useEffect(() => {
@@ -77,7 +82,18 @@ export const DevicesProvider: FC<Props> = ({ children }) => {
     };
   }, [setDevices]);
 
-  return <Context.Provider value={{ devices, setDevices, loading, setLoading }}>{children}</Context.Provider>;
+  // Config
+  useEffect(() => {
+    NOTIFY.asyncTry(async () => {
+      setConfig(await CONFIG.read());
+    });
+  }, []);
+
+  return (
+    <Context.Provider value={{ devices, setDevices, loading, setLoading, config, setConfig }}>
+      {children}
+    </Context.Provider>
+  );
 };
 
 /**

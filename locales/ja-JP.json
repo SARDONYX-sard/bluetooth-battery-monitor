@@ -25,6 +25,11 @@
   "custom-js-auto-run-tooltip2": "この設定項目はユーザーが手動で選択しない限り有効化されることはありません",
   "custom-js-label": "カスタムJavaScript(信用できないスクリプトは実行しないでください)",
   "editor-mode-list-label": "エディタモード",
+  "icon-type": {
+    "circle": "円系",
+    "number-box": "数字ボックス",
+    "tooltip": "バッテリー情報のアイコン形状"
+  },
   "import-lang-btn": "言語インポート",
   "import-lang-tooltip": "Jsonファイルから任意の言語をインポートします。(有効化のため自動で再読み込みします)",
   "import-lang-tooltip2": "注: 無効なJsonの場合、英語にフォールバックします。(Jsonの書き方はWikiを参照してください)",

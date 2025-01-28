@@ -1,5 +1,7 @@
 import { invoke } from '@tauri-apps/api/core';
 
+import type { IconType } from '@/services/api/sys_tray';
+
 export type Config = {
   /** e.g. `0` */
   address: number;
@@ -11,6 +13,9 @@ export type Config = {
   /** e.g. `20`(%) */
   // biome-ignore lint/style/useNamingConvention: <explanation>
   notify_battery_level: number;
+
+  // biome-ignore lint/style/useNamingConvention: <explanation>
+  icon_type: IconType
 };
 
 export const CONFIG = {
@@ -20,6 +25,8 @@ export const CONFIG = {
     battery_query_duration_minutes: 60,
     // biome-ignore lint/style/useNamingConvention: <explanation>
     notify_battery_level: 20,
+    // biome-ignore lint/style/useNamingConvention: <explanation>
+    icon_type: 'circle',
   } as const satisfies Config,
 
   /**

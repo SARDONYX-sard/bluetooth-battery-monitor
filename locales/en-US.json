@@ -25,6 +25,11 @@
   "custom-js-auto-run-tooltip2": "This configuration item will not be activated unless manually selected by the user.",
   "custom-js-label": "Custom JavaScript(Please do not execute untrusted scripts)",
   "editor-mode-list-label": "Editor Mode",
+  "icon-type": {
+    "circle": "Circle",
+    "number-box": "NumBox",
+    "tooltip": "Icon shape of the battery information"
+  },
   "import-lang-btn": "Import Language",
   "import-lang-tooltip": "Import any language from a Json file. (automatically reloads for validation).",
   "import-lang-tooltip2": "Note: For invalid Json, fall back to English. (See Wiki for how to write Json)",
@@ -63,14 +68,14 @@
   "tab-label-backup": "Backup",
   "tab-label-editor": "Editor / Preset",
   "tab-label-lang": "Language",
-  "tab-label-notice": "Notice",
+  "tab-label-notice": "Notify",
   "tab-label-tab": "Tab",
   "tab-list-position-bottom": "Bottom",
   "tab-list-position-label": "Position",
   "tab-list-position-top": "Top",
   "target-bt-id": "Display in tray",
   "target-bt-id-tooltip": "Display the battery information for this device in the taskbar's tray.",
-  "update-interval": "Update interval(mins)",
+  "update-interval": "Interval (mins)",
   "update-interval-tooltip": "Battery information acquisition interval (minutes).",
   "updater": {
     "dialog": {
@@ -82,6 +87,6 @@
       "update": "Restart to apply the update"
     }
   },
-  "warn-limit-battery": "Warn battery(%)",
+  "warn-limit-battery": "Warn(%)",
   "warn-limit-battery-tooltip": "Notification at what percentage of battery power remaining."
 }
