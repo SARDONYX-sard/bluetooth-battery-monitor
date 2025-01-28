@@ -27,6 +27,7 @@
   "editor-mode-list-label": "エディタモード",
   "icon-type": {
     "circle": "円系",
+    "label": "アイコン形状",
     "number-box": "数字ボックス",
     "tooltip": "バッテリー情報のアイコン形状"
   },

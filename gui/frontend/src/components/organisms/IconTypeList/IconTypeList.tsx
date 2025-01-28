@@ -20,7 +20,7 @@ export const IconTypeList = ({ iconType, handleIconType }: IconTypeListProps) =>
 
   return (
     <Tooltip placement='top' title={t('icon-type.tooltip')}>
-      <SelectWithLabel label={'Icon type'} menuItems={menuItems} onChange={handleIconType} value={iconType} />
+      <SelectWithLabel label={t('icon-type.label')} menuItems={menuItems} onChange={handleIconType} value={iconType} />
     </Tooltip>
   );
 };

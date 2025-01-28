@@ -27,6 +27,7 @@
   "editor-mode-list-label": "Editor Mode",
   "icon-type": {
     "circle": "Circle",
+    "label": "Icon type",
     "number-box": "NumBox",
     "tooltip": "Icon shape of the battery information"
   },
