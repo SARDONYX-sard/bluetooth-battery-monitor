@@ -13,7 +13,7 @@ import { LOG } from '@/services/api/log';
 import { useDevicesContext } from './DevicesProvider';
 
 export const DeviceCards = () => {
-  const { devices, setDevices } = useDevicesContext();
+  const { devices, setDevices, config } = useDevicesContext();
   const { logLevel } = useLogLevelContext();
 
   useEffect(() => {
@@ -50,7 +50,7 @@ export const DeviceCards = () => {
             return new Date(b.last_used).getTime() - new Date(a.last_used).getTime(); // sort in ascending order based on last_used
           })
           .map(([address, dev]) => {
-            return <DeviceCard device={dev} key={address} />;
+            return <DeviceCard device={dev} iconType={config?.icon_type ?? 'circle'} key={address} />;
           })
       ) : (
         <LoadingSkeletons />

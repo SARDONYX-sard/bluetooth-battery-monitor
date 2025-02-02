@@ -25,6 +25,12 @@
   "custom-js-auto-run-tooltip2": "この設定項目はユーザーが手動で選択しない限り有効化されることはありません",
   "custom-js-label": "カスタムJavaScript(信用できないスクリプトは実行しないでください)",
   "editor-mode-list-label": "エディタモード",
+  "icon-type": {
+    "circle": "円系",
+    "label": "アイコン形状",
+    "number-box": "数字ボックス",
+    "tooltip": "バッテリー情報のアイコン形状"
+  },
   "import-lang-btn": "言語インポート",
   "import-lang-tooltip": "Jsonファイルから任意の言語をインポートします。(有効化のため自動で再読み込みします)",
   "import-lang-tooltip2": "注: 無効なJsonの場合、英語にフォールバックします。(Jsonの書き方はWikiを参照してください)",
@@ -38,6 +44,13 @@
   "log-level-list-tooltip2": "Debug: 変換されたconditionの途中データを記録します",
   "log-level-list-tooltip3": " Info: 変換時間を記録します",
   "log-level-list-tooltip4": "Error: 重大なエラー以外記録しません",
+  "monitor": {
+    "config-dialog": {
+      "button-name": "モニター設定",
+      "title": "モニター設定",
+      "tooltip": "モニター設定を開く"
+    }
+  },
   "notice-limit": "通知上限",
   "notice-position-bottom-center": "下・中央",
   "notice-position-bottom-left": "下・左",

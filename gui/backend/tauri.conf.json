@@ -16,7 +16,7 @@
         "title": "Bluetooth Battery Monitor",
         "transparent": true,
         "visible": false,
-        "width": 895,
+        "width": 1030,
         "windowEffects": {
           "effects": ["micaDark"]
         }
