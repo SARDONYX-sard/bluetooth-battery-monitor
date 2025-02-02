@@ -5,7 +5,7 @@ use tauri::image::Image;
 
 /// Get background color and text color based on the battery level
 const fn get_colors(battery_level: u64, is_connected: bool) -> (Rgba<u8>, Rgba<u8>) {
-    const GRAY: Rgba<u8> = Rgba([105, 105, 105, 255]);
+    const GRAY: Rgba<u8> = Rgba([89, 89, 89, 255]);
     const RED: Rgba<u8> = Rgba([255, 0, 0, 255]);
     const WHITE: Rgba<u8> = Rgba([255, 255, 255, 255]);
     const BLUE: Rgba<u8> = Rgba([0, 128, 255, 255]);

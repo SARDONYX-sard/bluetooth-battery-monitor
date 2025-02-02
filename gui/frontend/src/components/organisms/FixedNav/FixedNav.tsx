@@ -2,9 +2,9 @@ import { Box, type SxProps, type Theme } from '@mui/material';
 
 import { LogDirButton } from '@/components/molecules/LogDirButton';
 import { LogFileButton } from '@/components/molecules/LogFileButton';
-import { ConfigFields } from '@/components/organisms/BluetoothGrid/ConfigFields';
 import { RestartButton } from '@/components/organisms/BluetoothGrid/RestartButton';
 import { LogLevelList } from '@/components/organisms/LogLevelList';
+import { MonitorConfigButton } from '@/components/organisms/MonitorConfig/MonitorConfigButton';
 
 const sx: SxProps<Theme> = {
   position: 'fixed',
@@ -28,7 +28,7 @@ export const FixedNav = () => {
         <LogDirButton />
         <LogFileButton />
         <RestartButton />
-        <ConfigFields />
+        <MonitorConfigButton />
       </Box>
     </>
   );

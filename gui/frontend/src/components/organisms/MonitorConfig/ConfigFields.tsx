@@ -1,5 +1,6 @@
 import { useDebounce } from 'react-use';
 
+import { useDevicesContext } from '@/components/organisms//BluetoothGrid/DevicesProvider';
 import type { IconTypeListProps } from '@/components/organisms/IconTypeList/IconTypeList';
 import { NOTIFY } from '@/lib/notify';
 import { CONFIG } from '@/services/api/bluetooth_config';
@@ -8,7 +9,6 @@ import { normalizeIconType, updateTrayIcon } from '@/services/api/sys_tray';
 import { IconTypeList } from '../IconTypeList';
 
 import { AutoStartSwitch } from './AutoStartSwitch';
-import { useDevicesContext } from './DevicesProvider';
 import { NumericField } from './NumericField';
 
 import type { ChangeEvent } from 'react';
