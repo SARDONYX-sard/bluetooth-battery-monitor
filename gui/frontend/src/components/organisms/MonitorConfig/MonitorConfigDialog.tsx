@@ -16,7 +16,7 @@ export const MonitorConfigDialog: React.FC<MonitorConfigDialogProps> = ({ open, 
 
   return (
     <Dialog onClose={onClose} open={open}>
-      <DialogTitle>{`${t('updater.dialog.title')}`}</DialogTitle>
+      <DialogTitle>{`${t('monitor.config-dialog.title')}`}</DialogTitle>
       <DialogContent>
         <ConfigFields />
       </DialogContent>

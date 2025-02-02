@@ -19,10 +19,10 @@ export const MonitorConfigButton: React.FC = () => {
   return (
     <>
       <ButtonWithToolTip
-        buttonName='Config'
+        buttonName={t('monitor.config-dialog.button-name')}
         icon={<SettingsIcon />}
         onClick={handleOpenDialog}
-        tooltipTitle={t('updater.tooltip.update')}
+        tooltipTitle={t('monitor.config-dialog.tooltip')}
       />
       <MonitorConfigDialog onClose={handleCloseDialog} open={isDialogOpen} />
     </>

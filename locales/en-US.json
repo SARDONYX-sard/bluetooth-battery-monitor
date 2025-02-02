@@ -44,6 +44,13 @@
   "log-level-list-tooltip2": "Debug: Logs data on the way of the converted condition.",
   "log-level-list-tooltip3": " Info: Log the conversion time.",
   "log-level-list-tooltip4": "Error: Logs nothing but errors.",
+  "monitor": {
+    "config-dialog": {
+      "button-name": "Config",
+      "title": "Monitor Configuration",
+      "tooltip": "Option Monitor configuration"
+    }
+  },
   "notice-limit": "Limit",
   "notice-position-bottom-center": "Bottom Center",
   "notice-position-bottom-left": "Bottom Left",
