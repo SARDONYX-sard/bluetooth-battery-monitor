@@ -169,7 +169,7 @@ pub fn get_bluetooth_devices() -> Result<Devices, BluetoothDeviceInfoError> {
             let mut device_info = match BluetoothDeviceInfo::from_instance_id(id) {
                 Ok(info) => info,
                 Err(err) => {
-                    tracing::error!("{err}");
+                    tracing::warn!("Failed to acquire device information. Probably this device cannot be read by pnp-device. => {err}");
                     continue;
                 }
             };

@@ -1,7 +1,6 @@
+use crate::device::device_info::LocalTime;
 use windows::core::{IInspectable, Interface as _, HSTRING};
 use windows::Foundation::IReference;
-
-use crate::device::device_info::LocalTime;
 
 pub trait RevealValue: Sized {
     /// Reveals the value from an IInspectable.
@@ -35,11 +34,20 @@ impl RevealValue for LocalTime {
             .cast::<IReference<windows::Foundation::DateTime>>()?
             .Value()?;
         let utc_time = windows_datetime_to_chrono(val.UniversalTime);
-        Ok(Self::from_utc(&utc_time))
+
+        utc_time.map_or_else(
+            || {
+                Err(windows::core::Error::new(
+                    windows::core::HRESULT::from_win32(87), // Invalid parameter
+                    "Invalid LocalTime value",
+                ))
+            },
+            |time| Ok(Self::from_utc(&time)),
+        )
     }
 }
 
-fn windows_datetime_to_chrono(universal_time: i64) -> chrono::DateTime<chrono::Utc> {
+fn windows_datetime_to_chrono(universal_time: i64) -> Option<chrono::DateTime<chrono::Utc>> {
     use chrono::TimeZone as _;
 
     // Windows FILETIME epoch (1601-01-01) to Unix epoch (1970-01-01) in 100ns units
@@ -52,5 +60,5 @@ fn windows_datetime_to_chrono(universal_time: i64) -> chrono::DateTime<chrono::U
     // Create chrono::DateTime
     chrono::Utc
         .timestamp_opt(seconds, nanoseconds as u32)
-        .unwrap()
+        .latest()
 }

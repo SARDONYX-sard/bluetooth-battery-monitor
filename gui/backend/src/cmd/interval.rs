@@ -38,7 +38,6 @@ pub async fn restart_interval(app: AppHandle) {
 
             let app = app.clone();
             let address = config.address;
-            let window = app.get_webview_window("main").unwrap();
 
             async move {
                 // NOTE: The callback fn cannot return a Result, so write only error log.
@@ -66,6 +65,12 @@ pub async fn restart_interval(app: AppHandle) {
                     ));
                 };
 
+                let window = if let Some(window) = app.get_webview_window("main") {
+                    window
+                } else {
+                    tracing::error!("GUI `main` windows is not found!");
+                    return;
+                };
                 err_log!(window.emit("bt_monitor://restart_devices", &devices));
 
                 // Replace all

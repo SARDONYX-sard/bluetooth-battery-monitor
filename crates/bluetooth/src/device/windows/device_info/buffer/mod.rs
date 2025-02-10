@@ -126,8 +126,18 @@ impl DeviceProperty for DateTime<Utc> {
         buffer: Self::Buffer,
         property_type: DEVPROPTYPE,
     ) -> Result<Self, DevicePropertyError> {
+        use chrono::offset::LocalResult;
+
         match property_type {
-            DEVPROP_TYPE_FILETIME => Ok(to_datetime(&buffer)),
+            DEVPROP_TYPE_FILETIME => Ok(match to_datetime(&buffer) {
+                LocalResult::Ambiguous(_, date) | LocalResult::Single(date) => date,
+                LocalResult::None => {
+                    return Err(DevicePropertyError::TypeError {
+                        actual: property_type.0,
+                        expected: DEVPROP_TYPE_BOOLEAN.0,
+                    })
+                }
+            }),
             _ => Err(DevicePropertyError::TypeError {
                 actual: property_type.0,
                 expected: DEVPROP_TYPE_BOOLEAN.0,
@@ -137,7 +147,7 @@ impl DeviceProperty for DateTime<Utc> {
 }
 
 /// FILETIME to chrono::DateTime<Utc>
-fn to_datetime(file_time: &FILETIME) -> chrono::DateTime<chrono::Utc> {
+fn to_datetime(file_time: &FILETIME) -> chrono::MappedLocalTime<chrono::DateTime<chrono::Utc>> {
     // FILETIME => 1601-01-01T00:00:00Z standard
     const FILETIME_EPOCH: i64 = 11644473600; // 1970 - 1601 secs
     const HUNDRED_NANOSECONDS: i64 = 10_000_000; // 100nano to secs
@@ -148,7 +158,5 @@ fn to_datetime(file_time: &FILETIME) -> chrono::DateTime<chrono::Utc> {
     let nano_seconds = ((filetime % HUNDRED_NANOSECONDS as u64) * 100) as u32;
 
     use chrono::TimeZone as _;
-    chrono::Utc
-        .timestamp_opt(unix_timestamp, nano_seconds)
-        .unwrap()
+    chrono::Utc.timestamp_opt(unix_timestamp, nano_seconds)
 }

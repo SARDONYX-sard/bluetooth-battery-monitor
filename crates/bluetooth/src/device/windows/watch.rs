@@ -91,7 +91,7 @@ impl Watcher {
                 let address = match id_to_address(&mut device.Id()?.to_string().as_str()) {
                     Ok(address) => address,
                     Err(e) => {
-                        tracing::error!("{e}");
+                        tracing::error!("Failed id to address conversion:\n{e}");
                         return Ok(());
                     }
                 };
