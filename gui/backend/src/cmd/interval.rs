@@ -2,12 +2,11 @@
 /// DeviceWatcher triggers when a device is connected or disconnected, but cannot WATCH DEVPKEY for battery information.
 /// ThatFor this reason, it is currently not possible to use the ITherefore, it is currently using interval processing.
 use super::config::{read_config, write_config_sync};
-use crate::cmd::supports::notify;
-use crate::cmd::system_tray::update_tray_inner;
+use crate::cmd::device_watcher::update_tray;
 use crate::err_log;
 use bluetooth::device::windows::{device_info::get_bluetooth_devices, watch::DEVICES};
 use std::{
-    sync::atomic::{AtomicU64, Ordering},
+    sync::atomic::{AtomicBool, AtomicU64, Ordering},
     time::Duration,
 };
 use tauri::{AppHandle, Emitter as _, Manager as _};
@@ -15,6 +14,7 @@ use timer::{clear_interval, set_interval};
 
 /// The task is singleton.
 static INTERVAL_ID: AtomicU64 = AtomicU64::new(0);
+static IS_ONE_CALLED: AtomicBool = AtomicBool::new(false);
 
 /// # NOTE
 /// The callback fn cannot return a Result, so write only error log.
@@ -23,7 +23,9 @@ pub async fn restart_interval(app: AppHandle) {
     tracing::debug!("`restart_interval` was called.");
     let id = INTERVAL_ID.load(Ordering::Acquire);
     if id != 0 {
+        // The fact that this place is called means that it has been forcibly re-initialized.
         clear_interval(id).await;
+        IS_ONE_CALLED.store(false, Ordering::Release);
     };
 
     let config = read_config(app.clone()).await.unwrap_or_else(|_| {
@@ -49,21 +51,12 @@ pub async fn restart_interval(app: AppHandle) {
                     }
                 };
 
-                if let Some(dev) = devices.get(&address) {
-                    let battery_level = dev.battery_level as u64;
-                    if battery_level <= config.notify_battery_level {
-                        let notify_msg = format!("Battery power is low: {battery_level}%");
-                        err_log!(notify::notify(&app, &notify_msg));
-                    }
-
-                    let dev_name = &dev.friendly_name;
-                    err_log!(update_tray_inner(
-                        dev_name,
-                        battery_level,
-                        dev.is_connected,
-                        config.icon_type
-                    ));
+                if !IS_ONE_CALLED.load(Ordering::Acquire) {
+                    if let Some(dev) = devices.get(&address) {
+                        update_tray(&app, config.notify_battery_level, config.icon_type, &dev);
+                    };
                 };
+                IS_ONE_CALLED.store(true, Ordering::Release);
 
                 let window = if let Some(window) = app.get_webview_window("main") {
                     window

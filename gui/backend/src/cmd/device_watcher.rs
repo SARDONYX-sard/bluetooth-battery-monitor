@@ -119,7 +119,7 @@ fn update_devices(app: &AppHandle, info: &BluetoothDeviceInfo) {
     update_tray(app, config.notify_battery_level, config.icon_type, info);
 }
 
-fn update_tray(
+pub(crate) fn update_tray(
     app: &AppHandle,
     notify_battery_level: u64,
     icon_type: IconType,
