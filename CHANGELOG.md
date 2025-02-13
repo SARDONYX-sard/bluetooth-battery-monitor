@@ -4,6 +4,29 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.5.0] - 2025-02-13
+### :sparkles: New Features
+- [`4e768d2`](https://github.com/SARDONYX-sard/bluetooth-battery-monitor/commit/4e768d2462a9c4b73a61e28ab9a3cc7446475a03) - add updater functionality and configuration for desktop platforms *(commit by [@SARDONYX-sard](https://github.com/SARDONYX-sard))*
+- [`42a54dd`](https://github.com/SARDONYX-sard/bluetooth-battery-monitor/commit/42a54dd3bd711b7160bb86c6487c06f735fcb72f) - **frontend**: implement updater dialog and navigation component with localization support *(commit by [@SARDONYX-sard](https://github.com/SARDONYX-sard))*
+- [`ab72275`](https://github.com/SARDONYX-sard/bluetooth-battery-monitor/commit/ab7227574964c7a404e15f42c9b29775d2d3b5a6) - add icon type selection and configuration support *(commit by [@SARDONYX-sard](https://github.com/SARDONYX-sard))*
+- [`a0f3f18`](https://github.com/SARDONYX-sard/bluetooth-battery-monitor/commit/a0f3f186107e3631dc93d8dcaffd618a23f0d492) - **i18n**: add localization support for icon type label in English and Japanese *(commit by [@SARDONYX-sard](https://github.com/SARDONYX-sard))*
+- [`a89b59a`](https://github.com/SARDONYX-sard/bluetooth-battery-monitor/commit/a89b59a5ebd176039bfa3d45cb8a260ce2082172) - **monitor**: add Monitor Config button and dialog for configuration settings *(commit by [@SARDONYX-sard](https://github.com/SARDONYX-sard))*
+- [`66dfbb6`](https://github.com/SARDONYX-sard/bluetooth-battery-monitor/commit/66dfbb6279b7ee30d04b4386e90350cab177388a) - **i18n**: add localization for Monitor Config button and dialog *(commit by [@SARDONYX-sard](https://github.com/SARDONYX-sard))*
+
+### :bug: Bug Fixes
+- [`ec24fc6`](https://github.com/SARDONYX-sard/bluetooth-battery-monitor/commit/ec24fc62d5a59a1ae7af0536fb656a2261628b41) - fix `isis_connected` getter *(commit by [@SARDONYX-sard](https://github.com/SARDONYX-sard))*
+- [`4bcaea1`](https://github.com/SARDONYX-sard/bluetooth-battery-monitor/commit/4bcaea1384f06b9cabdc79a95c809b9540e0e335) - **bluetooth**: update last used date on connection state change *(commit by [@SARDONYX-sard](https://github.com/SARDONYX-sard))*
+- [`9e75c5d`](https://github.com/SARDONYX-sard/bluetooth-battery-monitor/commit/9e75c5d8fd6bf9703267e9d59b0a5a5df1a77583) - **icon**: adjust battery image text scaling for better visibility *(commit by [@SARDONYX-sard](https://github.com/SARDONYX-sard))*
+- [`0b29465`](https://github.com/SARDONYX-sard/bluetooth-battery-monitor/commit/0b294657a738ccdedc59ea33d059bca8874056a9) - **icon**: adjust battery image text scaling for improved clarity *(commit by [@SARDONYX-sard](https://github.com/SARDONYX-sard))*
+- [`edc14da`](https://github.com/SARDONYX-sard/bluetooth-battery-monitor/commit/edc14da15f26a233381e9da9ab84ccdd119ee095) - **logging**: improve error messages for device information retrieval and battery level handling *(commit by [@SARDONYX-sard](https://github.com/SARDONYX-sard))*
+- [`2a22af4`](https://github.com/SARDONYX-sard/bluetooth-battery-monitor/commit/2a22af4c8a99353c9363f083f371ab538f315ada) - fix uninitialized panics in notification plugins *(commit by [@SARDONYX-sard](https://github.com/SARDONYX-sard))*
+- [`07a64f2`](https://github.com/SARDONYX-sard/bluetooth-battery-monitor/commit/07a64f215479baeff6406c69ee1130a5e782f5bd) - prevent multiple calls for interval and watch notifications. *(commit by [@SARDONYX-sard](https://github.com/SARDONYX-sard))*
+
+### :recycle: Refactors
+- [`8909edc`](https://github.com/SARDONYX-sard/bluetooth-battery-monitor/commit/8909edcfade8b96d6cf622488f9709864a653c92) - update type definitions for VimModeRef and VimStatusRef in MonacoEditor *(commit by [@SARDONYX-sard](https://github.com/SARDONYX-sard))*
+- [`ecc4817`](https://github.com/SARDONYX-sard/bluetooth-battery-monitor/commit/ecc48179b131a0911e7aeeb329b7224cf89d828a) - **frontend**: remove unnecessary a component *(commit by [@SARDONYX-sard](https://github.com/SARDONYX-sard))*
+
+
 ## [0.4.2] - 2025-01-21
 ### :sparkles: New Features
 - [`d0b3726`](https://github.com/SARDONYX-sard/bluetooth-battery-monitor/commit/d0b3726c80c128ec227a0de1c885abea29eff7da) - change TypeError display *(commit by [@SARDONYX-sard](https://github.com/SARDONYX-sard))*
@@ -76,3 +99,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [0.4.0]: https://github.com/SARDONYX-sard/bluetooth-battery-monitor/compare/0.3.1...0.4.0
 [0.4.1]: https://github.com/SARDONYX-sard/bluetooth-battery-monitor/compare/0.4.0...0.4.1
 [0.4.2]: https://github.com/SARDONYX-sard/bluetooth-battery-monitor/compare/0.4.1...0.4.2
+[0.5.0]: https://github.com/SARDONYX-sard/bluetooth-battery-monitor/compare/0.4.3...0.5.0
