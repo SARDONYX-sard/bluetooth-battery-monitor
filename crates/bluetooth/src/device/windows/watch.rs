@@ -52,11 +52,13 @@ const BLUETOOTH_BATTERY: &str = "{104ea319-6ee2-4701-bd47-8ddbf425bbe5} 2";
 impl Watcher {
     /// Creates a new `Watcher`.
     ///
+    /// - `update_fn`: (`newInfo`, changed_connection or not)
+    ///
     /// # Errors
     ///
     /// Returns an error if the device watcher fails to be created.
     pub fn new(
-        update_fn: impl Fn(&BluetoothDeviceInfo) + Send + 'static,
+        update_fn: impl Fn(&BluetoothDeviceInfo, bool) + Send + 'static,
     ) -> crate::errors::Result<Self> {
         let watcher = {
             // e0cbf06c-cd8b-4647-bb8a-263b43f0f974 is Bluetooth classic
@@ -106,7 +108,7 @@ impl Watcher {
                             .unwrap_or_default();
 
                         match dev.value_mut().update_info(is_connected) {
-                            Ok(()) => update_fn(dev.value()),
+                            Ok(changed_connection) => update_fn(dev.value(), changed_connection),
                             Err(err) => tracing::error!("{err}"),
                         }
                     }
@@ -176,7 +178,7 @@ mod tests {
     fn watch_test() -> crate::errors::Result<()> {
         tracing::debug!("{:#?}", DEVICES.as_ref());
 
-        let watcher = Arc::new(Watcher::new(|_| ())?);
+        let watcher = Arc::new(Watcher::new(|_, _| ())?);
         watcher.start()?;
         tracing::info!("Started");
 

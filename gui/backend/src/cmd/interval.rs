@@ -53,7 +53,13 @@ pub async fn restart_interval(app: AppHandle) {
 
                 if !IS_ONE_CALLED.load(Ordering::Acquire) {
                     if let Some(dev) = devices.get(&address) {
-                        update_tray(&app, config.notify_battery_level, config.icon_type, &dev);
+                        update_tray(
+                            &app,
+                            config.notify_battery_level,
+                            config.icon_type,
+                            &dev,
+                            dev.is_connected,
+                        );
                     };
                 };
                 IS_ONE_CALLED.store(true, Ordering::Release);

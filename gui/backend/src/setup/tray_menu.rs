@@ -95,6 +95,7 @@ pub fn new_tray_menu(app: &AppHandle<tauri::Wry>) -> Result<(), tauri::Error> {
                         tauri::async_runtime::spawn(async move {
                             let app = app;
                             err_log!(restart_device_watcher_inner(&app).await);
+                            crate::cmd::interval::restart_interval(app).await;
                         });
                     }
                     MenuId::Show => {

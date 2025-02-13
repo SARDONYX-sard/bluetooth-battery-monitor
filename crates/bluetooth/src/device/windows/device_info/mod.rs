@@ -102,7 +102,7 @@ impl BluetoothDeviceInfo {
         })
     }
 
-    /// Update information
+    /// Update information & Return `Connections changed?` statuss
     ///
     /// - battery_level
     /// - is_connected
@@ -111,20 +111,21 @@ impl BluetoothDeviceInfo {
     pub(crate) fn update_info(
         &mut self,
         is_connected: bool,
-    ) -> Result<(), BluetoothDeviceInfoError> {
+    ) -> Result<bool, BluetoothDeviceInfoError> {
         self.battery_level = {
             let device = DeviceInstance::new(self.device_instance);
             device.get_device_property(&DEVPKEY_Bluetooth_Battery)?
         };
 
         // Intent: update the last used date when the switch to connected/disconnected occurs
-        if self.is_connected != is_connected {
+        let changed_connection = self.is_connected != is_connected;
+        if changed_connection {
             self.last_used = LocalTime::now();
         }
         self.is_connected = is_connected;
         self.last_updated = LocalTime::now();
 
-        Ok(())
+        Ok(changed_connection)
     }
 }
 

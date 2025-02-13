@@ -55,7 +55,9 @@ pub async fn restart_device_watcher_inner(app: &AppHandle) -> crate::error::Resu
                         notify_battery_level,
                         icon_type,
                         info.value(),
+                        false,// Assumption that the interval is also initialized at the same time
                     );
+
                 } else {
                     tracing::debug!("The address of the device selected as tray icon could not be found in the device information list.\n\
 Therefore, the first device information found is selected instead. " );
@@ -66,6 +68,7 @@ Therefore, the first device information found is selected instead. " );
                             notify_battery_level,
                             icon_type,
                             info.value(),
+                            false, // Assumption that the interval is also initialized at the same time
                         );
                     }
                 }
@@ -83,7 +86,7 @@ Therefore, the first device information found is selected instead. " );
 
 fn init_watcher(app: &AppHandle) -> Watcher {
     let app = app.clone();
-    match Watcher::new(move |info| update_devices(&app, info)) {
+    match Watcher::new(move |info, changed_connect| update_devices(&app, info, changed_connect)) {
         Ok(watcher) => watcher,
         Err(err) => {
             let err = format!("Failed to start device watcher: {err}");
@@ -95,7 +98,7 @@ fn init_watcher(app: &AppHandle) -> Watcher {
 
 /// # NOTE
 /// The callback fn cannot return a Result, so write only error log.
-fn update_devices(app: &AppHandle, info: &BluetoothDeviceInfo) {
+fn update_devices(app: &AppHandle, info: &BluetoothDeviceInfo, changed_connect: bool) {
     tracing::info!("Device watcher update event");
 
     let window = if let Some(window) = app.get_webview_window("main") {
@@ -116,7 +119,13 @@ fn update_devices(app: &AppHandle, info: &BluetoothDeviceInfo) {
     if info.address != config.address {
         return;
     }
-    update_tray(app, config.notify_battery_level, config.icon_type, info);
+    update_tray(
+        app,
+        config.notify_battery_level,
+        config.icon_type,
+        info,
+        changed_connect && info.is_connected,
+    );
 }
 
 pub(crate) fn update_tray(
@@ -124,6 +133,7 @@ pub(crate) fn update_tray(
     notify_battery_level: u64,
     icon_type: IconType,
     info: &BluetoothDeviceInfo,
+    enable_notify: bool,
 ) {
     let friendly_name = &info.friendly_name;
     let battery_level = info.battery_level as u64;
@@ -134,7 +144,7 @@ pub(crate) fn update_tray(
         icon_type
     ));
 
-    if info.is_connected && battery_level <= notify_battery_level {
+    if enable_notify && battery_level <= notify_battery_level {
         let notify_msg = format!("Battery power is low: {battery_level}%");
         err_log!(notify(app, &notify_msg));
     };
