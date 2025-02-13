@@ -1,6 +1,6 @@
 use super::supports::notify::notify;
 use super::system_tray::{default_tray_inner, update_tray_inner, IconType};
-use crate::cmd::config::{read_config_sync, write_config_sync};
+use crate::cmd::config::{read_config_sync, write_config_sync, Config};
 use crate::err_log;
 use crate::err_log_to_string;
 use crate::error::Error;
@@ -10,9 +10,6 @@ use bluetooth::device::windows::watch::DEVICES;
 use bluetooth::BluetoothDeviceInfo;
 use std::sync::Mutex;
 use tauri::{AppHandle, Emitter as _, Manager as _};
-
-/// Device watcher singleton
-pub static DEVICE_WATCHER: Mutex<Option<Watcher>> = Mutex::new(None);
 
 #[tauri::command]
 pub async fn get_devices() -> Devices {
@@ -29,6 +26,7 @@ pub async fn restart_device_watcher_inner(app: &AppHandle) -> crate::error::Resu
     tracing::info!("Try to reinitialize device watcher.");
     default_tray_inner().await?;
 
+    static DEVICE_WATCHER: Mutex<Option<Watcher>> = Mutex::new(None); // Device watcher singleton
     DEVICE_WATCHER
         .lock()
         .map(|mut watcher| {
@@ -46,17 +44,33 @@ pub async fn restart_device_watcher_inner(app: &AppHandle) -> crate::error::Resu
                 };
 
                 // Update tray icon
-                let config = read_config_sync(app.clone()).unwrap_or_else(|_| {
+                let Config { address,  notify_battery_level, icon_type, .. }= read_config_sync(app.clone()).unwrap_or_else(|_| {
                     err_log!(write_config_sync(app.clone(), Default::default()));
                     Default::default()
                 });
-                if let Some(info) = devices.get(&config.address) {
+
+                if let Some(info) = devices.get(&address) {
                     update_tray(
                         app,
-                        config.notify_battery_level,
-                        config.icon_type,
+                        notify_battery_level,
+                        icon_type,
                         info.value(),
+                        false,// Assumption that the interval is also initialized at the same time
                     );
+
+                } else {
+                    tracing::debug!("The address of the device selected as tray icon could not be found in the device information list.\n\
+Therefore, the first device information found is selected instead. " );
+                    let value = devices.iter().next();
+                    if let Some(info) = value {
+                        update_tray(
+                            app,
+                            notify_battery_level,
+                            icon_type,
+                            info.value(),
+                            false, // Assumption that the interval is also initialized at the same time
+                        );
+                    }
                 }
             }
 
@@ -72,7 +86,7 @@ pub async fn restart_device_watcher_inner(app: &AppHandle) -> crate::error::Resu
 
 fn init_watcher(app: &AppHandle) -> Watcher {
     let app = app.clone();
-    match Watcher::new(move |info| update_devices(&app, info)) {
+    match Watcher::new(move |info, changed_connect| update_devices(&app, info, changed_connect)) {
         Ok(watcher) => watcher,
         Err(err) => {
             let err = format!("Failed to start device watcher: {err}");
@@ -84,14 +98,16 @@ fn init_watcher(app: &AppHandle) -> Watcher {
 
 /// # NOTE
 /// The callback fn cannot return a Result, so write only error log.
-fn update_devices(app: &AppHandle, info: &BluetoothDeviceInfo) {
+fn update_devices(app: &AppHandle, info: &BluetoothDeviceInfo, changed_connect: bool) {
     tracing::info!("Device watcher update event");
 
-    if let Err(err) = app
-        .get_webview_window("main")
-        .unwrap()
-        .emit("bt_monitor://update_devices", &info)
-    {
+    let window = if let Some(window) = app.get_webview_window("main") {
+        window
+    } else {
+        tracing::error!("GUI `main` windows is not found!");
+        return;
+    };
+    if let Err(err) = window.emit("bt_monitor://update_devices", &info) {
         tracing::error!("{err}");
     }
 
@@ -103,14 +119,21 @@ fn update_devices(app: &AppHandle, info: &BluetoothDeviceInfo) {
     if info.address != config.address {
         return;
     }
-    update_tray(app, config.notify_battery_level, config.icon_type, info);
+    update_tray(
+        app,
+        config.notify_battery_level,
+        config.icon_type,
+        info,
+        changed_connect && info.is_connected,
+    );
 }
 
-fn update_tray(
+pub(crate) fn update_tray(
     app: &AppHandle,
     notify_battery_level: u64,
     icon_type: IconType,
     info: &BluetoothDeviceInfo,
+    enable_notify: bool,
 ) {
     let friendly_name = &info.friendly_name;
     let battery_level = info.battery_level as u64;
@@ -121,7 +144,7 @@ fn update_tray(
         icon_type
     ));
 
-    if info.is_connected && battery_level <= notify_battery_level {
+    if enable_notify && battery_level <= notify_battery_level {
         let notify_msg = format!("Battery power is low: {battery_level}%");
         err_log!(notify(app, &notify_msg));
     };

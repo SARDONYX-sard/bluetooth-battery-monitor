@@ -1,0 +1,8 @@
+# This file is a special exception configuration file for `clippy`, the Rust linter.
+# See below for details.
+# - https://doc.rust-lang.org/clippy/lint_configuration.html
+# - https://github.com/rust-lang/rust-clippy?tab=readme-ov-file#configuration
+
+allow-expect-in-tests = true
+allow-panic-in-tests = true
+allow-unwrap-in-tests = true # https://rust-lang.github.io/rust-clippy/master/index.html#unwrap_used

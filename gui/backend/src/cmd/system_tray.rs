@@ -35,7 +35,10 @@ pub fn update_tray_inner(
             71..=80 => include_bytes!("../../icons/battery/battery-80.png").as_slice(),
             81..=90 => include_bytes!("../../icons/battery/battery-90.png").as_slice(),
             91..=100 => include_bytes!("../../icons/battery/battery-100.png").as_slice(),
-            _ => unreachable!(),
+            unknown => {
+                tracing::error!("Unknown battery level: {unknown}");
+                DEFAULT_ICON
+            }
         }
     } else {
         match battery_level {
@@ -50,7 +53,10 @@ pub fn update_tray_inner(
             71..=80 => include_bytes!("../../icons/battery_power_off/battery-80.png").as_slice(),
             81..=90 => include_bytes!("../../icons/battery_power_off/battery-90.png").as_slice(),
             91..=100 => include_bytes!("../../icons/battery_power_off/battery-100.png").as_slice(),
-            _ => unreachable!(),
+            unknown => {
+                tracing::error!("Unknown battery level: {unknown}");
+                DEFAULT_ICON
+            }
         }
     };
 
@@ -78,10 +84,11 @@ pub fn update_tray_inner(
     Ok(())
 }
 
+const DEFAULT_ICON: &[u8] = include_bytes!("../../icons/icon.png").as_slice();
+
 /// Update application tray icon & name
 pub async fn default_tray_inner() -> tauri::Result<()> {
     const LOADING_MSG: &str = "Getting bluetooth battery...";
-    const DEFAULT_ICON: &[u8] = include_bytes!("../../icons/icon.png").as_slice();
 
     if let Ok(mut guard) = TRAY_ICON.lock() {
         if let Some(tray) = guard.as_mut() {

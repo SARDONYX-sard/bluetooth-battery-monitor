@@ -65,7 +65,12 @@ pub fn new_tray_menu(app: &AppHandle<tauri::Wry>) -> Result<(), tauri::Error> {
                 ..
             } = event
             {
-                let window = tray.app_handle().get_webview_window("main").unwrap();
+                let window = if let Some(window) = tray.app_handle().get_webview_window("main") {
+                    window
+                } else {
+                    tracing::error!("GUI `main` windows is not found!");
+                    return;
+                };
                 match window.is_visible() {
                     Ok(visible) => {
                         if visible {
@@ -90,10 +95,17 @@ pub fn new_tray_menu(app: &AppHandle<tauri::Wry>) -> Result<(), tauri::Error> {
                         tauri::async_runtime::spawn(async move {
                             let app = app;
                             err_log!(restart_device_watcher_inner(&app).await);
+                            crate::cmd::interval::restart_interval(app).await;
                         });
                     }
                     MenuId::Show => {
-                        let window = app.get_webview_window("main").unwrap();
+                        let window = if let Some(window) = app.get_webview_window("main") {
+                            window
+                        } else {
+                            tracing::error!("GUI `main` windows is not found!");
+                            return;
+                        };
+
                         match window.is_visible() {
                             Ok(visible) => {
                                 if visible {
