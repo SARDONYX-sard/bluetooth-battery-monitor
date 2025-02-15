@@ -451,7 +451,7 @@ dependencies = [
 
 [[package]]
 name = "bluetooth"
-version = "0.5.0"
+version = "0.5.1"
 dependencies = [
  "chrono",
  "dashmap",
@@ -471,7 +471,7 @@ dependencies = [
 
 [[package]]
 name = "bluetooth_battery_monitor"
-version = "0.5.0"
+version = "0.5.1"
 dependencies = [
  "ab_glyph",
  "bluetooth",
