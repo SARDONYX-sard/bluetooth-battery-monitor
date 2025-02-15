@@ -22,7 +22,33 @@ pub fn update_tray_inner(
     is_connected: bool,
     icon_type: IconType,
 ) -> tauri::Result<()> {
-    let battery_icon = if is_connected {
+    if let Ok(mut guard) = TRAY_ICON.lock() {
+        if let Some(tray) = guard.as_mut() {
+            match icon_type {
+                IconType::Circle => {
+                    let battery_icon = read_icon(is_connected, battery_level);
+                    tray.set_icon(Some(Image::from_bytes(battery_icon)?))?;
+                }
+                IconType::NumberBox => {
+                    tray.set_icon(Some(crate::cmd::supports::icon::create_battery_image(
+                        64,
+                        64,
+                        battery_level,
+                        is_connected,
+                    )))?;
+                }
+            }
+
+            let tooltip = format!("{device_name} {battery_level}%");
+            tray.set_tooltip(Some(tooltip))?;
+        };
+    };
+
+    Ok(())
+}
+
+fn read_icon(is_connected: bool, battery_level: u64) -> &'static [u8] {
+    if is_connected {
         match battery_level {
             0 => include_bytes!("../../icons/battery/battery-0.png"),
             1..=10 => include_bytes!("../../icons/battery/battery-10.png").as_slice(),
@@ -58,30 +84,7 @@ pub fn update_tray_inner(
                 DEFAULT_ICON
             }
         }
-    };
-
-    if let Ok(mut guard) = TRAY_ICON.lock() {
-        if let Some(tray) = guard.as_mut() {
-            match icon_type {
-                IconType::Circle => {
-                    tray.set_icon(Some(Image::from_bytes(battery_icon)?))?;
-                }
-                IconType::NumberBox => {
-                    tray.set_icon(Some(crate::cmd::supports::icon::create_battery_image(
-                        64,
-                        64,
-                        battery_level,
-                        is_connected,
-                    )))?;
-                }
-            }
-
-            let tooltip = format!("{device_name} {battery_level}%");
-            tray.set_tooltip(Some(tooltip))?;
-        };
-    };
-
-    Ok(())
+    }
 }
 
 const DEFAULT_ICON: &[u8] = include_bytes!("../../icons/icon.png").as_slice();

@@ -98,7 +98,7 @@ fn init_watcher(app: &AppHandle) -> Watcher {
 
 /// # NOTE
 /// The callback fn cannot return a Result, so write only error log.
-fn update_devices(app: &AppHandle, info: &BluetoothDeviceInfo, changed_connect: bool) {
+fn update_devices(app: &AppHandle, info: &BluetoothDeviceInfo, _changed_connect: bool) {
     tracing::info!("Device watcher update event");
 
     let window = if let Some(window) = app.get_webview_window("main") {
@@ -124,7 +124,7 @@ fn update_devices(app: &AppHandle, info: &BluetoothDeviceInfo, changed_connect: 
         config.notify_battery_level,
         config.icon_type,
         info,
-        changed_connect && info.is_connected,
+        info.is_connected,
     );
 }
 
