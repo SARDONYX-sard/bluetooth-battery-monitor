@@ -1,18 +1,23 @@
 import { relaunch } from '@tauri-apps/plugin-process';
-import { check } from '@tauri-apps/plugin-updater';
+import { type Update, check } from '@tauri-apps/plugin-updater';
 import { useEffect, useState } from 'react';
 
+import { NOTIFY } from '@/lib/notify';
+
+// - ref: https://v2.tauri.app/plugin/updater/
 export const useUpdater = () => {
   const [isDownloading, setDownloading] = useState(false);
   const [isUpdatable, setUpdatable] = useState(false);
   const [progress, setProgress] = useState(0);
 
+  const [updater, setUpdater] = useState<Update | null>(null);
   const [oldVersion, setOldVersion] = useState<string | null>(null);
   const [newVersion, setNewVersion] = useState<string | null>(null);
 
   useEffect(() => {
     const checkForUpdates = async () => {
       const update = await check();
+      setUpdater(update);
       if (update?.available) {
         setOldVersion(update.currentVersion);
         setNewVersion(update.version);
@@ -21,7 +26,7 @@ export const useUpdater = () => {
         let downloaded = 0;
         let contentLength = 0;
 
-        await update.downloadAndInstall((event) => {
+        await update.download((event) => {
           switch (event.event) {
             case 'Started': {
               contentLength = event.data.contentLength ?? 0;
@@ -42,6 +47,7 @@ export const useUpdater = () => {
           }
         });
       }
+
       setDownloading(false);
     };
 
@@ -57,10 +63,12 @@ export const useUpdater = () => {
 
   const handleRelaunch = async () => {
     try {
-      await relaunch();
+      if (updater) {
+        await updater.install();
+        await relaunch();
+      }
     } catch (err) {
-      // biome-ignore lint/suspicious/noConsole: <explanation>
-      console.error(`[Failed to launch app]: ${err}`);
+      NOTIFY.error(`[Failed to launch app]: ${err}`);
     }
   };
 
