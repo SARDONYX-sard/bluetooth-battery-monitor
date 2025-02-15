@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.5.1] - 2025-02-15
+### :bug: Bug Fixes
+- [`0c590ee`](https://github.com/SARDONYX-sard/bluetooth-battery-monitor/commit/0c590ee33f490358bc2fc8c276bedd987418779a) - enhance update_tray_inner function for better icon handling *(commit by [@SARDONYX-sard](https://github.com/SARDONYX-sard))*
+
+
 ## [0.5.0] - 2025-02-13
 ### :sparkles: New Features
 - [`4e768d2`](https://github.com/SARDONYX-sard/bluetooth-battery-monitor/commit/4e768d2462a9c4b73a61e28ab9a3cc7446475a03) - add updater functionality and configuration for desktop platforms *(commit by [@SARDONYX-sard](https://github.com/SARDONYX-sard))*
@@ -100,3 +105,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [0.4.1]: https://github.com/SARDONYX-sard/bluetooth-battery-monitor/compare/0.4.0...0.4.1
 [0.4.2]: https://github.com/SARDONYX-sard/bluetooth-battery-monitor/compare/0.4.1...0.4.2
 [0.5.0]: https://github.com/SARDONYX-sard/bluetooth-battery-monitor/compare/0.4.3...0.5.0
+[0.5.1]: https://github.com/SARDONYX-sard/bluetooth-battery-monitor/compare/0.5.0...0.5.1
