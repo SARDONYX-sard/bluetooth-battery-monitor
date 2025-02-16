@@ -1,15 +1,10 @@
-use crate::{cmd::device_watcher::restart_device_watcher_inner, err_log};
+use crate::{cmd::device_watcher::restart_device_watcher_inner, err_log, exec_hidden_cmd};
 use parse_display::{Display, FromStr};
-use std::{
-    process::Command,
-    str::FromStr,
-    sync::{Arc, Mutex},
-};
-use tauri::{
-    menu::{Menu, MenuItem},
-    tray::{MouseButton, MouseButtonState, TrayIcon, TrayIconBuilder},
-    AppHandle, Manager as _,
-};
+use std::str::FromStr;
+use std::sync::{Arc, Mutex};
+use tauri::menu::{Menu, MenuItem};
+use tauri::tray::{MouseButton, MouseButtonState, TrayIcon, TrayIconBuilder};
+use tauri::{AppHandle, Manager as _};
 
 pub static TRAY_ICON: Mutex<Option<TrayIcon>> = Mutex::new(None);
 
@@ -120,7 +115,7 @@ pub fn new_tray_menu(app: &AppHandle<tauri::Wry>) -> Result<(), tauri::Error> {
                         };
                     }
                     MenuId::BtOsMenu => {
-                        err_log!(Command::new("cmd")
+                        err_log!(exec_hidden_cmd("cmd")
                             .args(["/c", "start", "ms-settings:bluetooth"])
                             .output());
                     }

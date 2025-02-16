@@ -1,3 +1,4 @@
+use crate::exec_hidden_cmd;
 use tauri::AppHandle;
 use tauri_plugin_notification::NotificationExt as _;
 
@@ -11,13 +12,8 @@ pub fn notify(app: &AppHandle, message: &str) -> Result<(), tauri_plugin_notific
     // See: [[bug] No notification sound on Windows](https://github.com/tauri-apps/tauri/issues/6652)
     #[cfg(windows)]
     {
-        use std::os::windows::process::CommandExt as _;
-        use std::process::Command;
-        const CREATE_NO_WINDOW: u32 = 0x08000000;
-
-        crate::err_log!(Command::new("powershell.exe")
+        crate::err_log!(exec_hidden_cmd("powershell.exe")
             .arg("[System.Media.SystemSounds]::Asterisk.Play()")
-            .creation_flags(CREATE_NO_WINDOW)
             .output());
     }
     app.notification()
