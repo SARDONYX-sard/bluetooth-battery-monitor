@@ -4,7 +4,7 @@ use windows::Devices::Enumeration::{
     DeviceInformation, DeviceInformationKind, DeviceInformationUpdate, DeviceWatcher,
     DeviceWatcherStatus,
 };
-use windows::Foundation::Collections::IIterable;
+use windows_collections::IIterable;
 use windows::Foundation::TypedEventHandler;
 
 use super::address_parser::id_to_address;

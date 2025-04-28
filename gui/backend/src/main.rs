@@ -61,17 +61,3 @@ macro_rules! err_log {
         }
     };
 }
-
-/// Shell execution with hidden flag.
-pub(crate) fn exec_hidden_cmd<S>(cmd: S) -> std::process::Command
-where
-    S: AsRef<std::ffi::OsStr>,
-{
-    use std::os::windows::process::CommandExt as _;
-    use std::process::Command;
-    const CREATE_NO_WINDOW: u32 = 0x08000000;
-
-    let mut cmd = Command::new(cmd);
-    cmd.creation_flags(CREATE_NO_WINDOW);
-    cmd
-}
