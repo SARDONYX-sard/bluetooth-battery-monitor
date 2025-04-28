@@ -23,6 +23,6 @@ pub async fn open_bluetooth_menu() -> windows::core::Result<bool> {
     use windows::Foundation::Uri;
     use windows::System::Launcher;
 
-    let uri = Uri::CreateUri(h!("ms-settings:privacy-webcam"))?;
+    let uri = Uri::CreateUri(h!("ms-settings:bluetooth"))?;
     Launcher::LaunchUriAsync(&uri)?.await
 }
