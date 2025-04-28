@@ -4,8 +4,8 @@ use windows::Devices::Enumeration::{
     DeviceInformation, DeviceInformationKind, DeviceInformationUpdate, DeviceWatcher,
     DeviceWatcherStatus,
 };
-use windows_collections::IIterable;
 use windows::Foundation::TypedEventHandler;
+use windows_collections::IIterable;
 
 use super::address_parser::id_to_address;
 use super::device_info::get_bluetooth_devices;
