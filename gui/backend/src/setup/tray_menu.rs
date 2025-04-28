@@ -1,4 +1,4 @@
-use crate::{cmd::device_watcher::restart_device_watcher_inner, err_log, exec_hidden_cmd};
+use crate::{cmd::device_watcher::restart_device_watcher_inner, err_log};
 use parse_display::{Display, FromStr};
 use std::str::FromStr;
 use std::sync::{Arc, Mutex};
@@ -115,9 +115,9 @@ pub fn new_tray_menu(app: &AppHandle<tauri::Wry>) -> Result<(), tauri::Error> {
                         };
                     }
                     MenuId::BtOsMenu => {
-                        err_log!(exec_hidden_cmd("cmd")
-                            .args(["/c", "start", "ms-settings:bluetooth"])
-                            .output());
+                        tauri::async_runtime::spawn(async move {
+                            err_log!(bluetooth::utils::open_bluetooth_menu().await);
+                        });
                     }
                     MenuId::Quit => std::process::exit(0),
                 },

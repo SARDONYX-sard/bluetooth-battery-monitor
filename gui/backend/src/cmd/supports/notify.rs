@@ -1,4 +1,3 @@
-use crate::exec_hidden_cmd;
 use tauri::AppHandle;
 use tauri_plugin_notification::NotificationExt as _;
 
@@ -11,14 +10,13 @@ use tauri_plugin_notification::NotificationExt as _;
 pub fn notify(app: &AppHandle, message: &str) -> Result<(), tauri_plugin_notification::Error> {
     // See: [[bug] No notification sound on Windows](https://github.com/tauri-apps/tauri/issues/6652)
     #[cfg(windows)]
-    {
-        crate::err_log!(exec_hidden_cmd("powershell.exe")
-            .arg("[System.Media.SystemSounds]::Asterisk.Play()")
-            .output());
+    if let Err(err) = bluetooth::utils::play_asterisk() {
+        tracing::error!("Failed to play sound: {err}");
     }
+
     app.notification()
         .builder()
-        .title("[bluetooth battery monitor]")
+        .title("[Bluetooth Battery Monitor]")
         .body(message)
         .show()
 }

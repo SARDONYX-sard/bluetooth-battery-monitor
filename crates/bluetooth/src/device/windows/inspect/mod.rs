@@ -2,7 +2,7 @@ mod errors;
 mod impls;
 
 use windows::core::{IInspectable, HSTRING};
-use windows::Foundation::Collections::IKeyValuePair;
+use windows_collections::IKeyValuePair;
 
 pub use errors::RevealError;
 pub use impls::RevealValue;
