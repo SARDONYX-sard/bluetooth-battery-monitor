@@ -18,7 +18,7 @@ pub fn play_asterisk() -> windows::core::Result<()> {
 ///
 /// # Errors
 /// Returns an error if the settings fails to open.
-pub async fn goto_bluetooth_menu() -> windows::core::Result<bool> {
+pub async fn open_bluetooth_menu() -> windows::core::Result<bool> {
     use windows::core::h;
     use windows::Foundation::Uri;
     use windows::System::Launcher;

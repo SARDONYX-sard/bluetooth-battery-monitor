@@ -116,7 +116,7 @@ pub fn new_tray_menu(app: &AppHandle<tauri::Wry>) -> Result<(), tauri::Error> {
                     }
                     MenuId::BtOsMenu => {
                         tauri::async_runtime::spawn(async move {
-                            err_log!(bluetooth::utils::goto_bluetooth_menu().await);
+                            err_log!(bluetooth::utils::open_bluetooth_menu().await);
                         });
                     }
                     MenuId::Quit => std::process::exit(0),
