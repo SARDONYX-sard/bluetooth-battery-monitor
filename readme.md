@@ -2,7 +2,7 @@
 
 <div align="center">
   <a href="https://github.com/SARDONYX-sard/bluetooth-battery-monitor/releases">
-    <img src="./gui/backend/icons/128x128.png" alt="Bluetooth Battery Monitor" />
+    <img src="./gui/backend/icons/icon.svg" alt="Bluetooth Battery Monitor" />
   </a>
 
   <!-- Release Badges -->

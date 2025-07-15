@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="150px" height="150px" viewBox="-0.5 -0.5 515 515">
+  <defs>
+    <linearGradient id="blue-line" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#3aa2de" />
+      <stop offset="100%" stop-color="#0077cc" />
+    </linearGradient>
+    <linearGradient id="green-line" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#00cccc" />
+      <stop offset="100%" stop-color="#006666" />
+    </linearGradient>
+    <radialGradient id="glow-circle" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#ffff99" />
+      <stop offset="100%" stop-color="#cccc00" />
+    </radialGradient>
+  </defs>
+
+  <g>
+    <path
+      d="M 257 17 C 379.84 17 482.85 109.75 495.69 231.91 C 508.53 354.08 427.05 466.22 306.9 491.76 C 186.75 517.29 66.7 447.99 28.75 331.16"
+      fill="none" stroke="url(#blue-line)" stroke-width="35" stroke-miterlimit="10" transform="rotate(90,257,257)" />
+    <path
+      d="M 257 79.5 C 349.13 79.5 426.38 148.1 436.01 238.45 C 445.64 328.8 384.54 411.73 294.42 430.62 C 204.31 449.51 114.28 398.25 85.81 311.85"
+      fill="none" stroke="url(#green-line)" stroke-width="42" stroke-miterlimit="10" transform="rotate(270,257,257)" />
+    <ellipse cx="257" cy="257" rx="85" ry="85" fill="none" stroke="url(#glow-circle)" stroke-width="35" />
+  </g>
+</svg>
