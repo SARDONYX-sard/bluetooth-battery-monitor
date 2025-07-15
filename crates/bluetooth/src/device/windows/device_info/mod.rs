@@ -198,6 +198,6 @@ mod tests {
     fn test_bluetooth_devices() {
         let devices = get_bluetooth_devices().unwrap_or_else(|err| panic!("{err}"));
         let json = serde_json::to_string_pretty(&devices).unwrap_or_else(|err| panic!("{err}"));
-        println!("{}", json);
+        println!("{json}");
     }
 }

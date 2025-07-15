@@ -83,7 +83,7 @@ mod tests {
 
         match u32::try_from(category) {
             Ok(bt_class) => assert_eq!(bt_class, expected_cod),
-            Err(err) => panic!("Failed with error: {:?}", err),
+            Err(err) => panic!("Failed with error: {err:?}"),
         }
     }
 
@@ -97,7 +97,7 @@ mod tests {
         let bt_class = 2360324;
         match Category::try_from(bt_class) {
             Ok(category) => assert_eq!(category, expected_category),
-            Err(err) => panic!("Failed with error: {:?}", err),
+            Err(err) => panic!("Failed with error: {err:?}"),
         };
 
         let expected_category = Category {

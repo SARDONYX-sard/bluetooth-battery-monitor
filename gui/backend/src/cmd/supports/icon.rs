@@ -46,7 +46,7 @@ pub(crate) fn create_battery_image(
         x: width as f32 * 0.80, // Scale relative to icon size
         y: height as f32 * 0.80,
     };
-    let text = format!("{}", battery_level); // Convert battery level to string
+    let text = format!("{battery_level}"); // Convert battery level to string
 
     // Calculate text position to center it
     let text_width = (scale.x * text.len() as f32 * 0.5) as i32; // Approximate text width
