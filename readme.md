@@ -1,23 +1,51 @@
 # Bluetooth Battery Monitor
 
-<div>
-    <a href="https://github.com/SARDONYX-sard/bluetooth-battery-monitor/actions/workflows/lint-and-test.yaml">
-        <img src="https://github.com/SARDONYX-sard/bluetooth-battery-monitor/actions/workflows/lint-and-test.yaml/badge.svg" alt="Lint&Test">
+<div align="center">
+  <a href="https://github.com/SARDONYX-sard/bluetooth-battery-monitor/releases">
+    <img src="./gui/backend/icons/128x128.png" alt="Bluetooth Battery Monitor" />
+  </a>
+
+  <!-- Release Badges -->
+  <p>
+    <a href="https://github.com/SARDONYX-sard/bluetooth-battery-monitor/releases/latest">
+      <img src="https://img.shields.io/github/v/release/SARDONYX-sard/bluetooth-battery-monitor?style=flat-square" alt="Latest Release">
+    </a>
+    <a href="https://github.com/SARDONYX-sard/bluetooth-battery-monitor/releases">
+      <img src="https://img.shields.io/github/downloads/SARDONYX-sard/bluetooth-battery-monitor/total?style=flat-square" alt="Total Downloads">
     </a>
     <a href="https://github.com/SARDONYX-sard/bluetooth-battery-monitor/actions/workflows/release-gui.yaml">
-        <img src="https://github.com/SARDONYX-sard/bluetooth-battery-monitor/actions/workflows/release-gui.yaml/badge.svg" alt="Release">
+      <img src="https://github.com/SARDONYX-sard/bluetooth-battery-monitor/actions/workflows/release-gui.yaml/badge.svg?style=flat-square" alt="Release GUI Status">
     </a>
     <a href="https://opensource.org/licenses/MIT">
-        <img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License">
+      <img src="https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square" alt="License: MIT">
     </a>
     <a href="https://opensource.org/licenses/Apache-2.0">
-        <img src="https://img.shields.io/badge/License-Apache_2.0-blue.svg" alt="License">
+      <img src="https://img.shields.io/badge/License-Apache_2.0-blue.svg?style=flat-square" alt="License: Apache 2.0">
     </a>
-</div>
+    <a href="https://github.com/SARDONYX-sard/bluetooth-battery-monitor/stargazers">
+      <img src="https://img.shields.io/github/stars/SARDONYX-sard/bluetooth-battery-monitor?style=social" alt="GitHub Stars">
+    </a>
+  </p>
 
-<p align="center">
-   <img src="./gui/backend/icons/128x128.png" alt="bluetooth battery monitor icon"/>
-</p>
+  <!-- Development Badges -->
+  <p>
+    <a href="https://github.com/SARDONYX-sard/bluetooth-battery-monitor/actions/workflows/lint-and-test.yaml">
+      <img src="https://github.com/SARDONYX-sard/bluetooth-battery-monitor/actions/workflows/lint-and-test.yaml/badge.svg?style=flat-square" alt="Lint & Test Status">
+    </a>
+    <a href="https://github.com/SARDONYX-sard/bluetooth-battery-monitor/issues">
+      <img src="https://img.shields.io/github/issues/SARDONYX-sard/bluetooth-battery-monitor?style=flat-square" alt="Open Issues">
+    </a>
+    <a href="https://github.com/SARDONYX-sard/bluetooth-battery-monitor/pulls">
+      <img src="https://img.shields.io/github/issues-pr/SARDONYX-sard/bluetooth-battery-monitor?style=flat-square" alt="Open PRs">
+    </a>
+    <a href="https://github.com/SARDONYX-sard/bluetooth-battery-monitor/commits/main">
+      <img src="https://img.shields.io/github/last-commit/SARDONYX-sard/bluetooth-battery-monitor?style=flat-square" alt="Last Commit">
+    </a>
+    <a href="https://github.com/SARDONYX-sard/bluetooth-battery-monitor">
+      <img src="https://img.shields.io/github/languages/code-size/SARDONYX-sard/bluetooth-battery-monitor?style=flat-square" alt="Code Size">
+    </a>
+  </p>
+</div>
 
 ## Getting Started for User
 
